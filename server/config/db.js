@@ -1,21 +1,26 @@
 import dotenv from 'dotenv';
-import { neon } from '@neondatabase/serverless';
+import pkg from 'pg';
 
 dotenv.config();
 
-// Initialize Neon database connection
-const sql = neon(process.env.DATABASE_URL);
+const { Pool } = pkg;
 
-// Database connection function
+// Initialize PostgreSQL connection pool
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false, // Required for Neon PostgreSQL with SSL
+    },
+});
+
+// Test the connection
 const connectDB = async () => {
     try {
-        // Check the database connection by querying the version
-        const result = await sql`SELECT version()`;
-        const { version } = result[0];
-        console.log(`Connected to the database. Version: ${version}`);
+        const result = await pool.query('SELECT version()');
+        console.log(`Connected to the database. Version: ${result.rows[0].version}`);
     } catch (error) {
-        console.error("Error connecting to the database:", error);
+        console.error('Error connecting to the database:', error);
     }
 };
 
-export { connectDB };
+export { pool, connectDB };
