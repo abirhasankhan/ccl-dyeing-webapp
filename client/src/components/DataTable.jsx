@@ -12,7 +12,7 @@ import {
 	Box,
 	Text,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const DataTable = ({
 	data,
@@ -23,11 +23,43 @@ const DataTable = ({
 	rowsPerPage = 10,
 }) => {
 	const [currentPage, setCurrentPage] = useState(1);
+	const [sortConfig, setSortConfig] = useState(null);
 
+	// Pagination
 	const totalPages = Math.ceil(data.length / rowsPerPage);
 	const startIndex = (currentPage - 1) * rowsPerPage;
 	const currentPageData = data.slice(startIndex, startIndex + rowsPerPage);
 
+	// Sorting
+	const sortedData = useMemo(() => {
+		let sortableData = [...data];
+		if (sortConfig !== null) {
+			sortableData.sort((a, b) => {
+				if (a[sortConfig.key] < b[sortConfig.key]) {
+					return sortConfig.direction === "ascending" ? -1 : 1;
+				}
+				if (a[sortConfig.key] > b[sortConfig.key]) {
+					return sortConfig.direction === "ascending" ? 1 : -1;
+				}
+				return 0;
+			});
+		}
+		return sortableData;
+	}, [data, sortConfig]);
+
+	const requestSort = (key) => {
+		let direction = "ascending";
+		if (
+			sortConfig &&
+			sortConfig.key === key &&
+			sortConfig.direction === "ascending"
+		) {
+			direction = "descending";
+		}
+		setSortConfig({ key, direction });
+	};
+
+	// Pagination controls
 	const handleNextPage = () => {
 		if (currentPage < totalPages) {
 			setCurrentPage(currentPage + 1);
@@ -41,22 +73,36 @@ const DataTable = ({
 	};
 
 	return (
-		<Box>
-			<TableContainer mt={10}>
+		<Box overflowX="auto" mt={10}>
+			<TableContainer>
 				<Table variant="striped" colorScheme="teal">
 					{caption && <TableCaption>{caption}</TableCaption>}
 					<Thead>
 						<Tr>
 							{columns.map((column) => (
-								<Th key={column.accessor}>{column.Header}</Th>
+								<Th
+									key={column.accessor}
+									isNumeric={column.isNumeric}
+									onClick={() => requestSort(column.accessor)}
+									style={{ cursor: "pointer" }} // Make it look clickable
+								>
+									{column.Header}
+									{sortConfig?.key === column.accessor && (
+										<span>
+											{sortConfig.direction ===
+											"ascending"
+												? "↑"
+												: "↓"}
+										</span>
+									)}
+								</Th>
 							))}
-							<Th>Actions</Th>{" "}
-							{/* Add an extra column for actions */}
+							<Th>Actions</Th>
 						</Tr>
 					</Thead>
 					<Tbody>
 						{currentPageData.map((row, index) => (
-							<Tr key={index}>
+							<Tr key={row.id}>
 								{columns.map((column) => (
 									<Td
 										key={column.accessor}
@@ -67,18 +113,17 @@ const DataTable = ({
 								))}
 								<Td>
 									<HStack spacing={4}>
-										{/* Edit Button */}
 										<Button
 											colorScheme="blue"
 											onClick={() => onEdit(row)}
 										>
 											Edit
 										</Button>
-										{/* Delete Button */}
 										<Button
 											colorScheme="red"
-											onClick={() => onDelete(row)}
-											isDisabled={false} // Add any condition to disable delete
+											onClick={() =>
+												onDelete(row.clientid)
+											} // Pass the client ID to the delete handler
 										>
 											Delete
 										</Button>

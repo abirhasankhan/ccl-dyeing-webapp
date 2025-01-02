@@ -8,6 +8,7 @@ export const useClientStore = create((set) => ({
 
     // Create a new client
     createClient: async (newClient) => {
+
         if (!newClient.companyname || !newClient.address || !newClient.contact || !newClient.email) {
             return {
                 success: false,
@@ -60,7 +61,52 @@ export const useClientStore = create((set) => ({
             console.error("Error fetching client data:", error);
             // Handle error (e.g., set error state or show a notification)
         }
-    }
+    },
+
+    // Update an existing client
+    updateClient: async (id, updatedClient) => {
+
+        try {
+            const res = await axios.put(`/api/client/update/${id}`, updatedClient);
+
+            if (res.status === 200 || res.status === 201) {
+                set((state) => ({
+                    client: state.client.map((client) => {
+                        if (client.clientid === id) {
+                            return { ...client, ...updatedClient };  // Merge existing client data with updated data
+                        }
+                        return client;
+                    }),
+                }));
+                return { success: true, message: "Client updated successfully" };
+            } else {
+                return { success: false, message: "Failed to update client" };
+            }
+        } catch (error) {
+            console.error("Error updating client:", error);
+            return { success: false, message: "An error occurred while updating the client." };
+        }
+    },
+
+    // Delete an existing client
+    deleteClient: async (id) => {
+        try {
+            const res = await axios.delete(`/api/client/${id}`);
+
+            if (res.status === 200 || res.status === 201) {
+                set((state) => ({
+                    client: state.client.filter((client) => client.clientid !== id),
+                }));
+                return { success: true, message: "Client deleted successfully" };
+            } else {
+                return { success: false, message: "Failed to delete client" };
+            }
+        } catch (error) {
+            console.error("Error deleting client:", error);
+            return { success: false, message: "An error occurred while deleting the client." };
+        }
+    },
+
 
 
 

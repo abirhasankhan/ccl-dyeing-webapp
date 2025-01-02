@@ -276,40 +276,31 @@ export const updateClient = async (req, res) => {
 
 // Delete a client
 export const deleteClient = async (req, res) => {
-
     const { id } = req.params;
 
     try {
-
         const result = await db.delete(Client)
             .where(eq(Client.clientid, id))
             .returning();
 
         if (result.length === 0) {
-            return res.status(404).send(
-                { 
-                    success: false,
-                    message: "Client not found." 
-
-                }
-            );
+            return res.status(404).send({
+                success: false,
+                message: "Client not found.",
+            });
         }
 
-        res.status(200).json(
-            { 
-                success: true,
-                message: "Client deleted successfully." 
-
-            }
-        );
+        // Return 200 with a success message
+        res.status(200).json({
+            success: true,
+            message: "Client deleted successfully.",
+        });
     } catch (error) {
-
-        return res.status(500).send(
-            {
-                success: false,
-                message: "Internal server error",
-                details: error.message
-            }
-        );
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            details: error.message,
+        });
     }
 };
+

@@ -14,7 +14,7 @@ router.post("/create", createClient);
 router.get("/clients", getClients);
 router.get("/search", searchClientsByName); // Search clients by name
 router.get("/:id", getClientById);
-router.put("/:id", updateClient);
+router.put("/update/:id", updateClient);
 router.delete("/:id", deleteClient);
 
 export default router;
