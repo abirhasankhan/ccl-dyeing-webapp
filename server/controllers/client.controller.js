@@ -1,6 +1,6 @@
 import { db } from "../config/drizzleSetup.js";
 import { Client } from "../models/client.model.js";
-import { eq, sql, ilike, or } from 'drizzle-orm';
+import { eq, sql, ilike, or, ne, and } from 'drizzle-orm';
 
 
 
@@ -20,18 +20,27 @@ export const createClient = async (req, res) => {
 
     try {
 
-        // Check for duplicate email or contact 
+        // Normalize inputs by trimming strings
+        const normalizedCompanyName = companyname.trim();
+        const normalizedAddress = address.trim();
+        const normalizedContact = contact.trim();
+        const normalizedEmail = email.trim().toLowerCase(); // Trim and lowercase email
+        const normalizedRemarks = remarks?.trim() || null; // Trim remarks or set to null
+
+        // Check for duplicate email or contact
+
         // Using an Arrow Function
         // const existingClient = await db
         //     .select()
         //     .from(Client)
-        //     .where((row) => row.email === email || row.contact === contact);
+        //     .where((row) => row.email === normalizedEmail || row.contact === normalizedContact);
+
 
         //Using an Equality Function 
         const existingClient = await db
             .select()
             .from(Client)
-            .where(or(eq(Client.email, email), eq(Client.contact, contact)));
+            .where(or(eq(Client.email, normalizedEmail), eq(Client.contact, normalizedContact)));
 
         if (existingClient.length > 0) {
             return res.status(400).send(
@@ -42,11 +51,11 @@ export const createClient = async (req, res) => {
         }
 
         const newClient = {
-            companyname,
-            address,
-            contact,
-            email,
-            remarks,
+            companyname: normalizedCompanyName,
+            address: normalizedAddress,
+            contact: normalizedContact,
+            email: normalizedEmail,
+            remarks: normalizedRemarks,
         };
 
         const result = await db.insert(Client).values(newClient).returning();
@@ -113,7 +122,12 @@ export const getClientById = async (req, res) => {
             );
         }
 
-        return res.status(200).json(client[0]);
+        return res.status(200).json(
+            {
+                success: true,
+                data: client[0]
+            }
+        );
 
     } catch (error) {
         return res.status(500).send(
@@ -132,15 +146,16 @@ export const searchClientsByName = async (req, res) => {
 
     const { name } = req.query;
 
-    try {
+    if (!name) {
+        return res.status(400).send(
+            {
+                message: "Name query parameter is required."
+            }
+        );
+    }
 
-        if (!name) {
-            return res.status(400).send(
-                {
-                    message: "Name query parameter is required."
-                }
-            );
-        }
+
+    try {
 
         const clients = await db
             .select()
@@ -177,89 +192,85 @@ export const searchClientsByName = async (req, res) => {
 
 // Update a client
 export const updateClient = async (req, res) => {
-
     const { id } = req.params;  // Get client ID from request parameters
     const { companyname, address, contact, email, remarks, status } = req.body;  // Get updated client data from request body
 
     try {
-
+        // Check if the client exists
         const client = await db.select()
             .from(Client)
             .where(eq(Client.clientid, id));
 
         if (client.length === 0) {
-            return res.status(404).send(
-                { 
-                    success: false,
-                    message: "Client not found."
-
-                }
-            );
+            return res.status(404).send({
+                success: false,
+                message: "Client not found."
+            });
         }
+
+        // Normalize inputs
+        const normalizedCompanyName = companyname?.trim();
+        const normalizedAddress = address?.trim();
+        const normalizedContact = contact?.trim();
+        const normalizedEmail = email?.trim().toLowerCase();  // Trim and lowercase email
+        const normalizedRemarks = remarks?.trim() || null;    // Trim remarks or set to null
+        const normalizedStatus = status?.trim();
 
         // Check if there's another client with the same email or contact (excluding the current client)
         const existingClient = await db
             .select()
             .from(Client)
             .where(
-                sql`clientid != ${id}`,  // Ensure we are not checking the current client
-                sql`email = ${email}`,    // Check for the same email
-                sql`contact = ${contact}` // Check for the same contact
+                and(
+                    ne(Client.clientid, id), // Ensure we are not checking the current client
+                    or(eq(Client.email, normalizedEmail), eq(Client.contact, normalizedContact)) // Check for duplicates
+                )
             );
 
-        // If a client with the same email or contact exists, return a 400 error
         if (existingClient && existingClient.length > 0) {
-            return res.status(400).send(
-                {
-                    success: false,
-                    message: "A client with this email or contact number already exists."
-                }
-            );
+            return res.status(400).send({
+                success: false,
+                message: "A client with this email or contact number already exists."
+            });
         }
 
         // Prepare the updated client data
         const updatedClient = {
-            companyname,
-            address,
-            contact,
-            email,
-            remarks,
-            status,
+            companyname: normalizedCompanyName,
+            address: normalizedAddress,
+            contact: normalizedContact,
+            email: normalizedEmail,
+            remarks: normalizedRemarks,
+            status: normalizedStatus,
         };
 
         // Perform the update operation on the Client table
         const result = await db
-            .update(Client)  // Specify the table to update
-            .set(updatedClient)  // Set the updated values for the client
+            .update(Client)
+            .set(updatedClient)
             .where(eq(Client.clientid, id))
-            .returning();  // Return the updated client
+            .returning();
 
         // If no client is updated (client not found), return a 404 error
         if (result && result.length === 0) {
-            return res.status(404).send(
-                {
-                    success: false,
-                    message: "Client not found."
-                }
-            );
+            return res.status(404).send({
+                success: false,
+                message: "Client not found."
+            });
         }
 
         // If successful, return the updated client data
-        res.status(200).json(
-            {
-                success: true,
-                data: result[0]
-            }
-        );
+        res.status(200).json({
+            success: true,
+            data: result[0]
+        });
 
     } catch (error) {
-        return res.status(500).send(
-            {
-                success: false,
-                message: "Internal server error",
-                details: error.message
-            }
-        );
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            details: error.message
+        });
     }
 };
 
