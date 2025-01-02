@@ -1,6 +1,6 @@
 import { db } from "../config/drizzleSetup.js";
 import { Client } from "../models/client.model.js";
-import { eq, sql, ilike, or, ne, and } from 'drizzle-orm';
+import { eq, ilike, or, ne, and } from 'drizzle-orm';
 
 
 
@@ -78,28 +78,27 @@ export const createClient = async (req, res) => {
 };
 
 // Get all clients
+
 export const getClients = async (req, res) => {
-
     try {
+        const clients = await db
+            .select()
+            .from(Client)
+            .orderBy(Client.clientid); // Sorting by clientid in ascending order
 
-        const clients = await db.select().from(Client);
-        
-        res.status(200).json(
-            {
-                success: true,
-                data: clients
-            }
-        );
+        res.status(200).json({
+            success: true,
+            data: clients,
+        });
     } catch (error) {
-        res.status(500).json(
-            {
-                success: false,
-                message: "Internal server error",
-                details: error.message
-            }
-        );
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            details: error.message,
+        });
     }
 };
+
 
 // Get a client by ID
 export const getClientById = async (req, res) => {

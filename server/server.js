@@ -27,8 +27,8 @@ app.get('/', (req, res) => {
     res.send('Server is running');
 });
 
-app.use('/auth', authRoutes);
-app.use('/clients', clientRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/client', clientRoutes);
 
 // Connect to the database
 (async () => {
