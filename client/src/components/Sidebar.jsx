@@ -52,7 +52,7 @@ const Sidebar = () => {
 			} text-white flex flex-col p-6 shadow-md overflow-y-auto`}
 		>
 			<h2 className="text-2xl font-bold mb-8 text-center text-yellow-400">
-				Dashboard
+				Dyeing
 			</h2>
 			<ul className="space-y-6">
 				{sidebarItems.map((item, index) => (
