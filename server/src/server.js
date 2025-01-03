@@ -3,11 +3,12 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 
-import { createSchema } from "./models/user.model.js";
-import { createClientSchema } from './models/client.model.js';
+import { 
+    authRoutes, 
+    clientRoutes, 
+    dyeingFinishingPricesRoutes 
+} from './routes/index.js';
 
-import authRoutes from './routes/auth.route.js';
-import clientRoutes from './routes/client.routes.js';
 // Load environment variables
 dotenv.config();
 
@@ -29,17 +30,18 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/client', clientRoutes);
+app.use('/api/dyeing-finishing-prices', dyeingFinishingPricesRoutes);
 
 // Connect to the database
 (async () => {
+
     await connectDB();
-    await createSchema(); 
-    await createClientSchema();
 
 })();
 
 // Start the server
 const PORT = process.env.PORT || 5001; // Fallback to port 5001 if PORT is not defined
+
 app.listen(PORT, () => {
 
     // Start server after database connection

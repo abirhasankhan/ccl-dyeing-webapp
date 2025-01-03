@@ -1,19 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp } from "drizzle-orm/pg-core"; // Import Drizzle ORM core functions
 import { db } from "../config/drizzleSetup.js"; // Import the Drizzle instance
-
-// Define the Client table schema using Drizzle ORM
-export const Client = pgTable("Clients", {
-    clientid: varchar("clientid", { length: 50 }).primaryKey(), // Client ID
-    companyname: varchar("companyname", { length: 255 }).notNull(), // Company name
-    address: text("address").notNull(), // Address
-    contact: varchar("contact", { length: 20 }).notNull().unique(), // Contact number (unique constraint)
-    email: varchar("email", { length: 50 }).notNull().unique(), // Email address (unique constraint)
-    status: varchar("status", { length: 50 }).default("active"), // Default status is 'active'
-    created_at: timestamp("created_at").defaultNow(), // Automatically set creation timestamp
-    updated_at: timestamp("updated_at").defaultNow(), // Automatically set update timestamp
-    remarks: text("remarks"), // Remarks (optional)
-});
-
 
 // Function to create the Client table manually (if necessary)
 export const createClientSchema = async () => {
@@ -27,6 +12,7 @@ export const createClientSchema = async () => {
 
         // If the result is null, the table does not exist
         if (result.rows[0].to_regclass === null) {
+
             console.log("Clients table does not exist. Creating it...");
 
             // Raw SQL query to create the Clients table with unique constraints

@@ -77,8 +77,8 @@ export const createClient = async (req, res) => {
     }
 };
 
-// Get all clients
 
+// Get all clients
 export const getClients = async (req, res) => {
     try {
         const clients = await db
@@ -140,6 +140,7 @@ export const getClientById = async (req, res) => {
     }
 };
 
+
 // Search clients by ID or name
 export const searchClients = async (req, res) => {
     const { id, name } = req.query;
@@ -186,7 +187,6 @@ export const searchClients = async (req, res) => {
         });
     }
 };
-
 
 
 // Update a client
@@ -303,4 +303,3 @@ export const deleteClient = async (req, res) => {
         });
     }
 };
-

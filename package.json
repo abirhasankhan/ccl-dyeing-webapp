@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon server/server.js"
+    "dev": "nodemon server/src/server.js",
+    "dev-mig": "node server/src/migrations"
   },
   "keywords": [],
   "type": "module",
