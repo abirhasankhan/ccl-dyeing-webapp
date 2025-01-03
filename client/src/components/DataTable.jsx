@@ -15,8 +15,8 @@ import {
 import { useState, useMemo } from "react";
 
 const DataTable = ({
-	data,
-	columns,
+	data = [],
+	columns = [],
 	caption,
 	onEdit,
 	onDelete,
@@ -72,6 +72,10 @@ const DataTable = ({
 		}
 	};
 
+	if (!data || data.length === 0) {
+		return <Text>No data available</Text>;
+	}
+
 	return (
 		<Box overflowX="auto" mt={10}>
 			<TableContainer>
@@ -101,7 +105,7 @@ const DataTable = ({
 						</Tr>
 					</Thead>
 					<Tbody>
-						{currentPageData.map((row, index) => (
+						{currentPageData.map((row) => (
 							<Tr key={row.id}>
 								{columns.map((column) => (
 									<Td
@@ -123,7 +127,7 @@ const DataTable = ({
 											colorScheme="red"
 											onClick={() =>
 												onDelete(row.clientid)
-											} // Pass the client ID to the delete handler
+											}
 										>
 											Delete
 										</Button>

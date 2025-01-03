@@ -3,25 +3,32 @@ import {
 	Text,
 	VStack,
 	Button,
-	useToast,
 	Box,
 	Flex,
 	useDisclosure,
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalCloseButton,
-	ModalBody,
-	ModalFooter,
+	Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useClientStore } from "../store/client";
 
-import { DataTable, FormModal } from "../components";
+import {
+	DataTable,
+	FormModal,
+	DeleteConfirmationModal,
+	SearchBar,
+} from "../components";
+
+import { useToastNotification } from "../hooks/toastUtils";
 
 function ClientPage() {
+	const { showError, showSuccess } = useToastNotification();
+
+	const [clients, setClients] = useState([]);
+	const [searchResults, setSearchResults] = useState([]);
+	const [loading, setLoading] = useState(false); // Loading state
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
+
 	const [newClient, setNewClient] = useState({
 		companyname: "",
 		address: "",
@@ -30,105 +37,6 @@ function ClientPage() {
 		remarks: "",
 		status: "", // Include status for editing
 	});
-
-	// To track whether we're editing or adding a client
-	const [editClientId, setEditClientId] = useState(null);
-
-	// State for handling delete confirmation modal
-	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-	const [clientToDelete, setClientToDelete] = useState(null);
-
-	const toast = useToast();
-
-	const { createClient, fetchClient, updateClient, deleteClient, client } =
-		useClientStore();
-
-	useEffect(() => {
-		fetchClient();
-	}, [fetchClient]);
-
-	// createClient function to handle creating a new client
-	const handleCreateClient = async () => {
-		try {
-			const { success, message } = await createClient(newClient);
-
-			if (!success) {
-				toast({
-					title: "Error",
-					description: message,
-					status: "error",
-					duration: 4000,
-					isClosable: true,
-				});
-			} else {
-				toast({
-					title: "Success",
-					description: message,
-					status: "success",
-					duration: 3000,
-					isClosable: true,
-				});
-				onClose(); // Close the modal after successful creation
-				resetForm(); // Reset form after closing
-			}
-		} catch (error) {
-			console.error("Error creating client:", error);
-			toast({
-				title: "Error",
-				description: "An error occurred while creating the client.",
-				status: "error",
-				duration: 4000,
-				isClosable: true,
-			});
-		}
-	};
-
-	// Function to handle editing a client
-	const handleEditClient = (clientData) => {
-		setEditClientId(clientData.clientid); // Set the client ID to track which client we're editing
-		setNewClient(clientData); // Populate the form with the existing data
-		onOpen(); // Open the modal
-	};
-
-	// Function to handle updating the client
-	const handleUpdateClient = async () => {
-		try {
-			const { success, message } = await updateClient(
-				editClientId,
-				newClient
-			);
-
-			if (!success) {
-				toast({
-					title: "Error",
-					description: message,
-					status: "error",
-					duration: 4000,
-					isClosable: true,
-				});
-			} else {
-				toast({
-					title: "Success",
-					description: message,
-					status: "success",
-					duration: 3000,
-					isClosable: true,
-				});
-				onClose(); // Close the modal after successful update
-				resetForm(); // Reset form after closing
-				setEditClientId(null); // Reset the edit client ID
-			}
-		} catch (error) {
-			console.error("Error updating client:", error);
-			toast({
-				title: "Error",
-				description: "An error occurred while updating the client.",
-				status: "error",
-				duration: 4000,
-				isClosable: true,
-			});
-		}
-	};
 
 	// Reset form data
 	const resetForm = () => {
@@ -140,6 +48,52 @@ function ClientPage() {
 			remarks: "",
 			status: "", // Reset status as well
 		});
+	};
+
+	// To track whether we're editing or adding a client
+	const [editClientId, setEditClientId] = useState(null);
+
+	// State for handling delete confirmation modal
+	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [clientToDelete, setClientToDelete] = useState(null);
+
+	const { createClient, fetchClient, updateClient, deleteClient, client } =
+		useClientStore();
+
+	// Fetch client data on initial load
+	useEffect(() => {
+		const loadClients = async () => {
+			setLoading(true);
+			await fetchClient();
+			setLoading(false);
+		};
+		loadClients();
+	}, [fetchClient]);
+
+	// Update clients when the data changes
+	useEffect(() => {
+		setClients(client);
+		setSearchResults(client); // Set search results to all clients initially
+	}, [client]);
+
+	// Handle search functionality
+	const handleSearch = (query) => {
+		if (query === "") {
+			// If query is empty, show all clients
+			setSearchResults(clients);
+		} else {
+			// Search logic based on multiple fields (id, name, etc.)
+			const results = clients.filter((client) => {
+				return (
+					client.clientid.toString().includes(query) ||
+					client.companyname
+						.toLowerCase()
+						.includes(query.toLowerCase()) ||
+					client.contact.toLowerCase().includes(query.toLowerCase())
+				);
+			});
+			setSearchResults(results); // Set filtered results
+		}
 	};
 
 	const handleChange = (e) => {
@@ -206,43 +160,68 @@ function ClientPage() {
 
 	const caption = "Client Information List"; // Optional Caption for the table
 
+	// createClient function to handle creating a new client
+	const handleCreateClient = async () => {
+		try {
+			const { success, message } = await createClient(newClient);
+			if (!success) {
+				showError(message); // Use the utility function for errors
+			} else {
+				showSuccess(message); // Use the utility function for success
+				onClose();
+				resetForm();
+			}
+		} catch (error) {
+			console.error("Error creating client:", error);
+			showError("An error occurred while creating the client.");
+		}
+	};
+
+	// Function to handle editing a client
+	const handleEditClient = (clientData) => {
+		setEditClientId(clientData.clientid); // Set the client ID to track which client we're editing
+		setNewClient(clientData); // Populate the form with the existing data
+		onOpen(); // Open the modal
+	};
+
+	// Function to handle updating the client
+	const handleUpdateClient = async () => {
+		try {
+			const { success, message } = await updateClient(
+				editClientId,
+				newClient
+			);
+
+			if (!success) {
+				showError(message); // Use the utility function for errors
+			} else {
+				showSuccess(message); // Use the utility function for success
+				onClose();
+				resetForm();
+				setEditClientId(null);
+			}
+		} catch (error) {
+			console.error("Error updating client:", error);
+			showError("An error occurred while updating the client.");
+		}
+	};
+
 	// Delete function
 	const handleDelete = async () => {
 		try {
-			// Call the deleteClient function from the store, passing the client id to delete
 			const { success, message } = await deleteClient(clientToDelete);
-
 			if (!success) {
-				toast({
-					title: "Error",
-					description: message,
-					status: "error",
-					duration: 4000,
-					isClosable: true,
-				});
+				showError(message); // Use the utility function for errors
 			} else {
-				toast({
-					title: "Success",
-					description: message,
-					status: "success",
-					duration: 3000,
-					isClosable: true,
-				});
-				// Optionally, fetch the updated client list
-				fetchClient(); // Ensure the client list is refreshed after deletion
+				showSuccess(message); // Use the utility function for success
+				fetchClient();
 			}
 		} catch (error) {
 			console.error("Error deleting client:", error);
-			toast({
-				title: "Error",
-				description: "An error occurred while deleting the client.",
-				status: "error",
-				duration: 4000,
-				isClosable: true,
-			});
+			showError("An error occurred while deleting the client.");
 		} finally {
-			setDeleteModalOpen(false); // Close the confirmation modal after delete attempt
-			setClientToDelete(null); // Reset client ID after deletion
+			setDeleteModalOpen(false);
+			setClientToDelete(null);
 		}
 	};
 
@@ -255,7 +234,7 @@ function ClientPage() {
 	return (
 		<Box minH="100vh" display="flex" flexDirection="column" px={4}>
 			{/* Full height container */}
-			<Container maxW={"container.xl"} py={12} px={0}>
+			<Container maxW={"container.xl"} py={12}>
 				<VStack spacing={8}>
 					<Text
 						fontSize={"30"}
@@ -274,16 +253,31 @@ function ClientPage() {
 						</Button>
 					</Flex>
 
-					{/* Display DataTable with client data */}
-					{client.length > 0 ? (
+					{/* Search Bar Component */}
+					<SearchBar
+						fields={["clientid", "companyname", "contact"]} // Search by ID, Name, and Contact
+						onSearch={handleSearch}
+						placeholder="Search by ID, Name, or Contact"
+					/>
+
+					{/* Loading Spinner */}
+					{loading ? (
+						<Flex justify="center" mt={8}>
+							<Spinner size="xl" />
+						</Flex>
+					) : (
+						// Display DataTable with client data
 						<DataTable
-							data={client}
+							data={searchResults} // Always show search results or all clients
 							columns={columns}
 							caption={caption}
 							onEdit={handleEditClient} // Pass the handleEditClient function
 							onDelete={openDeleteConfirmation} // Pass the openDeleteConfirmation function
 						/>
-					) : (
+					)}
+
+					{/* Display message when no clients found */}
+					{!loading && searchResults.length === 0 && (
 						<VStack spacing={8} mt={10}>
 							<Text
 								fontSize={"xl"}
@@ -310,34 +304,17 @@ function ClientPage() {
 				handleChange={handleChange}
 				handleSubmit={
 					editClientId ? handleUpdateClient : handleCreateClient
-				} // Decide which function to call based on whether we're editing or adding
+				}
 				modalTitle={editClientId ? "Edit Client" : "Add New Client"}
 				fields={fields} // Pass the dynamic field configuration
 			/>
 
 			{/* Delete Confirmation Modal */}
-			<Modal
+			<DeleteConfirmationModal
 				isOpen={isDeleteModalOpen}
 				onClose={() => setDeleteModalOpen(false)}
-			>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Confirm Deletion</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody>
-						Are you sure you want to delete this client? This action
-						cannot be undone.
-					</ModalBody>
-					<ModalFooter>
-						<Button colorScheme="red" onClick={handleDelete} mr={3}>
-							Delete
-						</Button>
-						<Button onClick={() => setDeleteModalOpen(false)}>
-							Cancel
-						</Button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+				onConfirm={handleDelete}
+			/>
 		</Box>
 	);
 }

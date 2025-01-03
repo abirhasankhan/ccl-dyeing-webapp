@@ -140,53 +140,53 @@ export const getClientById = async (req, res) => {
     }
 };
 
-// Search clients by name
-export const searchClientsByName = async (req, res) => {
+// Search clients by ID or name
+export const searchClients = async (req, res) => {
+    const { id, name } = req.query;
 
-    const { name } = req.query;
-
-    if (!name) {
-        return res.status(400).send(
-            {
-                message: "Name query parameter is required."
-            }
-        );
+    if (!id && !name) {
+        return res.status(400).send({
+            message: "Either 'id' or 'name' query parameter is required."
+        });
     }
-
 
     try {
+        let clients;
 
-        const clients = await db
-            .select()
-            .from(Client)
-            .where(ilike(Client.companyname, `%${name}%`)); // Case-insensitive LIKE search
-
-        if (clients.length === 0) {
-            return res.status(404).json(
-                {
-                    success: false,
-                    message: "No clients found with the specified name."
-                }
-            );
+        if (id) {
+            // Search by ID
+            clients = await db
+                .select()
+                .from(Client)
+                .where(eq(Client.clientid, id));
+        } else if (name) {
+            // Search by name
+            clients = await db
+                .select()
+                .from(Client)
+                .where(ilike(Client.companyname, `%${name}%`)); // Case-insensitive LIKE search
         }
 
-        res.status(200).json(
-            {
-                success: true,
-                data: clients
-            }
-        );
-
-    } catch (error) {
-        return res.status(500).send(
-            {
+        if (clients.length === 0) {
+            return res.status(404).json({
                 success: false,
-                message: "Internal server error",
-                details: error.message
-            }
-        );
+                message: "No clients found with the specified criteria."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: clients
+        });
+    } catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal server error",
+            details: error.message
+        });
     }
 };
+
 
 
 // Update a client
