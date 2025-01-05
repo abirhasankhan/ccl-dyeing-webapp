@@ -16,6 +16,7 @@ export const useClientStore = create((set, get) => ({
 
     // Create a new client
     createClient: async (newClient) => {
+        
         set({ loading: true }); // Start loading
 
         if (!newClient.companyname || !newClient.address || !newClient.contact || !newClient.email) {
