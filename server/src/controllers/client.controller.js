@@ -10,7 +10,7 @@ export const createClient = async (req, res) => {
     const { companyname, address, contact, email, remarks } = req.body;
 
     if (!companyname || !address || !contact || !email) {
-        return res.status(400).send(
+        return res.status(400).json(
             {
                 message: "All fields are required."
 
@@ -67,7 +67,7 @@ export const createClient = async (req, res) => {
         );
 
     } catch (error) {
-        return res.status(500).send(
+        return res.status(500).json(
             {
                 success: false,
                 message: "Internal server error",

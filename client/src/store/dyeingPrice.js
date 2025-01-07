@@ -98,7 +98,12 @@ export const useDyeingPriceStore = create((set, get) => ({
         } catch (error) {
             set({ loading: false }); // End loading
             console.error("Error updating Dyeing Price:", error);
-            return { success: false, message: "An error occurred while updating the Dyeing Price." };
+            const errorMessage = error.response?.data?.message || "An error occurred while updating the Dyeing Price.";
+
+            return { 
+                success: false, 
+                message: errorMessage,
+            };
         }
     },
 

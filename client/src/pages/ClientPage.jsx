@@ -9,7 +9,8 @@ import {
 	Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useClientStore } from "../store/client";
+
+import { useClientStore } from "../store";
 
 import {
 	DataTable,

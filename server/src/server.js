@@ -6,7 +6,8 @@ import { connectDB } from './config/db.js';
 import { 
     authRoutes, 
     clientRoutes, 
-    dyeingFinishingPricesRoutes 
+    dyeingFinishingPricesRoutes,
+    additionalProcessPricesRoutes
 } from './routes/index.js';
 
 // Load environment variables
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/client', clientRoutes);
 app.use('/api/dyeing-finishing-prices', dyeingFinishingPricesRoutes);
+app.use('/api/additional-process-prices', additionalProcessPricesRoutes);
 
 // Connect to the database
 (async () => {

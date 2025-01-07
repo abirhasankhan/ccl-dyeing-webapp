@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { Route, Routes } from "react-router-dom";
 
-import { HomePage, ClientPage } from "./pages";
+import { HomePage, ClientPage, ServicePricePage } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
 function App() {
@@ -48,6 +48,11 @@ function App() {
 						<Routes>
 							<Route path="/" element={<HomePage />} />
 							<Route path="/client" element={<ClientPage />} />
+							<Route
+								path="/service-price"
+								element={<ServicePricePage />}
+							/>
+
 							{/* Other routes */}
 						</Routes>
 					</Box>

@@ -13,6 +13,8 @@ import { useColorMode } from "@chakra-ui/react"; // Import Chakra UI's useColorM
 const sidebarItems = [
 	{ label: "Home", to: "/", icon: <FaHome /> },
 	{ label: "Client", to: "/client", icon: <FaInfoCircle /> },
+	{ label: "Services", to: "/service-price", icon: <FaInfoCircle /> },
+
 	{
 		label: "Services",
 		to: "#",
