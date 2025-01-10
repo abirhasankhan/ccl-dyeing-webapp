@@ -25,12 +25,7 @@ const DataTable = ({
 	const [currentPage, setCurrentPage] = useState(1);
 	const [sortConfig, setSortConfig] = useState(null);
 
-	// Pagination
-	const totalPages = Math.ceil(data.length / rowsPerPage);
-	const startIndex = (currentPage - 1) * rowsPerPage;
-	const currentPageData = data.slice(startIndex, startIndex + rowsPerPage);
-
-	// Sorting
+	// Sorting logic
 	const sortedData = useMemo(() => {
 		let sortableData = [...data];
 		if (sortConfig !== null) {
@@ -59,7 +54,14 @@ const DataTable = ({
 		setSortConfig({ key, direction });
 	};
 
-	// Pagination controls
+	// Pagination logic
+	const totalPages = Math.ceil(sortedData.length / rowsPerPage);
+	const startIndex = (currentPage - 1) * rowsPerPage;
+	const currentPageData = sortedData.slice(
+		startIndex,
+		startIndex + rowsPerPage
+	);
+
 	const handleNextPage = () => {
 		if (currentPage < totalPages) {
 			setCurrentPage(currentPage + 1);
@@ -125,9 +127,7 @@ const DataTable = ({
 										</Button>
 										<Button
 											colorScheme="red"
-											onClick={() =>
-												onDelete(row.clientid)
-											}
+											onClick={() => onDelete(row)}
 										>
 											Delete
 										</Button>

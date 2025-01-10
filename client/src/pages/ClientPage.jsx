@@ -77,6 +77,7 @@ function ClientPage() {
 		setSearchResults(client); // Set search results to all clients initially
 	}, [client]);
 
+
 	// Handle search functionality
 	const handleSearch = (query) => {
 		if (query === "") {
@@ -227,8 +228,8 @@ function ClientPage() {
 	};
 
 	// Open the delete confirmation modal
-	const openDeleteConfirmation = (clientid) => {
-		setClientToDelete(clientid);
+	const openDeleteConfirmation = (clientData) => {
+		setClientToDelete(clientData.clientid);
 		setDeleteModalOpen(true);
 	};
 

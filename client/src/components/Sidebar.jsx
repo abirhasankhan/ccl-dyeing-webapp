@@ -20,8 +20,16 @@ const sidebarItems = [
 		to: "#",
 		icon: <FaBriefcase />,
 		subItems: [
-			{ label: "Web Development", to: "/services/web", icon: <FaCode /> },
-			{ label: "App Development", to: "/services/app", icon: <FaCode /> },
+			{
+				label: "Dyeing Prices",
+				to: "/services/dyeing-prices",
+				icon: <FaCode />,
+			},
+			{
+				label: "Additional Prices",
+				to: "/services/additional-prices",
+				icon: <FaCode />,
+			},
 		],
 	},
 	{

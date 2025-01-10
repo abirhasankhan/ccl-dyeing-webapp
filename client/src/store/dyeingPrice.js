@@ -55,26 +55,27 @@ export const useDyeingPriceStore = create((set, get) => ({
 
     // Fetch Dyeing Price
     fetchDyeingPrice: async () => {
-        set({ loading: true }); // Start loading
+        set({ loading: true });
 
         try {
             const res = await axios.get("/api/dyeing-finishing-prices");
 
-            if (res.status === 200) {
-                set({ dyeingPrices: res.data.data });
+            if(res.status === 200) {
+                set({ dyeingPrices: res.data.data});
             } else {
-                throw new Error("Failed to fetch Dyeing Price data");
+                throw new Error("Faild to fetch data")
             }
+
         } catch (error) {
-            console.error("Error fetching Dyeing Price data:", error);
+            console.error("Error fetching client data:", error);
         } finally {
-            set({ loading: false }); // End loading
+            set({ loading: false });
         }
     },
 
+
     // Update Dyeing Price
     updateDyeingPrice: async (id, updatedDyeingPrice) => {
-
         set({ loading: true }); // Start loading
 
         try {
@@ -82,54 +83,51 @@ export const useDyeingPriceStore = create((set, get) => ({
 
             if (res.status === 200 || res.status === 201) {
                 set((state) => ({
-                    dyeingPrices: state.dyeingPrices.map((dyeingPrice) => {
-                        if (dyeingPrice.id === id) {
-                            return { ...dyeingPrice, ...updatedDyeingPrice };
-                        }
-                        return dyeingPrice;
-                    }),
+                    dyeingPrices: state.dyeingPrices.map((dyeingPrice) =>
+                        dyeingPrice.id === id ? { ...dyeingPrice, ...updatedDyeingPrice } : dyeingPrice
+                    ),
                 }));
-                set({ loading: false }); // End loading
                 return { success: true, message: "Dyeing Price updated successfully" };
-            } else {
-                set({ loading: false }); // End loading
-                return { success: false, message: "Failed to update Dyeing Price" };
             }
-        } catch (error) {
-            set({ loading: false }); // End loading
-            console.error("Error updating Dyeing Price:", error);
-            const errorMessage = error.response?.data?.message || "An error occurred while updating the Dyeing Price.";
+            throw new Error("Failed to update Dyeing Price");
 
-            return { 
-                success: false, 
-                message: errorMessage,
-            };
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "An error occurred while updating the Dyeing Price.";
+            console.error("Error updating Dyeing Price:", errorMessage);
+            return { success: false, message: errorMessage };
+        } finally {
+            set({ loading: false }); // Ensure loading state is cleared
         }
     },
 
+
     // Delete Dyeing Price
     deleteDyeingPrice: async (id) => {
-        set({ loading: true }); // Start loading
+        if (!id) {
+            console.error("ID is undefined or invalid");
+            return { success: false, message: "Invalid Dyeing Price ID" };
+        }
+
+        set({ loading: true });
 
         try {
             const res = await axios.delete(`/api/dyeing-finishing-prices/${id}`);
 
             if (res.status === 200 || res.status === 201) {
-                set((state) => ({ 
-                    dyeingPrices: state.dyeingPrices.filter((dyeingPrice) => dyeingPrice.id !== id) 
+                set((state) => ({
+                    dyeingPrices: state.dyeingPrices.filter((dyeingPrice) => dyeingPrice.df_priceid !== id)
                 }));
-                set({ loading: false }); // End loading 
                 return { success: true, message: "Dyeing Price deleted successfully" };
             } else {
-                set({ loading: false }); // End loading 
-                return { success: false, message: "Failed to delete Dyeing Price" };
+                throw new Error("Failed to delete Dyeing Price");
             }
         } catch (error) {
-            set({ loading: false }); // End loading 
-            console.error("Error deleting Dyeing Price:", error);
-            return { success: false, message: "An error occurred while deleting the Dyeing Price." };
+            const errorMessage = error.response?.data?.message || error.message || "An error occurred while deleting the Dyeing Price.";
+            console.error(`Error deleting Dyeing Price with ID ${id}:`, errorMessage);
+            return { success: false, message: errorMessage };
+        } finally {
+            set({ loading: false });
         }
-    }
+    },
 
-
-}))
+}));

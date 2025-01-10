@@ -20,7 +20,6 @@ import {
 	DataTable,
 	FormModal,
 	DeleteConfirmationModal,
-	SearchBar,
 } from "../components";
 
 import { useToastNotification } from "../hooks/toastUtils";

@@ -31,17 +31,17 @@ export const createDyeingFinishingPrice = async (req, res) => {
 
         const newPrice = {
             color: normalizedColor,
-            shade_percent: normalizedShade_percent,
+            shade_percent: normalizedShade_percent || null,
             tube_tk: normalizedTube_tk,
             open_tk: normalizedOpen_tk,
             elasteen_tk: normalizedElasteen_tk,
-            double_dyeing_tk: normalizedDouble_dyeing_tk,
-            remarks: normalizedRemarks,
+            double_dyeing_tk: normalizedDouble_dyeing_tk || 55,
+            remarks: normalizedRemarks || null,
         };
 
         const insertedPrice = await db.insert(DyeingFinishingPrices).values(newPrice).returning();
 
-        res.status(201).json(
+        return res.status(201).json(
             { 
                 success: true,
                 data: insertedPrice[0],
@@ -49,7 +49,7 @@ export const createDyeingFinishingPrice = async (req, res) => {
         );
 
     } catch (error) {
-        res.status(500).json(
+        return res.status(500).json(
             { 
                 success: false,
                 message: "Failed to create Dyeing Finishing Price", 
@@ -64,14 +64,18 @@ export const createDyeingFinishingPrice = async (req, res) => {
 export const getAllDyeingFinishingPrices = async (req, res) => {
 
     try {
-        const prices = await db.select().from(DyeingFinishingPrices);
-        res.status(200).json({
+        const prices = await db
+            .select()
+            .from(DyeingFinishingPrices)
+            .orderBy(DyeingFinishingPrices.df_priceid);
+
+        return res.status(200).json({
             success: true,
             data: prices,
             
         });
     } catch (error) {
-        res.status(500).json(
+        return res.status(500).json(
             {
                 success: false,
                 message: "Failed to fetch DyeingFinishingPrices", 
@@ -108,8 +112,8 @@ export const updateDyeingFinishingPrice = async (req, res) => {
         const normalizedTube_tk = tube_tk?.trim();
         const normalizedOpen_tk = open_tk?.trim();
         const normalizedElasteen_tk = elasteen_tk?.trim();
-        const normalizedDouble_dyeing_tk = double_dyeing_tk?.trim() || 55; // Trim or set to 55
-        const normalizedRemarks = remarks?.trim() || null; // Trim remarks or set to null
+        const normalizedDouble_dyeing_tk = double_dyeing_tk?.trim(); // Trim or set to 55
+        const normalizedRemarks = remarks?.trim(); // Trim remarks or set to null
 
         // Prepare the updatedPrice data
         const updatedPrice = {
@@ -136,12 +140,12 @@ export const updateDyeingFinishingPrice = async (req, res) => {
                 });
         }
 
-        res.status(200).json({ 
+        return res.status(200).json({
             success: true,
             data: result[0]
         });
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Failed to update Dyeing Finishing Price",
             details: error.message
@@ -156,20 +160,7 @@ export const deleteDyeingFinishingPrice = async (req, res) => {
     const { id } = req.params;
 
     try {
-
-        // Check if the DyeingFinishingPrice exists
-        const existingPrice = await db
-            .select()
-            .from(DyeingFinishingPrices)
-            .where(eq(DyeingFinishingPrices.df_priceid, id));
-
-        if (existingPrice.length === 0) {
-            return res.status(404).send({
-                success: false,
-                message: "Dyeing Finishing Price not found",
-            });
-        }
-
+        
         const deletedPrice = await db.delete(DyeingFinishingPrices)
             .where(eq(DyeingFinishingPrices.df_priceid, id))
             .returning(); // returning() returns the deleted row, not rows affected
@@ -182,14 +173,13 @@ export const deleteDyeingFinishingPrice = async (req, res) => {
             });
         }
 
-        res.status(200).json({ 
+        return res.status(200).json({
             success: true,
             message: "DyeingFinishingPrice deleted",
             data: deletedPrice
         });
     } catch (error) {
-        console.error("Error deleting DyeingFinishingPrice:", error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: "Failed to delete DyeingFinishingPrice",
             error: error.message

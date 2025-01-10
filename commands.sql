@@ -7,8 +7,9 @@ CREATE TABLE DyeingFinishingPrices (
     open_tk DECIMAL(10, 2) NOT NULL,
     elasteen_tk DECIMAL(10, 2) NOT NULL,
     double_dyeing_tk DECIMAL(10, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    remarks TEXT
+    notes TEXT,
+    remarks TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: AdditionalProcessPrices
