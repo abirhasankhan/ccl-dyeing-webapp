@@ -29,13 +29,9 @@ const createAdditionalProcessPrice = asyncHandler(async (req, res) => {
     }
 
 
-    const result = await db.insert(AdditionalProcessPrices).values(newPrice);
+    const result = await db.insert(AdditionalProcessPrices).values(newPrice).returning();
 
-    if (!result.length) {
-        throw new ApiError(500, "Failed to create Additional Process Price");
-    }
-
-    res.status(201).json(
+    return res.status(201).json(
         new ApiResponse(
             201,
             result[0],
@@ -49,8 +45,8 @@ const createAdditionalProcessPrice = asyncHandler(async (req, res) => {
 
 // Get all Additional Process Prices
 const getAllAdditionalProcessPrices = asyncHandler(async (req, res, next) => {
-    const prices = await db.select().from(AdditionalProcessPrices);
-    res.status(200).json(
+    const prices = await db.select().from(AdditionalProcessPrices).orderBy(AdditionalProcessPrices.ap_priceid);
+    return res.status(200).json(
         new ApiResponse(200, prices, "Fetched Additional Process Prices successfully")
     );
 });
@@ -98,16 +94,6 @@ const updateAdditionalProcessPrice = asyncHandler(async (req, res, next) => {
 const deleteAdditionalProcessPrice = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    // Check if the AdditionalProcessPrice exists
-    const existingPrice = await db
-        .select()
-        .from(AdditionalProcessPrices)
-        .where(eq(AdditionalProcessPrices.ap_priceid, id));
-
-    if (existingPrice.length === 0) {
-        throw new ApiError(404, "Additional Process Price not found");
-    }
-
     const deletedPrice = await db
         .delete(AdditionalProcessPrices)
         .where(eq(AdditionalProcessPrices.ap_priceid, id))
@@ -118,7 +104,7 @@ const deleteAdditionalProcessPrice = asyncHandler(async (req, res, next) => {
         throw new ApiError(404, "Additional Process Price not found");
     }
 
-    res.status(200).json(
+    return res.status(200).json(
         new ApiResponse(200, deletedPrice, "Additional Process Price deleted successfully")
     );
 });

@@ -15,7 +15,7 @@ export const useAdditionalPriceStore = create((set, get) => ({
 
         set({ loading: true }); // Start loading
 
-        if (!newAdditionalPrice.price || !newAdditionalPrice.process_type) {
+        if ( !newAdditionalPrice.process_type || !newAdditionalPrice.price_tk) {
 
             set({ loading: false }); // End loading
             return {
@@ -25,7 +25,7 @@ export const useAdditionalPriceStore = create((set, get) => ({
         }
 
         try {
-            const res = await axios.post("/api/additional-prices/create", newAdditionalPrice);
+            const res = await axios.post("/api/additional-process-prices/create", newAdditionalPrice);
 
             if (res.status === 200 || res.status === 201) {
                 set((state) => ({ additionalPrices: [...state.additionalPrices, res.data.data] }));
@@ -58,7 +58,7 @@ export const useAdditionalPriceStore = create((set, get) => ({
         set({ loading: true }); // Start loading
 
         try {
-            const res = await axios.get("/api/additional-prices");
+            const res = await axios.get("/api/additional-process-prices");
 
             if (res.status === 200) {
                 set({ additionalPrices: res.data.data });
@@ -89,7 +89,7 @@ export const useAdditionalPriceStore = create((set, get) => ({
         set({ loading: true }); // Start loading
 
         try {
-            const res = await axios.put(`/api/additional-prices/${id}`, updatedAdditionalPrice);
+            const res = await axios.put(`/api/additional-process-prices/${id}`, updatedAdditionalPrice);
 
             if (res.status === 200 || res.status === 201) {
                 set((state) => ({
@@ -123,7 +123,7 @@ export const useAdditionalPriceStore = create((set, get) => ({
         set({ loading: true }); // Start loading
 
         try {
-            const res = await axios.delete(`/api/additional-prices/${id}`);
+            const res = await axios.delete(`/api/additional-process-prices/${id}`);
 
             if (res.status === 200 || res.status === 201) {
                 set((state) => ({

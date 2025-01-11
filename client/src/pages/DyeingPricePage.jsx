@@ -84,39 +84,83 @@ function DyeingPricePage() {
 	};
 
 	const commonFields = [
-		{ label: "Color", name: "color", placeholder: "Color" },
-		{ label: "Shade %", name: "shade_percent", placeholder: "Shade %" },
-		{ label: "Tube TK", name: "tube_tk", placeholder: "Tube TK" },
-		{ label: "Open TK", name: "open_tk", placeholder: "Open TK" },
+		{ label: "Color", name: "color", placeholder: "Color", type: "text" },
+		{
+			label: "Shade %",
+			name: "shade_percent",
+			placeholder: "Shade %",
+			type: "text",
+		},
+		{
+			label: "Tube TK",
+			name: "tube_tk",
+			placeholder: "Tube TK (number only)",
+			type: "number",
+		},
+		{
+			label: "Open TK",
+			name: "open_tk",
+			placeholder: "Open TK (number only)",
+			type: "number",
+		},
 		{
 			label: "Elasteen TK",
 			name: "elasteen_tk",
-			placeholder: "Elasteen TK",
+			placeholder: "Elasteen TK (number only)",
+			type: "number",
 		},
 		{
 			label: "Double Dyeing TK",
 			name: "double_dyeing_tk",
-			placeholder: "Double Dyeing TK",
+			placeholder: "Double Dyeing TK (number only)",
+			type: "number",
 		},
-		{ label: "Remarks", name: "remarks", placeholder: "Remarks" },
+		{
+			label: "Remarks",
+			name: "remarks",
+			placeholder: "Remarks",
+			type: "text",
+		},
 	];
 
 	const editFields = [
-		{ label: "Color", name: "color", placeholder: "Color" },
-		{ label: "Shade %", name: "shade_percent", placeholder: "Shade %" },
-		{ label: "Tube TK", name: "tube_tk", placeholder: "Tube TK" },
-		{ label: "Open TK", name: "open_tk", placeholder: "Open TK" },
+		{ label: "Color", name: "color", placeholder: "Color", type: "text" },
+		{
+			label: "Shade %",
+			name: "shade_percent",
+			placeholder: "Shade %",
+			type: "text",
+		},
+		{
+			label: "Tube TK",
+			name: "tube_tk",
+			placeholder: "Tube TK (number only)",
+			type: "number",
+		},
+		{
+			label: "Open TK",
+			name: "open_tk",
+			placeholder: "Open TK (number only)",
+			type: "number",
+		},
 		{
 			label: "Elasteen TK",
 			name: "elasteen_tk",
-			placeholder: "Elasteen TK",
+			placeholder: "Elasteen TK (number only)",
+			type: "number",
 		},
 		{
 			label: "Double Dyeing TK",
 			name: "double_dyeing_tk",
-			placeholder: "Double Dyeing TK",
+			placeholder: "Double Dyeing TK (number only)",
+			type: "number",
 		},
-		{ label: "Remarks", name: "remarks", placeholder: "Remarks" },
+		{
+			label: "Remarks",
+			name: "remarks",
+			placeholder: "Remarks",
+			type: "text",
+		},
 	];
 
 	const fields = editDyeingId ? editFields : commonFields;
