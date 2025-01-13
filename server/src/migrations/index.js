@@ -8,6 +8,7 @@ import { createClientDealsSchema } from './ClientDealsSchema.js';
         await createClientSchema();
         await dyeingFinishingPricesSchema();
         await additionalProcessPricesSchema();
+        await createClientDealsSchema();
         
         console.log('Migration applied successfully!');
     } catch (error) {

@@ -1,7 +1,7 @@
 import { pgTable, varchar, text, timestamp } from "drizzle-orm/pg-core"; // Import Drizzle ORM core functions
 
 // Define the Client table schema using Drizzle ORM
-export const Client = pgTable("Clients", {
+export const Client = pgTable("clients", {
     clientid: varchar("clientid", { length: 50 }).primaryKey(), // Client ID
     companyname: varchar("companyname", { length: 255 }).notNull(), // Company name
     address: text("address").notNull(), // Address

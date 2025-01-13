@@ -3,21 +3,21 @@ import { db } from "../config/drizzleSetup.js"; // Import the Drizzle instance
 // Function to create the Client table manually (if necessary)
 export const createClientSchema = async () => {
     try {
-        console.log("Checking if the Clients table exists...");
+        console.log("Checking if the clients table exists...");
 
         // Check if the 'Clients' table exists by querying the information_schema
         const result = await db.execute(`
-            SELECT to_regclass('public."Clients"');
+            SELECT to_regclass('public."clients"');
         `);
 
         // If the result is null, the table does not exist
         if (result.rows[0].to_regclass === null) {
 
-            console.log("Clients table does not exist. Creating it...");
+            console.log("clients table does not exist. Creating it...");
 
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
-                CREATE TABLE IF NOT EXISTS "Clients" (
+                CREATE TABLE IF NOT EXISTS "clients" (
                     clientid VARCHAR(50) PRIMARY KEY,
                     companyname VARCHAR(255) NOT NULL,
                     address TEXT NOT NULL,
@@ -48,7 +48,7 @@ export const createClientSchema = async () => {
             // Trigger to auto-generate client ID
             const createTriggerGenerateClientIdQuery = `
                 CREATE TRIGGER trigger_generate_client_id
-                BEFORE INSERT ON "Clients"
+                BEFORE INSERT ON "clients"
                 FOR EACH ROW
                 EXECUTE FUNCTION generate_client_id();
             `;
@@ -67,7 +67,7 @@ export const createClientSchema = async () => {
             // Trigger to update updated_at on record update
             const createTriggerUpdateTimestampQuery = `
                 CREATE TRIGGER trigger_update_timestamp
-                BEFORE UPDATE ON "Clients"
+                BEFORE UPDATE ON "clients"
                 FOR EACH ROW
                 EXECUTE FUNCTION update_timestamp();
             `;
@@ -80,11 +80,11 @@ export const createClientSchema = async () => {
             await db.execute(createFunctionUpdateTimestampQuery); // Create timestamp update function
             await db.execute(createTriggerUpdateTimestampQuery); // Create trigger for updated_at column
 
-            console.log("Clients schema created successfully.");
+            console.log("clients schema created successfully.");
         } else {
-            console.log("Clients table already exists. Skipping creation.");
+            console.log("clients table already exists. Skipping creation.");
         }
     } catch (error) {
-        console.error("Error creating Clients schema:", error);
+        console.error("Error creating clients schema:", error);
     }
 };
