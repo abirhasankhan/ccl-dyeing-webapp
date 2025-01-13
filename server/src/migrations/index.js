@@ -1,14 +1,16 @@
-import { createClientSchema } from './clientSchema.js';
+import { clientSchema } from './clientSchema.js';
 import { dyeingFinishingPricesSchema } from './dyeingFinishingPricesSchema.js';
 import { additionalProcessPricesSchema } from './additionalProcessPricesSchema.js';
-import { createClientDealsSchema } from './ClientDealsSchema.js';
+import { clientDealsSchema } from './clientDealsSchema.js';
+import { dyeingFinishingDealsSchema } from './dyeingFinishingDealsSchema.js'
 
 (async () => {
     try {
-        await createClientSchema();
+        await clientSchema();
         await dyeingFinishingPricesSchema();
         await additionalProcessPricesSchema();
-        await createClientDealsSchema();
+        await clientDealsSchema();
+        await dyeingFinishingDealsSchema();
         
         console.log('Migration applied successfully!');
     } catch (error) {

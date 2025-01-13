@@ -1,7 +1,7 @@
 import { db } from "../config/drizzleSetup.js"; // Import the Drizzle instance
 
 // Function to create the Client table manually (if necessary)
-export const createClientSchema = async () => {
+export const clientSchema = async () => {
     try {
         console.log("Checking if the clients table exists...");
 

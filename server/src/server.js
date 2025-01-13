@@ -8,7 +8,8 @@ import {
     clientRoutes, 
     dyeingFinishingPricesRoutes,
     additionalProcessPricesRoutes,
-    clientDealsRoutes
+    clientDealsRoutes,
+    dyeingFinishingDealsRoutes
 } from './routes/index.js';
 
 // Load environment variables
@@ -35,6 +36,7 @@ app.use('/api/client', clientRoutes);
 app.use('/api/dyeing-finishing-prices', dyeingFinishingPricesRoutes);
 app.use('/api/additional-process-prices', additionalProcessPricesRoutes);
 app.use('/api/client-deals', clientDealsRoutes);
+app.use('/api/dyeing-finishing-deals', dyeingFinishingDealsRoutes);
 
 // Connect to the database
 (async () => {

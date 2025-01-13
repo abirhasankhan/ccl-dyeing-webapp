@@ -1,6 +1,7 @@
 import { db } from "../config/drizzleSetup.js"; // Import the Drizzle instance
 
 export const dyeingFinishingPricesSchema = async () => {
+    
     try {
 
         // Checking if the dyeing_finishing_prices table exists

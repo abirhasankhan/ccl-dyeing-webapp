@@ -1,5 +1,5 @@
 import { db } from "../config/drizzleSetup.js";
-import { clientDeals } from "../models/createClientDeals.model.js";
+import { clientDeals } from "../models/clientDeals.model.js";
 import { eq, ilike } from 'drizzle-orm';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
