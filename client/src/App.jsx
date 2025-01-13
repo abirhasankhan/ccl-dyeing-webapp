@@ -6,8 +6,13 @@ import {
 	ClientPage,
 	DyeingPricePage,
 	AdditionalPricePage,
+	ClientDealPageForm,
+	DyeingFinishingDealsForm,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
+
+import MultiStepForm from "./MultiStepForm";
+
 
 function App() {
 	return (
@@ -59,6 +64,27 @@ function App() {
 							/>
 							<Route
 								path="/services/additional-prices"
+								element={<AdditionalPricePage />}
+							/>
+
+							{/* Main Multistep Form, updated path */}
+							<Route
+								path="/client-deal/create"
+								element={<MultiStepForm />}
+							/>
+
+							<Route
+								path="/client-deal"
+								element={<ClientDealPageForm />}
+							/>
+
+							<Route
+								path="/dyeing-finishing"
+								element={<DyeingFinishingDealsForm />}
+							/>
+
+							<Route
+								path="/client-deal/view"
 								element={<AdditionalPricePage />}
 							/>
 

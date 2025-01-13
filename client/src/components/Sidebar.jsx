@@ -31,12 +31,12 @@ const sidebarItems = [
 		],
 	},
 	{
-		label: "Contact",
+		label: "Client Deal",
 		to: "#",
 		icon: <FaPhone />,
 		subItems: [
-			{ label: "Email", to: "/contact/email", icon: <FaPhone /> },
-			{ label: "Phone", to: "/contact/phone", icon: <FaPhone /> },
+			{ label: "Create", to: "/client-deal/create", icon: <FaPhone /> },
+			{ label: "View", to: "/client-deal/view", icon: <FaPhone /> },
 		],
 	},
 ];

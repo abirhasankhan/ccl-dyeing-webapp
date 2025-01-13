@@ -9,15 +9,24 @@ import { ApiResponse } from "../utils/apiResponse.js";
 // Create a new record
 const createClientDeals = asyncHandler(async (req, res) => {
 
+
+    
+
     const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, remarks } = req.body;
+
+    if (!clientid || !clientid.trim()) {
+        throw new ApiError(400, "clientid is required and cannot be empty");
+    }
+
+
+
 
     const requiredFields = ['clientid', 'paymentMethod', 'issueDate', 'validThrough', 'representative', 'designation', 'contactNo'];
 
     const missingFields = requiredFields.filter(field => !req.body[field]);
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
-    }
-
+    }    
 
     // Normalize inputs by trimming strings
     const normalizedClientid = clientid.trim();
@@ -27,7 +36,7 @@ const createClientDeals = asyncHandler(async (req, res) => {
     const normalizedRepresentative = representative.trim();
     const normalizedDesignation = designation.trim();
     const normalizedContactNo = contactNo.trim();
-    const normalizedBankInfo = bankInfo?.trim() || null;
+    const normalizedBankInfo = bankInfo || null;
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
@@ -45,6 +54,7 @@ const createClientDeals = asyncHandler(async (req, res) => {
         remarks: normalizedRemarks,
     }
 
+
     const result = await db.insert(clientDeals).values(newClientDeals).returning();
 
     if (result.length === 0) {
@@ -54,6 +64,8 @@ const createClientDeals = asyncHandler(async (req, res) => {
     return res.status(201).json(
         new ApiResponse(201, result, "ClientDeals created successfully")
     );
+
+    
 
 });
 
