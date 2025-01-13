@@ -483,7 +483,7 @@ EXECUTE FUNCTION update_order_returned_qty();
 
 
 
--- /*----------------Dyeing Ongoing Process------------------------*
+-- /*----------------Dyeing Ongoing Process------------------------*/
 
 
 -- Machines Table
