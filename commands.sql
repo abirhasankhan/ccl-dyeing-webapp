@@ -76,19 +76,20 @@ EXECUTE FUNCTION update_timestamp();
 -- Create a sequence for generating unique deal IDs
 CREATE SEQUENCE deal_id_seq START 1;
 
--- Create ClientDeals table
+
 -- Create ClientDeals table
 CREATE TABLE ClientDeals (
     deal_id VARCHAR(20) PRIMARY KEY,  
     clientid VARCHAR(20) NOT NULL,
-    remarks TEXT,
     payment_method VARCHAR(10) CHECK (payment_method IN ('Cash', 'Bank', 'Hybrid')) NOT NULL,
     issue_date DATE,
     valid_through DATE,
     representative VARCHAR(100),
     designation VARCHAR(100),
     contact_no VARCHAR(15),
-    bank_info JSONB,    
+    bank_info JSONB,
+    notes TEXT,
+    remarks TEXT,   
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (clientid) REFERENCES Clients(clientid)

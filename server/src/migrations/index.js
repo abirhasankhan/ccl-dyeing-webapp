@@ -1,6 +1,7 @@
 import { createClientSchema } from './clientSchema.js';
 import { dyeingFinishingPricesSchema } from './dyeingFinishingPricesSchema.js';
 import { additionalProcessPricesSchema } from './additionalProcessPricesSchema.js';
+import { createClientDealsSchema } from './ClientDealsSchema.js';
 
 (async () => {
     try {
