@@ -28,12 +28,24 @@ export const clientDealsSchema = async () => {
                     contact_no VARCHAR(15),
                     bank_info JSONB,
                     notes TEXT,
+                    status VARCHAR(30) DEFAULT 'Pending',
                     remarks TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (clientid) REFERENCES clients(clientid)
                 );
             `;
+
+            /**
+                Pending: The deal has been created but not yet finalized or approved.
+                In Progress: The deal is currently being negotiated or processed.
+                Approved: The deal has been confirmed and approved by both parties.
+                Rejected: The deal was declined or rejected.
+                Completed: The deal has been successfully completed.
+                Cancelled: The deal was canceled before completion.
+                On Hold: The deal is temporarily paused.
+                Expired: The deal was not completed within a set timeframe.
+            */
 
             // Sequence for generating deals IDs
             const createSequenceQuery = `

@@ -14,6 +14,7 @@ export const clientDeals = pgTable('client_deals', {
     contactNo: varchar('contact_no', { length: 15 }),
     bankInfo: jsonb('bank_info'),
     notes: text('notes'),
+    status: varchar('status', { length: 30 }).default('Pending'),
     remarks: text('remarks'),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),

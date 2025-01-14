@@ -51,4 +51,102 @@ export const useDyeingFinishingDealsStore = create((set, get) => ({
         }
     },
 
+    // Fetch dyeing finishing deals
+    fetchDyeingFinishingDeals: async () => {
+        set({ loading: true }); // Start loading
+
+        try {
+            const res = await axios.get("/api/dyeing-finishing-deals");
+
+            if (res.status === 200) {
+                set({ dyeingFinishingDeals: res.data.data });
+            } else {
+                throw new Error(res.data.message || "Failed to fetch Dyeing Finishing Deals");
+            }
+        } catch (error) {
+            set({ loading: false }); // End loading
+
+            console.error("Error fetching Dyeing Finishing Deals:", error);
+            set({ loading: false }); // End loading
+
+            const errorMessage = error.response?.data?.message || "An error occurred while fetching Dyeing Finishing Deals.";
+            return {
+                success: false,
+                message: errorMessage,
+            };
+        } finally {
+            set({ loading: false }); // End loading
+        }
+    },
+
+    // Update an dyeing finishing deal
+    updateAdditionalProcessDeal: async (dealId, updatedDeal) => {
+        set({ loading: true }); // Start loading
+
+        try {
+            const res = await axios.put(`/api/dyeing-finishing-deals/${dealId}`, updatedDeal);
+
+            if (res.status >= 200 && res.status < 300) {
+                set((state) => ({
+                    dyeingFinishingDeals: state.dyeingFinishingDeals.map((deal) => {
+                        if (deal.deal_id === dealId) {
+                            return res.data.data;
+                        }
+                        return deal;
+                    }),
+                }));
+                set({ loading: false }); // End loading
+                return {
+                    success: true,
+                    message: res.data.message || "Dyeing Finishing Deals updated successfully",
+                };
+            } else {
+                throw new Error(res.data.message || "Failed to update Dyeing Finishing Deals");
+            }
+        } catch (error) {
+            set({ loading: false }); // End loading
+            console.error("Error updating Dyeing Finishing Deals:", error);
+            const errorMessage = error.response?.data?.message || "An error occurred while updating the Dyeing Finishing Deals.";
+            return {
+                success: false,
+                message: errorMessage,
+            }
+        }
+    },
+
+
+    // Delete a dyeing finishing deal
+    deleteDyeingFinishingDeal: async (dealId) => {
+        set({ loading: true }); // Start loading
+
+        try {
+            const res = await axios.delete(`/api/dyeing-finishing-deals/${dealId}`);
+
+            if (res.status === 200 || res.status === 204) {
+                set((state) => ({
+                    dyeingFinishingDeals: state.dyeingFinishingDeals.filter((deal) => deal.deal_id !== dealId),
+                }));
+                set({ loading: false }); // End loading
+                return {
+                    success: true,
+                    message: res.data.message || "Dyeing Finishing Deals deleted successfully",
+                };
+            } else {
+                set({ loading: false }); // End loading
+                throw new Error(res.data.message || "Failed to delete Dyeing Finishing Deals");
+            }
+            
+        } catch (error) {
+            set({ loading: false }); // End loading
+            console.error("Error deleting Dyeing Finishing Deals:", error);
+            const errorMessage = error.response?.data?.message || "An error occurred while deleting the Dyeing Finishing Deals.";
+            return {
+                success: false,
+                message: errorMessage,
+            }
+            
+        }
+    }
+
+
 }));

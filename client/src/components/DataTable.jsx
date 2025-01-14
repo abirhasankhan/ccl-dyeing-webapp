@@ -23,12 +23,15 @@ const DataTable = ({
 	rowsPerPage = 10,
 }) => {
 	const [currentPage, setCurrentPage] = useState(1);
-	const [sortConfig, setSortConfig] = useState(null);
+	const [sortConfig, setSortConfig] = useState({
+		key: null,
+		direction: "ascending",
+	});
 
 	// Sorting logic
 	const sortedData = useMemo(() => {
 		let sortableData = [...data];
-		if (sortConfig !== null) {
+		if (sortConfig.key) {
 			sortableData.sort((a, b) => {
 				if (a[sortConfig.key] < b[sortConfig.key]) {
 					return sortConfig.direction === "ascending" ? -1 : 1;
@@ -44,11 +47,7 @@ const DataTable = ({
 
 	const requestSort = (key) => {
 		let direction = "ascending";
-		if (
-			sortConfig &&
-			sortConfig.key === key &&
-			sortConfig.direction === "ascending"
-		) {
+		if (sortConfig.key === key && sortConfig.direction === "ascending") {
 			direction = "descending";
 		}
 		setSortConfig({ key, direction });
@@ -93,7 +92,7 @@ const DataTable = ({
 									style={{ cursor: "pointer" }} // Make it look clickable
 								>
 									{column.Header}
-									{sortConfig?.key === column.accessor && (
+									{sortConfig.key === column.accessor && (
 										<span>
 											{sortConfig.direction ===
 											"ascending"
@@ -108,7 +107,7 @@ const DataTable = ({
 					</Thead>
 					<Tbody>
 						{currentPageData.map((row) => (
-							<Tr key={row.id}>
+							<Tr key={row.id || Math.random().toString(36)}>
 								{columns.map((column) => (
 									<Td
 										key={column.accessor}

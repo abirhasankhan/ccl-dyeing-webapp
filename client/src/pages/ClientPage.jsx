@@ -263,20 +263,22 @@ function ClientPage() {
 					/>
 
 					{/* Loading Spinner */}
-					{loading ? (
-						<Flex justify="center" mt={8}>
-							<Spinner size="xl" />
-						</Flex>
-					) : (
-						// Display DataTable with client data
-						<DataTable
-							data={searchResults} // Always show search results or all clients
-							columns={columns}
-							caption={caption}
-							onEdit={handleEditClient} // Pass the handleEditClient function
-							onDelete={openDeleteConfirmation} // Pass the openDeleteConfirmation function
-						/>
-					)}
+					<div style={{ width: "100%" }}>
+						{loading ? (
+							<Flex justify="center" mt={8}>
+								<Spinner size="xl" />
+							</Flex>
+						) : (
+							// Display DataTable with client data
+							<DataTable
+								data={searchResults} // Always show search results or all clients
+								columns={columns}
+								caption={caption}
+								onEdit={handleEditClient} // Pass the handleEditClient function
+								onDelete={openDeleteConfirmation} // Pass the openDeleteConfirmation function
+							/>
+						)}
+					</div>
 
 					{/* Display message when no clients found */}
 					{!loading && searchResults.length === 0 && (

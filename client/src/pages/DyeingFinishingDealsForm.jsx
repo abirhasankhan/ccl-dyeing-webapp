@@ -5,7 +5,7 @@ import { FormInput, SubmitButton } from "../components";
 import { useToastNotification } from "../hooks/toastUtils";
 import { useDyeingFinishingDealsStore } from "../store";
 
-const DyeingFinishingDealsForm = ({ dealId, onPrev }) => {
+const DyeingFinishingDealsForm = ({ dealId, onPrev, onNext, onSkip }) => {
 	const methods = useForm({
 		defaultValues: {
 			deal_id: dealId,
@@ -29,7 +29,7 @@ const DyeingFinishingDealsForm = ({ dealId, onPrev }) => {
 			const response = await createDyeingFinishingDeal(formData);
 			if (response.success) {
 				showSuccess("Dyeing Finishing Deal created successfully!");
-				onPrev();
+				onNext(); // Move to the next step
 			} else {
 				showError(response.message);
 			}
@@ -51,6 +51,7 @@ const DyeingFinishingDealsForm = ({ dealId, onPrev }) => {
 				/>
 
 				{/* Service Type Dropdown */}
+
 				<Controller
 					name="service_type"
 					control={methods.control}
@@ -91,9 +92,11 @@ const DyeingFinishingDealsForm = ({ dealId, onPrev }) => {
 					isRequired={false} // Optional field
 				/>
 
-				<SubmitButton label="Submit" />
-				<Button mt={4} ml={2} onClick={onPrev}>
-					Back
+				{/* Action Buttons */}
+				<SubmitButton label="Submit & Next" />
+				{/* Skip Button */}
+				<Button mt={4} ml={2} onClick={onSkip}>
+					Skip
 				</Button>
 			</Box>
 		</FormProvider>

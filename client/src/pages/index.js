@@ -5,6 +5,12 @@ import DyeingPricePage from "./DyeingPricePage";
 import AdditionalPricePage from "./AdditionalPricePage";
 import ClientDealPageForm from "./ClientDealPageForm";
 import DyeingFinishingDealsForm from "./DyeingFinishingDealsForm";
+import AdditionalPriceDealForm from "./AdditionalPriceDealForm"
+import ClientDealViewPage from "./ClientDealViewPage"
+import DyeingDealViewPage from "./DyeingDealViewPage"
+import AdditionalDealViewPage from "./AdditionalDealViewPage"
+
+
 
 
 export { 
@@ -14,5 +20,9 @@ export {
     DyeingPricePage, 
     AdditionalPricePage, 
     ClientDealPageForm, 
-    DyeingFinishingDealsForm
+    DyeingFinishingDealsForm,
+    AdditionalPriceDealForm,
+    ClientDealViewPage,
+    DyeingDealViewPage,
+    AdditionalDealViewPage
 };

@@ -7,7 +7,7 @@ export const serviceTypeEnum = pgEnum('service_type', ['tube_tk', 'open_tk', 'el
 
 export const dyeingFinishingDeals = pgTable("dyeing_finishing_deals", {
     dfpid: varchar("dfpid", { length: 20 }).primaryKey(),
-    deal_id: varchar("deal_id", { length: 20 }).notNull().references(() => clientDeals.dealId),
+    deal_id: varchar("deal_id", { length: 20 }).notNull().references(() => clientDeals.deal_id),
     color: varchar("color", { length: 50 }).notNull(),
     shade_percent: varchar("shade_percent", { length: 50 }),
     service_type: serviceTypeEnum().notNull(),

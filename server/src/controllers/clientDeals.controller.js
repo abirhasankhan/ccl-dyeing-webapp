@@ -81,19 +81,37 @@ const createClientDeals = asyncHandler(async (req, res) => {
 
 // Get all records
 const getClientDeals = asyncHandler(async (req, res) => {
+    try {
+        const result = await db.select().from(clientDeals).orderBy(clientDeals.deal_id); // Sorting by clientid in ascending order
+;
 
-    const result = await db.select().from(clientDeals);
-    return res.status(200).json(
-        new ApiResponse(200, result, "ClientDeals fetched successfully")    
-    );
-})
+        // Format the result to ensure consistency
+        const formattedResult = result.map(deal => ({
+            ...deal,
+            bankInfo: deal.bankInfo ? {
+                bankName: deal.bankInfo.bankName || '',
+                branch: deal.bankInfo.branch || '',
+                sortCode: deal.bankInfo.sortCode || '',
+            } : { bankName: '', branch: '', sortCode: '' },  // Default to empty values
+        }));
+
+        return res.status(200).json(
+            new ApiResponse(200,  formattedResult , "ClientDeals fetched successfully")
+        );
+    } catch (error) {
+        console.error("Error fetching client deals:", error);
+        return res.status(500).json({ message: "Server Error", error });
+    }
+});
+
+
 
 // Update an existing record
 const updateClientDeals = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
 
-    const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, remarks } = req.body;
+    const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, status, remarks } = req.body;
 
     // Define required fields and check for missing ones
     const requiredFields = ['clientid', 'paymentMethod', 'issueDate', 'validThrough', 'representative', 'designation', 'contactNo'];
@@ -112,6 +130,7 @@ const updateClientDeals = asyncHandler(async (req, res) => {
     const normalizedDesignation = designation?.trim();
     const normalizedContactNo = contactNo?.trim();
     const normalizedNotes = notes?.trim() || null;
+    const normalizedStatus = status?.trim();
     const normalizedRemarks = remarks?.trim() || null;
 
     // Validate and normalize bankInfo (JSON)
@@ -144,6 +163,7 @@ const updateClientDeals = asyncHandler(async (req, res) => {
         contactNo: normalizedContactNo,
         bankInfo: normalizedBankInfo,
         notes: normalizedNotes,
+        status: normalizedStatus,
         remarks: normalizedRemarks,
     }
 

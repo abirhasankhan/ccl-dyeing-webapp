@@ -8,6 +8,10 @@ import {
 	AdditionalPricePage,
 	ClientDealPageForm,
 	DyeingFinishingDealsForm,
+	AdditionalPriceDealForm,
+	ClientDealViewPage,
+	DyeingDealViewPage,
+	AdditionalDealViewPage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -56,6 +60,7 @@ function App() {
 						ml={{ base: 0, md: "200px" }} // Make space for sidebar on large screens
 					>
 						<Routes>
+							
 							<Route path="/" element={<HomePage />} />
 							<Route path="/client" element={<ClientPage />} />
 							<Route
@@ -79,16 +84,30 @@ function App() {
 							/>
 
 							<Route
-								path="/dyeing-finishing"
+								path="/dyeing-finishing-deal"
 								element={<DyeingFinishingDealsForm />}
 							/>
-
 							<Route
-								path="/client-deal/view"
-								element={<AdditionalPricePage />}
+								path="/additional-price-deal"
+								element={<AdditionalPriceDealForm />}
 							/>
 
 							{/* Other routes */}
+
+							<Route
+								path="/client-deal/view/client-deal-view"
+								element={<ClientDealViewPage />}
+							/>
+
+							<Route
+								path="/client-deal/view/dyeing-deal-view"
+								element={<DyeingDealViewPage />}
+							/>
+
+							<Route
+								path="/client-deal/view/additional-deal-view"
+								element={<AdditionalDealViewPage />}
+							/>
 						</Routes>
 					</Box>
 				</Box>

@@ -10,7 +10,8 @@ import {
     dyeingFinishingPricesRoutes,
     additionalProcessPricesRoutes,
     clientDealsRoutes,
-    dyeingFinishingDealsRoutes
+    dyeingFinishingDealsRoutes,
+    additionalProcessDealsRoutes
 } from './routes/index.js';
 
 // Load environment variables
@@ -38,6 +39,7 @@ app.use('/api/dyeing-finishing-prices', dyeingFinishingPricesRoutes);
 app.use('/api/additional-process-prices', additionalProcessPricesRoutes);
 app.use('/api/client-deals', clientDealsRoutes);
 app.use('/api/dyeing-finishing-deals', dyeingFinishingDealsRoutes);
+app.use('/api/additional-process-deals', additionalProcessDealsRoutes);
 
 
 
