@@ -194,6 +194,15 @@ export const updateClient = async (req, res) => {
     const { id } = req.params;  // Get client ID from request parameters
     const { companyname, address, contact, email, remarks, status } = req.body;  // Get updated client data from request body
 
+    if (!companyname || !address || !contact || !email) {
+        return res.status(400).json(
+            {
+                message: "All fields are required."
+
+            }
+        );
+    }
+
     try {
         // Check if the client exists
         const client = await db.select()

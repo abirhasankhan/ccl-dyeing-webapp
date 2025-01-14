@@ -99,7 +99,11 @@ export const useClientStore = create((set, get) => ({
         } catch (error) {
             set({ loading: false }); // End loading
             console.error("Error updating client:", error);
-            return { success: false, message: "An error occurred while updating the client." };
+            const errorMessage = error.response?.data?.message || "An error occurred while updating the client.";
+            return {
+                success: false,
+                message: errorMessage,
+            };
         }
     },
 
@@ -123,7 +127,11 @@ export const useClientStore = create((set, get) => ({
         } catch (error) {
             set({ loading: false }); // End loading
             console.error("Error deleting client:", error);
-            return { success: false, message: "An error occurred while deleting the client." };
+            const errorMessage = error.response?.data?.message || "An error occurred while deleting the client.";
+            return {
+                success: false,
+                message: errorMessage,
+            };
         }
     },
 
