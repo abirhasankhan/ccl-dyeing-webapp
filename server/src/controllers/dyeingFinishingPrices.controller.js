@@ -91,6 +91,15 @@ export const updateDyeingFinishingPrice = async (req, res) => {
     const { id } = req.params;
     const { color, shade_percent, tube_tk, open_tk, elasteen_tk, double_dyeing_tk, remarks } = req.body;
 
+    if (!color || !tube_tk || !open_tk || !elasteen_tk) {
+        return res.status(400).send(
+            {
+                message: "All fields are required."
+
+            }
+        );
+    }
+
     try {
 
         // Check if the DyeingFinishingPrice exists

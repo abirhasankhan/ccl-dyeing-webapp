@@ -4,19 +4,46 @@ import { FormInput, SubmitButton } from "../components";
 import { Box, Select, VStack } from "@chakra-ui/react";
 import { useToastNotification } from "../hooks/toastUtils";
 import { useClientDealStore } from "../store";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+// Define the validation schema with yup
+const schema = yup.object().shape({
+	clientid: yup.string().required("Client ID is required"),
+	issueDate: yup.string().required("Issue Date is required"),
+	validThrough: yup.string().required("Valid Through is required"),
+	representative: yup.string().required("Representative is required"),
+	designation: yup.string().required("Designation is required"),
+	contactNo: yup.string().required("Contact No is required"),
+	notes: yup.string().notRequired(), // Notes is optional
+	paymentMethod: yup.string().required("Payment Method is required"),
+	bankInfo: yup.object().shape({
+		bankName: yup.string().when("paymentMethod", {
+			is: (val) => val === "Bank" || val === "Hybrid",
+			then: yup.string().required("Bank Name is required"),
+		}),
+		branch: yup.string().when("paymentMethod", {
+			is: (val) => val === "Bank" || val === "Hybrid",
+			then: yup.string().required("Branch is required"),
+		}),
+		sortCode: yup.string().when("paymentMethod", {
+			is: (val) => val === "Bank" || val === "Hybrid",
+			then: yup.string().required("Sort Code is required"),
+		}),
+	}),
+});
 
 const ClientDealPageForm = ({ onNext }) => {
-	
 	const { showError, showSuccess } = useToastNotification();
 
 	const methods = useForm({
+		resolver: yupResolver(schema),
 		defaultValues: {
 			clientid: "",
 			issueDate: "",
 			validThrough: "",
 			representative: "",
 			contactNo: "",
-			notes: "",
 			paymentMethod: "",
 			bankInfo: { bankName: "", branch: "", sortCode: "" },
 		},
@@ -47,7 +74,6 @@ const ClientDealPageForm = ({ onNext }) => {
 			console.error(error);
 		}
 	};
-
 
 	return (
 		<FormProvider {...methods}>
@@ -84,8 +110,13 @@ const ClientDealPageForm = ({ onNext }) => {
 						type="text"
 						required
 					/>
-					<FormInput label="Notes" name="notes" type="text" />
-					
+					<FormInput
+						label="Notes"
+						name="notes"
+						type="text"
+						isRequired={false}
+					/>
+				
 					{/* Payment Method Dropdown */}
 					<Controller
 						name="paymentMethod"

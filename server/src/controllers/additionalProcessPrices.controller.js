@@ -57,6 +57,11 @@ const updateAdditionalProcessPrice = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
     const { process_type, price_tk, remarks } = req.body;
 
+    if (!process_type || !price_tk) {
+
+        throw new ApiError(400, "All fields are required");
+    }
+
     // Check if the AdditionalProcessPrice exists
     const existingPrice = await db
         .select()

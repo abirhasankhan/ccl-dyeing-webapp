@@ -4,43 +4,54 @@ import { eq, ilike } from 'drizzle-orm';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import {Client} from "../models/client.model.js"
 
 
 // Create a new record
 const createClientDeals = asyncHandler(async (req, res) => {
 
-
-    
-
     const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, remarks } = req.body;
 
-    if (!clientid || !clientid.trim()) {
-        throw new ApiError(400, "clientid is required and cannot be empty");
-    }
-
-
-
-
+    // Define required fields and check for missing ones
     const requiredFields = ['clientid', 'paymentMethod', 'issueDate', 'validThrough', 'representative', 'designation', 'contactNo'];
+    const missingFields = requiredFields.filter(field => !req.body[field]?.trim());
 
-    const missingFields = requiredFields.filter(field => !req.body[field]);
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
-    }    
+    }
 
-    // Normalize inputs by trimming strings
-    const normalizedClientid = clientid.trim();
-    const normalizedPaymentMethod = paymentMethod.trim();
-    const normalizedIssueDate = issueDate.trim();
-    const normalizedValidThrough = validThrough.trim();
-    const normalizedRepresentative = representative.trim();
-    const normalizedDesignation = designation.trim();
-    const normalizedContactNo = contactNo.trim();
-    const normalizedBankInfo = bankInfo || null;
+    // Normalize inputs by trimming strings where applicable
+    const normalizedClientid = clientid?.trim();
+    const normalizedPaymentMethod = paymentMethod?.trim();
+    const normalizedIssueDate = issueDate?.trim();
+    const normalizedValidThrough = validThrough?.trim();
+    const normalizedRepresentative = representative?.trim();
+    const normalizedDesignation = designation?.trim();
+    const normalizedContactNo = contactNo?.trim();
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
+    // Validate and normalize bankInfo (JSON)
+    let normalizedBankInfo = null;
+    if (bankInfo) {
+        try {
+            normalizedBankInfo = typeof bankInfo === 'string'
+                ? JSON.parse(bankInfo)
+                : bankInfo;
+        } catch (error) {
+            throw new ApiError(400, "Invalid bankInfo JSON format");
+        }
+    }
 
+    // Check if the client exists and stop execution if not found
+    const existClient = await db.select().from(Client).where(eq(Client.clientid, normalizedClientid));
+    
+    if (existClient.length === 0) {
+        
+        throw new ApiError(404, "Client not found");
+    }
+
+    // Prepare the new client deal object
     const newClientDeals = {
         clientid: normalizedClientid,
         paymentMethod: normalizedPaymentMethod,
@@ -52,21 +63,19 @@ const createClientDeals = asyncHandler(async (req, res) => {
         bankInfo: normalizedBankInfo,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
-    }
+    };
 
-
+    // Insert the new client deal record
     const result = await db.insert(clientDeals).values(newClientDeals).returning();
 
     if (result.length === 0) {
-        throw new ApiError(404, "ClientDeals not found");
+        throw new ApiError(500, "Failed to create ClientDeals");
     }
 
+    // Return the successful response
     return res.status(201).json(
-        new ApiResponse(201, result, "ClientDeals created successfully")
+        new ApiResponse(201, result[0], "ClientDeals created successfully")
     );
-
-    
-
 });
 
 
@@ -83,26 +92,47 @@ const getClientDeals = asyncHandler(async (req, res) => {
 const updateClientDeals = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
+
     const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, remarks } = req.body;
 
-    // Check if the ClientDeals exists
-    const existingClientDeals = await db.select().from(clientDeals).where(eq(clientDeals.dealId, id));
+    // Define required fields and check for missing ones
+    const requiredFields = ['clientid', 'paymentMethod', 'issueDate', 'validThrough', 'representative', 'designation', 'contactNo'];
+    const missingFields = requiredFields.filter(field => !req.body[field]?.trim());
 
-    if (existingClientDeals.length === 0) {
-        throw new ApiError(404, "ClientDeals not found");
+    if (missingFields.length > 0) {
+        throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
     }
 
-    // Normalize inputs by trimming strings
-    const normalizedClientid = clientid.trim();
-    const normalizedPaymentMethod = paymentMethod.trim();
-    const normalizedIssueDate = issueDate.trim();
-    const normalizedValidThrough = validThrough.trim();
-    const normalizedRepresentative = representative.trim();
-    const normalizedDesignation = designation.trim();
-    const normalizedContactNo = contactNo.trim();
-    const normalizedBankInfo = bankInfo?.trim() || null;
+    // Normalize inputs by trimming strings where applicable
+    const normalizedClientid = clientid?.trim();
+    const normalizedPaymentMethod = paymentMethod?.trim();
+    const normalizedIssueDate = issueDate?.trim();
+    const normalizedValidThrough = validThrough?.trim();
+    const normalizedRepresentative = representative?.trim();
+    const normalizedDesignation = designation?.trim();
+    const normalizedContactNo = contactNo?.trim();
     const normalizedNotes = notes?.trim() || null;
-    const normalizedRemarks = remarks?.trim() || null;  
+    const normalizedRemarks = remarks?.trim() || null;
+
+    // Validate and normalize bankInfo (JSON)
+    let normalizedBankInfo = null;
+    if (bankInfo) {
+        try {
+            normalizedBankInfo = typeof bankInfo === 'string'
+                ? JSON.parse(bankInfo)
+                : bankInfo;
+        } catch (error) {
+            throw new ApiError(400, "Invalid bankInfo JSON format");
+        }
+    }
+
+    // Check if the client exists and stop execution if not found
+    const existClient = await db.select().from(Client).where(eq(Client.clientid, normalizedClientid));
+
+    if (existClient.length === 0) {
+
+        throw new ApiError(404, "Client not found");
+    }
 
     const updatedClientDeals = {
         clientid: normalizedClientid,
@@ -117,7 +147,7 @@ const updateClientDeals = asyncHandler(async (req, res) => {
         remarks: normalizedRemarks,
     }
 
-    const result = await db.update(clientDeals).set(updatedClientDeals).where(eq(clientDeals.dealId, id)).returning();
+    const result = await db.update(clientDeals).set(updatedClientDeals).where(eq(clientDeals.deal_id, id)).returning();
 
     if (result.length === 0) {
         throw new ApiError(404, "ClientDeals not found");
@@ -134,7 +164,7 @@ const deleteClientDeals = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
 
-    const deletedClientDeals = await db.delete(clientDeals).where(eq(clientDeals.dealId, id)).returning(); // returning() returns the deleted row, not rows affected
+    const deletedClientDeals = await db.delete(clientDeals).where(eq(clientDeals.deal_id, id)).returning(); // returning() returns the deleted row, not rows affected
 
     // Check if anything was deleted
     if (deletedClientDeals.length === 0) {
@@ -159,9 +189,9 @@ const searchClientDeals = asyncHandler(async (req, res) => {
     let clientDeal;
 
     if (deal_id) {
-        clientDeal = await db.select.from(clientDeals).where(eq(clientDeals.dealId, deal_id));
+        clientDeal = await db.select.from(clientDeals).where(eq(clientDeals.deal_id, deal_id));
     } else if (clientid){
-        clientDeal = await db.select.from(clientDeals).where(eq(clientDeals.clientId, clientid));
+        clientDeal = await db.select.from(clientDeals).where(eq(clientDeals.clientid, clientid));
     } else if (representative) {
         // Search by name
         clientDeal = await db
@@ -180,14 +210,11 @@ const searchClientDeals = asyncHandler(async (req, res) => {
         throw new ApiError(404, "No ClientDeals found with the specified criteria.");
     }
 
-
-
     return res.status(200).json(
         new ApiResponse(200, clientDeal, "Data found")
     );
 
 });    
-
 
 
 export {

@@ -1,6 +1,9 @@
 import { db } from "../config/drizzleSetup.js";
 import { Client } from "../models/client.model.js";
 import { eq, ilike, or, ne, and } from 'drizzle-orm';
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
 
 
@@ -234,6 +237,7 @@ export const updateClient = async (req, res) => {
                     or(eq(Client.email, normalizedEmail), eq(Client.contact, normalizedContact)) // Check for duplicates
                 )
             );
+
 
         if (existingClient && existingClient.length > 0) {
             return res.status(400).send({
