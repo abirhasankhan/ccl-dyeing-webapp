@@ -90,8 +90,6 @@ export const useClientDealStore = create((set, get) => ({
         }
     },
 
-
-
     // Update client deal
     updateClientDeal: async (dealId, updatedDeal) => {
         set({ loading: true });

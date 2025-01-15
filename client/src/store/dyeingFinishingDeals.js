@@ -80,7 +80,7 @@ export const useDyeingFinishingDealsStore = create((set, get) => ({
     },
 
     // Update an dyeing finishing deal
-    updateAdditionalProcessDeal: async (dealId, updatedDeal) => {
+    updateDyeingFinishingDeals: async (dealId, updatedDeal) => {
         set({ loading: true }); // Start loading
 
         try {
@@ -146,7 +146,51 @@ export const useDyeingFinishingDealsStore = create((set, get) => ({
             }
             
         }
-    }
+    },
+
+     // Search client deals by ID or name
+    searchClientDeals: (searchTerm, searchBy) => {
+        const { clientDeals } = get();
+        let filteredClientDeals = [];
+
+        if (searchTerm) {
+            if (searchBy === 'name') {
+                filteredClientDeals = clientDeals.filter(deal =>
+                    deal.deal_name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            } else if (searchBy === 'id') {
+                filteredClientDeals = clientDeals.filter(deal =>
+                    deal.deal_id.toString().includes(searchTerm) || deal.clientid.toString().includes(searchTerm)
+                );
+            }
+        } else {
+            filteredClientDeals = clientDeals;
+        }
+
+        set({ filteredClientDeals });
+    },
+
+    // Filter client deals based on search criteria
+    filterClientDeals: (clientDeals) => {
+        const { searchTerm, searchBy } = get();
+        let filteredClientDeals = [];
+
+        if (searchTerm) {
+            if (searchBy === 'name') {
+                filteredClientDeals = clientDeals.filter(deal =>
+                    deal.deal_name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            } else if (searchBy === 'id') {
+                filteredClientDeals = clientDeals.filter(deal =>
+                    deal.deal_id.toString().includes(searchTerm) || deal.clientid.toString().includes(searchTerm)
+                );
+            }
+        } else {
+            filteredClientDeals = clientDeals;
+        }
+
+        set({ filteredClientDeals });
+    },
 
 
 }));

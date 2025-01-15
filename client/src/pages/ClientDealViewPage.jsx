@@ -235,10 +235,6 @@ const columns = [
 		accessor: "bankInfo.sortCode",
 	},
 ];
-
-
-
-    console.log("Client Deals:", clientDeals);
     
 
 	const caption = "Client Deal Information List"; // Optional Caption for the table
@@ -283,8 +279,6 @@ const handleUpdateCDeal = async () => {
 		showError("An error occurred while updating the client deal.");
 	}
 };
-
-
 
 
 	// Delete function

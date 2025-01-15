@@ -73,7 +73,7 @@ const createDyeingFinishingDeals = asyncHandler(async (req, res) => {
 // Get all Dyeing Finishing Deals
 const getAllDyeingFinishingDeals = asyncHandler(async (req, res) => {
 
-    const result = await db.select().from(dyeingFinishingDeals);
+    const result = await db.select().from(dyeingFinishingDeals).orderBy(dyeingFinishingDeals.dfpid);
     return res.status(200).json(
         new ApiResponse(200, result, "Dyeing Finishing Deals fetched successfully")    
     );
