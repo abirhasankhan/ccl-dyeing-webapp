@@ -56,9 +56,9 @@ const createAdditionalProcessDeals = asyncHandler(async (req, res) => {
 // Get all Additional Process Deals
 const getAllAdditionalProcessDeals = asyncHandler(async (req, res) => {
     
-    const additionalProcessDeals = await db.select().from(additionalProcessDeals);
+    const result = await db.select().from(additionalProcessDeals).orderBy(additionalProcessDeals.appid);
     return res.status(200).json(
-        new ApiResponse(200, additionalProcessDeals, "Additional Process Deals fetched successfully")
+        new ApiResponse(200, result, "Additional Process Deals fetched successfully")
     );
 })
 

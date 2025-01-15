@@ -23,7 +23,6 @@ import {
 import { useToastNotification } from "../hooks/toastUtils";
 
 function AdditionalDealViewPage() {
-
 	const { showError, showSuccess } = useToastNotification();
 
 	const [addPgdeal, setAddPgdeal] = useState({});
@@ -34,26 +33,18 @@ function AdditionalDealViewPage() {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	const [newAddPgDeal, setNewAddPgDeal] = useState({
-		dfpid: "",
+		appid: "",
 		deal_id: "",
-		color: "",
-		shade_percent: "",
-		service_type: "",
-		service_price_tk: "",
-		double_dyeing_tk: "",
+		process_type: "",
 		total_price: "",
 		notes: "",
 	});
 
 	const resetForm = () => {
 		setNewAddPgDeal({
-			dfpid: "",
+			appid: "",
 			deal_id: "",
-			color: "",
-			shade_percent: "",
-			service_type: "",
-			service_price_tk: "",
-			double_dyeing_tk: "",
+			process_type: "",
 			total_price: "",
 			notes: "",
 		});
@@ -66,26 +57,26 @@ function AdditionalDealViewPage() {
 	const [addPgDealToDelete, setAddPgDealToDelete] = useState(null);
 
 	const {
-		fetchDyeingFinishingDeals,
-		updateDyeingFinishingDeals,
-		deleteDyeingFinishingDeal,
-		dyeingFinishingDeals,
-	} = useDyeingFinishingDealsStore();
+		fetchAdditionalProcessDeals,
+		updateAdditionalProcessDeal,
+		deleteAdditionalProcessDeal,
+		additionalProcessDeals,
+	} = useAdditionalProcessDealsStore();
 
 	useEffect(() => {
 		const loadData = async () => {
 			setLoading(true);
-			await fetchDyeingFinishingDeals();
+			await fetchAdditionalProcessDeals();
 			setLoading(false);
 		};
 		loadData();
-	}, [fetchDyeingFinishingDeals]);
+	}, [fetchAdditionalProcessDeals]);
 
 	// Update client deals state when the data changes
 	useEffect(() => {
-		setAddPgdeal(dyeingFinishingDeals);
-		setSearchResults(dyeingFinishingDeals); // Set search results to all clients initially
-	}, [dyeingFinishingDeals]);
+		setAddPgdeal(additionalProcessDeals);
+		setSearchResults(additionalProcessDeals); // Set search results to all clients initially
+	}, [additionalProcessDeals]);
 
 	// Handle search functionality
 	const handleSearch = (query) => {
@@ -117,31 +108,10 @@ function AdditionalDealViewPage() {
 			label: "Deal ID",
 			placeholder: "Enter Deal ID",
 		},
-
 		{
-			name: "color",
-			label: "Color",
-			placeholder: "Enter Color",
-		},
-		{
-			name: "shade_percent",
-			label: "Shade Parcent",
-			placeholder: "Enter Shade Parcent",
-		},
-		{
-			name: "service_type",
-			label: "Service Type",
-			placeholder: "Enter Service Type",
-		},
-		{
-			name: "service_price_tk",
-			label: "Service Price Tk",
-			placeholder: "Enter Service Price Tk",
-		},
-		{
-			name: "double_dyeing_tk",
-			label: "Double Dyeing Tk",
-			placeholder: "Enter Double Dyeing Tk",
+			name: "process_type",
+			label: "Process Type",
+			placeholder: "Enter Process Type",
 		},
 		{
 			name: "total_price",
@@ -164,36 +134,30 @@ function AdditionalDealViewPage() {
 		: commonFields;
 
 	const columns = [
-		{ Header: "ID", accessor: "dfpid" },
+		{ Header: "ID", accessor: "appid" },
 		{ Header: "Deal ID", accessor: "deal_id" },
-		{ Header: "Color", accessor: "color" },
-		{ Header: "Shade Parcent", accessor: "shade_percent" },
-		{ Header: "Service Type", accessor: "service_type" },
-		{ Header: "Service Price Tk", accessor: "service_price_tk" },
-		{ Header: "Double Dyeing Tk", accessor: "double_dyeing_tk" },
+		{ Header: "Process Type", accessor: "process_type" },
 		{ Header: "Total Price", accessor: "total_price" },
 		{ Header: "Notes", accessor: "notes" },
 	];
 
-	const caption = "Dyeing Deal Information List"; // Optional Caption for the table
+	const caption = "Additional Pprocess Deals Information List"; // Optional Caption for the table
 
-	// Function to handle editing a client deal
-	const handleEditDyeingDeal = (data) => {
-		setEditAddPgDdealId(data.dfpid); // Set the client ID to track which client we're editing
-		setNewAddPgDeal(data); // Populate the form with the existing data
+	// Function to handle editing a Additional Pprocess deal
+	const handleEditAddPgDeal = (data) => {
+		setEditAddPgDdealId(data.appid);
+		setNewAddPgDeal(data);
 		onOpen(); // Open the modal
 	};
 
-	// Function to handle updating the client
-	const handleUpdateDyeingDeal = async () => {
+	// Function to handle updating the Additional Pprocess Deal
+	const handleUpdateAddPgDeal = async () => {
 		try {
-			// Merge bank_info into newCDeal
 			const updatedDealData = {
 				...newAddPgDeal,
 			};
 
-			// Update the client deal with the merged data
-			const { success, message } = await updateDyeingFinishingDeals(
+			const { success, message } = await updateAdditionalProcessDeal(
 				editAddPgDdealId,
 				updatedDealData
 			);
@@ -205,29 +169,33 @@ function AdditionalDealViewPage() {
 				onClose();
 				resetForm();
 				setEditAddPgDdealId(null);
-				fetchDyeingFinishingDeals();
+				fetchAdditionalProcessDeals();
 			}
 		} catch (error) {
-			console.error("Error updating dyeing deal:", error);
-			showError("An error occurred while updating the dyeing deal.");
+			console.error("Error updating Additional Pprocess Deal:", error);
+			showError(
+				"An error occurred while updating the Additional Pprocess Deal."
+			);
 		}
 	};
 
 	// Delete function
 	const handleDelete = async () => {
 		try {
-			const { success, message } = await deleteDyeingFinishingDeal(
+			const { success, message } = await deleteAdditionalProcessDeal(
 				addPgDealToDelete
 			);
 			if (!success) {
 				showError(message); // Use the utility function for errors
 			} else {
 				showSuccess(message); // Use the utility function for success
-				fetchDyeingFinishingDeals();
+				fetchAdditionalProcessDeals();
 			}
 		} catch (error) {
-			console.error("Error deleting client deals:", error);
-			showError("An error occurred while deleting the client deals.");
+			console.error("Error deleting Additional Pprocess Deal:", error);
+			showError(
+				"An error occurred while deleting the Additional Pprocess Deal."
+			);
 		} finally {
 			setDeleteModalOpen(false);
 			setAddPgDealToDelete(null);
@@ -236,7 +204,7 @@ function AdditionalDealViewPage() {
 
 	// Open the delete confirmation modal
 	const openDeleteConfirmation = (data) => {
-		setAddPgDealToDelete(data.dfpid);
+		setAddPgDealToDelete(data.appid);
 		setDeleteModalOpen(true);
 	};
 
@@ -252,14 +220,14 @@ function AdditionalDealViewPage() {
 						bgClip={"text"}
 						textAlign={"center"}
 					>
-						Dyeing Deals Page
+						Additional Pprocess Deals Page
 					</Text>
 
 					{/* Search Bar Component */}
 					<SearchBar
-						fields={["dfpid", "deal_id"]} // Search by Deal ID, Client ID, and Contact
+						fields={["appid", "deal_id"]} // Search by Deal ID, Client ID, and Contact
 						onSearch={handleSearch}
-						placeholder="Search by Dyeing Deal ID, Deal ID"
+						placeholder="Search by Additional Pprocess Deal ID, Deal ID"
 					/>
 
 					{/* Loading Spinner */}
@@ -271,16 +239,16 @@ function AdditionalDealViewPage() {
 						) : (
 							// Display DataTable with client data
 							<DataTable
-								data={searchResults} // Always show search results or all clients
+								data={searchResults} // Always show search results or all Additional Pprocess Deal
 								columns={columns}
 								caption={caption}
-								onEdit={handleEditDyeingDeal} // Pass the handleEditClient function
+								onEdit={handleEditAddPgDeal} // Pass the handleEditClient function
 								onDelete={openDeleteConfirmation} // Pass the openDeleteConfirmation function
 							/>
 						)}
 					</div>
 
-					{/* Display message when no clients found */}
+					{/* Display message when no Additional Pprocess Deal found */}
 					{!loading && searchResults.length === 0 && (
 						<VStack spacing={8} mt={10}>
 							<Text
@@ -289,25 +257,25 @@ function AdditionalDealViewPage() {
 								color={"gray.500"}
 								textAlign={"center"}
 							>
-								No dyeing deals found 😢
+								No Additional Pprocess Deal found 😢
 							</Text>
 						</VStack>
 					)}
 				</VStack>
 			</Container>
 
-			{/* Add or Edit Client Modal */}
+			{/* Add or Edit Additional Pprocess Deal Modal */}
 			<FormModal
 				isOpen={isOpen}
 				onClose={() => {
 					onClose(); // Close modal
 					resetForm(); // Reset form data
-					setEditDyeingDdealId(null); // Reset the edit client ID
+					setEditAddPgDdealId(null); // Reset the edit client ID
 				}}
-				formData={newDyeingDeal}
+				formData={newAddPgDeal}
 				handleChange={handleChange}
-				handleSubmit={editDyeingDdealId && handleUpdateDyeingDeal}
-				modalTitle={editDyeingDdealId && "Edit Dyeing Deal"}
+				handleSubmit={editAddPgDdealId && handleUpdateAddPgDeal}
+				modalTitle={editAddPgDdealId && "Edit Dyeing Deal"}
 				fields={fields} // Pass the dynamic field configuration
 			/>
 
