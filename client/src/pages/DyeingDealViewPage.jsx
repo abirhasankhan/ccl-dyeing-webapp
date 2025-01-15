@@ -227,8 +227,8 @@ function DyeingDealViewPage() {
         fetchDyeingFinishingDeals();
 			}
 		} catch (error) {
-			console.error("Error deleting client deals:", error);
-			showError("An error occurred while deleting the client deals.");
+			console.error("Error deleting dyeing deals:", error);
+			showError("An error occurred while deleting the dyeing deals.");
 		} finally {
 			setDeleteModalOpen(false);
 			setDyeingDealToDelete(null);
