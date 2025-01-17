@@ -17,8 +17,8 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm }) {
 				<ModalHeader>Confirm Deletion</ModalHeader>
 				<ModalCloseButton />
 				<ModalBody>
-					Are you sure you want to delete this client? This action
-					cannot be undone.
+					Are you sure you want to  <h className="font-bold text-red-500">delete</h> this ? This
+					action cannot be undone.
 				</ModalBody>
 				<ModalFooter>
 					<Button colorScheme="red" onClick={onConfirm} mr={3}>

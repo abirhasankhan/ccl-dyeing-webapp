@@ -8,6 +8,7 @@ import {
 	Flex,
 	useDisclosure,
 	Spinner,
+	Button,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -23,11 +24,13 @@ import {
 import { useToastNotification } from "../hooks/toastUtils";
 
 function AdditionalDealViewPage() {
+
 	const { showError, showSuccess } = useToastNotification();
 
 	const [addPgdeal, setAddPgdeal] = useState({});
 
 	const [searchResults, setSearchResults] = useState([]);
+
 	const [loading, setLoading] = useState(false); // Loading state
 
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -51,12 +54,14 @@ function AdditionalDealViewPage() {
 	};
 
 	const [editAddPgDdealId, setEditAddPgDdealId] = useState(null);
+	
 	// State for handling delete confirmation modal
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
 	const [addPgDealToDelete, setAddPgDealToDelete] = useState(null);
 
 	const {
+		createAdditionalProcessDeal,
 		fetchAdditionalProcessDeals,
 		updateAdditionalProcessDeal,
 		deleteAdditionalProcessDeal,
@@ -126,7 +131,7 @@ function AdditionalDealViewPage() {
 	];
 
 	// Define additional fields for editing
-	const editFields = [{}];
+	const editFields = [];
 
 	// Combine fields based on the condition
 	const fields = editAddPgDdealId
@@ -142,6 +147,25 @@ function AdditionalDealViewPage() {
 	];
 
 	const caption = "Additional Pprocess Deals Information List"; // Optional Caption for the table
+
+	const handleCreateAddPgDeal = async () => {
+		try {
+			const { success, message } = await createAdditionalProcessDeal(
+				newAddPgDeal);
+			if (!success) {
+				showError(message); // Use the utility function for errors
+			} else {
+				showSuccess(message); // Use the utility function for success
+				onClose();
+				resetForm();
+				fetchAdditionalProcessDeals();
+
+			}
+		} catch (error) {
+			console.error("Error creating Additional Pprocess Deal:", error);
+			showError("An error occurred while creating Additional Pprocess Deal.");
+		}
+	};
 
 	// Function to handle editing a Additional Pprocess deal
 	const handleEditAddPgDeal = (data) => {
@@ -223,6 +247,13 @@ function AdditionalDealViewPage() {
 						Additional Pprocess Deals Page
 					</Text>
 
+					{/* Align button to the left */}
+					<Flex justify="flex-start" w="100%" pl={4}>
+						<Button colorScheme="blue" size="lg" onClick={onOpen}>
+							Add Additional Pprocess Deal
+						</Button>
+					</Flex>
+
 					{/* Search Bar Component */}
 					<SearchBar
 						fields={["appid", "deal_id"]} // Search by Deal ID, Client ID, and Contact
@@ -274,8 +305,8 @@ function AdditionalDealViewPage() {
 				}}
 				formData={newAddPgDeal}
 				handleChange={handleChange}
-				handleSubmit={editAddPgDdealId && handleUpdateAddPgDeal}
-				modalTitle={editAddPgDdealId && "Edit Dyeing Deal"}
+				handleSubmit={editAddPgDdealId ? handleUpdateAddPgDeal : handleCreateAddPgDeal}
+				modalTitle={editAddPgDdealId ? "Edit Dyeing Deal" : "Add Dyeing Deal"}
 				fields={fields} // Pass the dynamic field configuration
 			/>
 

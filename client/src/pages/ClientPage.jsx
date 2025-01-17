@@ -56,6 +56,7 @@ function ClientPage() {
 
 	// State for handling delete confirmation modal
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+	
 	const [clientToDelete, setClientToDelete] = useState(null);
 
 	const { createClient, fetchClient, updateClient, deleteClient, client } =

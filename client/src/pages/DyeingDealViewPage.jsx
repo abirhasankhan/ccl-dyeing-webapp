@@ -6,6 +6,7 @@ import {
 	Flex,
 	useDisclosure,
 	Spinner,
+	Button,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -21,12 +22,12 @@ import {
 import { useToastNotification } from "../hooks/toastUtils";
 
 function DyeingDealViewPage() {
-
 	const { showError, showSuccess } = useToastNotification();
 
 	const [dyeingdeal, setdyeingdeal] = useState({});
 
 	const [searchResults, setSearchResults] = useState([]);
+
 	const [loading, setLoading] = useState(false); // Loading state
 
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -39,7 +40,6 @@ function DyeingDealViewPage() {
 		service_type: "",
 		service_price_tk: "",
 		double_dyeing_tk: "",
-		total_price: "",
 		notes: "",
 	});
 
@@ -52,18 +52,19 @@ function DyeingDealViewPage() {
 			service_type: "",
 			service_price_tk: "",
 			double_dyeing_tk: "",
-			total_price: "",
 			notes: "",
 		});
 	};
 
 	const [editDyeingDdealId, setEditDyeingDdealId] = useState(null);
+
 	// State for handling delete confirmation modal
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
 	const [dyeingDealToDelete, setDyeingDealToDelete] = useState(null);
 
 	const {
+		createDyeingFinishingDeal,
 		fetchDyeingFinishingDeals,
 		updateDyeingFinishingDeals,
 		deleteDyeingFinishingDeal,
@@ -71,36 +72,49 @@ function DyeingDealViewPage() {
 	} = useDyeingFinishingDealsStore();
 
 	useEffect(() => {
+		let isMounted = true; // Flag to check if the component is still mounted
 		const loadData = async () => {
 			setLoading(true);
 			await fetchDyeingFinishingDeals();
-			setLoading(false);
+			if (isMounted) setLoading(false); // Only set loading to false if component is still mounted
 		};
 		loadData();
+		return () => {
+			isMounted = false;
+		}; // Cleanup function to set isMounted to false when component unmounts
 	}, [fetchDyeingFinishingDeals]);
+
 
 	// Update client deals state when the data changes
 	useEffect(() => {
-		setdyeingdeal(dyeingFinishingDeals);
-		setSearchResults(dyeingFinishingDeals); // Set search results to all clients initially
-	}, [dyeingFinishingDeals]);
+		if (dyeingFinishingDeals !== dyeingdeal) {
+			setdyeingdeal(dyeingFinishingDeals);
+			setSearchResults(dyeingFinishingDeals);
+		}
+	}, [dyeingFinishingDeals, dyeingdeal]);
+
 
 	// Handle search functionality
 	const handleSearch = (query) => {
-		if (query === "") {
-			// If query is empty, show all clients
-			setSearchResults(dyeingdeal);
-		} else {
-			// Search logic based on multiple fields (id, name, etc.)
-			const results = dyeingdeal.filter((data) => {
-				return (
-					data.deal_id.toString().includes(query) ||
-					data.dfpid.toString().includes(query)
+		const debounceTimeout = setTimeout(() => {
+
+			if (query === "") {
+				setSearchResults(dyeingdeal);
+			} else {
+				const results = dyeingdeal.filter((data) => {
+						return (
+							data.deal_id.toString().includes(query) ||
+							data.dfpid.toString().includes(query)
+						);
+					}
 				);
-			});
-			setSearchResults(results); // Set filtered results
-		}
+				setSearchResults(results);
+			}
+
+		}, 300); // Delay the search by 300ms
+		return () => clearTimeout(debounceTimeout);
 	};
+
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -122,10 +136,10 @@ function DyeingDealViewPage() {
 			placeholder: "Enter Color",
 		},
 		{
-			name: "shade_percent", 
+			name: "shade_percent",
 			label: "Shade Parcent",
 			placeholder: "Enter Shade Parcent",
-			},
+		},
 		{
 			name: "service_type",
 			label: "Service Type",
@@ -142,11 +156,6 @@ function DyeingDealViewPage() {
 			placeholder: "Enter Double Dyeing Tk",
 		},
 		{
-			name: "total_price",
-			label: "Total Price",
-			placeholder: "Enter Total Price",
-		},
-		{
 			name: "notes",
 			label: "Notes",
 			placeholder: "Enter Notes",
@@ -154,10 +163,7 @@ function DyeingDealViewPage() {
 	];
 
 	// Define additional fields for editing
-	const editFields = [
-		{
-		},
-	];
+	const editFields = [];
 
 	// Combine fields based on the condition
 	const fields = editDyeingDdealId
@@ -178,6 +184,24 @@ function DyeingDealViewPage() {
 
 	const caption = "Dyeing Deal Information List"; // Optional Caption for the table
 
+	// createClient function to handle creating a new client deal
+	const handleCreateDyeingDeal = async () => {
+		try {
+			const { success, message } = await createDyeingFinishingDeal(
+				newDyeingDeal
+			);
+			if (!success) {
+				showError(message); // Use the utility function for errors
+			} else {
+				showSuccess(message); // Use the utility function for success
+				onClose();
+				resetForm();
+			}
+		} catch (error) {
+			console.error("Error creating client deal:", error);
+			showError("An error occurred while creating client deal.");
+		}
+	};
 	// Function to handle editing a client deal
 	const handleEditDyeingDeal = (data) => {
 		setEditDyeingDdealId(data.dfpid); // Set the client ID to track which client we're editing
@@ -190,7 +214,7 @@ function DyeingDealViewPage() {
 		try {
 			// Merge bank_info into newCDeal
 			const updatedDealData = {
-				...newDyeingDeal
+				...newDyeingDeal,
 			};
 
 			// Update the client deal with the merged data
@@ -224,7 +248,7 @@ function DyeingDealViewPage() {
 				showError(message); // Use the utility function for errors
 			} else {
 				showSuccess(message); // Use the utility function for success
-        fetchDyeingFinishingDeals();
+				fetchDyeingFinishingDeals();
 			}
 		} catch (error) {
 			console.error("Error deleting dyeing deals:", error);
@@ -241,6 +265,7 @@ function DyeingDealViewPage() {
 		setDeleteModalOpen(true);
 	};
 
+
 	return (
 		<Box minH="100vh" display="flex" flexDirection="column" px={4}>
 			{/* Full height container */}
@@ -253,8 +278,15 @@ function DyeingDealViewPage() {
 						bgClip={"text"}
 						textAlign={"center"}
 					>
-            Dyeing Deals Page
+						Dyeing Deals Page
 					</Text>
+
+					{/* Align button to the left */}
+					<Flex justify="flex-start" w="100%" pl={4}>
+						<Button colorScheme="blue" size="lg" onClick={onOpen}>
+							Add Dyeing Finishing Deal
+						</Button>
+					</Flex>
 
 					{/* Search Bar Component */}
 					<SearchBar
@@ -307,8 +339,12 @@ function DyeingDealViewPage() {
 				}}
 				formData={newDyeingDeal}
 				handleChange={handleChange}
-				handleSubmit={editDyeingDdealId && handleUpdateDyeingDeal}
-				modalTitle={editDyeingDdealId && "Edit Dyeing Deal"}
+				handleSubmit={
+					editDyeingDdealId
+						? handleUpdateDyeingDeal
+						: handleCreateDyeingDeal
+				}
+				modalTitle={editDyeingDdealId ? "Edit Dyeing Deal" : "Add Dyeing Deal"}
 				fields={fields} // Pass the dynamic field configuration
 			/>
 

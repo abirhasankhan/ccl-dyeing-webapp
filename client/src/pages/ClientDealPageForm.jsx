@@ -10,13 +10,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 // Define the validation schema with yup
 const schema = yup.object().shape({
 	clientid: yup.string().required("Client ID is required"),
-	issueDate: yup.string().required("Issue Date is required"),
-	validThrough: yup.string().required("Valid Through is required"),
+	issue_date: yup.string().required("Issue Date is required"),
+	valid_through: yup.string().required("Valid Through is required"),
 	representative: yup.string().required("Representative is required"),
 	designation: yup.string().required("Designation is required"),
-	contactNo: yup.string().required("Contact No is required"),
+	contact_no: yup.string().required("Contact No is required"),
 	notes: yup.string().notRequired(), // Notes is optional
-	paymentMethod: yup.string().required("Payment Method is required"),
+	payment_method: yup.string().required("Payment Method is required"),
 	bankInfo: yup.object().shape({
 		bankName: yup.string().when("paymentMethod", {
 			is: (val) => val === "Bank" || val === "Hybrid",
@@ -40,11 +40,11 @@ const ClientDealPageForm = ({ onNext }) => {
 		resolver: yupResolver(schema),
 		defaultValues: {
 			clientid: "",
-			issueDate: "",
-			validThrough: "",
+			issue_date: "",
+			valid_through: "",
 			representative: "",
-			contactNo: "",
-			paymentMethod: "",
+			contact_no: "",
+			payment_method: "",
 			bankInfo: { bankName: "", branch: "", sortCode: "" },
 		},
 	});
@@ -82,13 +82,13 @@ const ClientDealPageForm = ({ onNext }) => {
 					<FormInput label="Client ID" name="clientid" required />
 					<FormInput
 						label="Issue Date"
-						name="issueDate"
+						name="issue_date"
 						type="date"
 						required
 					/>
 					<FormInput
 						label="Valid Through"
-						name="validThrough"
+						name="valid_through"
 						type="date"
 						required
 					/>
@@ -106,7 +106,7 @@ const ClientDealPageForm = ({ onNext }) => {
 					/>
 					<FormInput
 						label="Contact No"
-						name="contactNo"
+						name="contact_no"
 						type="text"
 						required
 					/>
@@ -116,10 +116,10 @@ const ClientDealPageForm = ({ onNext }) => {
 						type="text"
 						isRequired={false}
 					/>
-				
+
 					{/* Payment Method Dropdown */}
 					<Controller
-						name="paymentMethod"
+						name="payment_method"
 						control={methods.control}
 						render={({ field }) => (
 							<Select

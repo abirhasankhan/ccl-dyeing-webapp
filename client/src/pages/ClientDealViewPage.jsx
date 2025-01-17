@@ -6,6 +6,7 @@ import {
 	Flex,
 	useDisclosure,
 	Spinner,
+	Button,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -21,11 +22,13 @@ import {
 import { useToastNotification } from "../hooks/toastUtils";
 
 function ClientDealViewPage() {
+
 	const { showError, showSuccess } = useToastNotification();
 
 	const [cdeal, setcdeal] = useState({});
 
 	const [searchResults, setSearchResults] = useState([]);
+
 	const [loading, setLoading] = useState(false); // Loading state
 
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -59,12 +62,14 @@ function ClientDealViewPage() {
 	};
 
 	const [editCDdealId, setEditCDdealId] = useState(null);
+
 	// State for handling delete confirmation modal
 	const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
 	const [cDealToDelete, setCDealToDelete] = useState(null);
 
 	const {
+		createClientDeal,
 		fetchClientDeals,
 		updateClientDeal,
 		deleteClientDeal,
@@ -72,39 +77,50 @@ function ClientDealViewPage() {
 	} = useClientDealStore();
 
 	// Fetch client deals on initial load
-
 	useEffect(() => {
+		let isMounted = true; // Flag to check if the component is still mounted
 		const loadCDeal = async () => {
 			setLoading(true);
 			await fetchClientDeals();
-			setLoading(false);
+			if (isMounted) setLoading(false); // Only set loading to false if component is still mounted
 		};
 
 		loadCDeal();
+		return () => {
+			isMounted = false;
+		}; // Cleanup function to set isMounted to false when component unmounts
 	}, [fetchClientDeals]);
 
 	// Update client deals state when the data changes
 	useEffect(() => {
-		setcdeal(clientDeals);
-		setSearchResults(clientDeals); // Set search results to all clients initially
-	}, [clientDeals]);
+		if( clientDeals !== cdeal ) {
+			setcdeal(clientDeals);
+			setSearchResults(clientDeals); 
+		}
+
+	}, [clientDeals, cdeal]);
 
 	// Handle search functionality
 	const handleSearch = (query) => {
-		if (query === "") {
-			// If query is empty, show all clients
-			setSearchResults(cdeal);
-		} else {
-			// Search logic based on multiple fields (id, name, etc.)
-			const results = cdeal.filter((data) => {
-				return (
-					data.deal_id.toString().includes(query) ||
-					data.clientid.toString().includes(query) ||
-					data.contactNo.toLowerCase().includes(query.toLowerCase())
-				);
-			});
-			setSearchResults(results); // Set filtered results
-		}
+		const debounceTimeout = setTimeout(() => {
+
+			if (query === "") {
+				// If query is empty, show all clients
+				setSearchResults(cdeal);
+			} else {
+				// Search logic based on multiple fields (id, name, etc.)
+				const results = cdeal.filter((data) => {
+					return (
+						data.deal_id.toString().includes(query) ||
+						data.clientid.toString().includes(query) ||
+						data.contact_no.toLowerCase().includes(query.toLowerCase())
+					);
+				});
+				setSearchResults(results); // Set filtered results
+			}
+		
+		},300); // Delay the search by 300ms
+		return () => clearTimeout(debounceTimeout);
 	};
 
 	const handleChange = (e) => {
@@ -122,13 +138,13 @@ function ClientDealViewPage() {
 		},
 
 		{
-			name: "issueDate",
+			name: "issue_date",
 			label: "Issue Date",
 			placeholder: "Enter Issue Date",
 			type: "date",
 		},
 		{
-			name: "validThrough",
+			name: "valid_through",
 			label: "Valid Through",
 			placeholder: "Enter Valid Through",
 			type: "date",
@@ -144,37 +160,12 @@ function ClientDealViewPage() {
 			placeholder: "Enter Designation",
 		},
 		{
-			name: "contactNo",
+			name: "contact_no",
 			label: "Contact No",
 			placeholder: "Enter Contact No",
 		},
 		{
-			name: "notes",
-			label: "Notes",
-			placeholder: "Enter Notes",
-		},
-		// Other fields
-		{
-			name: "bankInfo.bankName",
-			label: "Bank Name",
-			placeholder: "Enter Bank Name",
-		},
-		{
-			name: "bankInfo.branch",
-			label: "Branch",
-			placeholder: "Enter Branch Name",
-		},
-		{
-			name: "bankInfo.sortCode",
-			label: "Sort Code",
-			placeholder: "Enter Sort Code",
-		},
-	];
-
-	// Define additional fields for editing
-	const editFields = [
-		{
-			name: "paymentMethod",
+			name: "payment_method",
 			label: "Payment Method",
 			type: "select", // Field type select
 			options: [
@@ -183,6 +174,31 @@ function ClientDealViewPage() {
 				{ label: "Hybrid", value: "Hybrid" },
 			],
 		},
+		{
+			name: "notes",
+			label: "Notes",
+			placeholder: "Enter Notes",
+		},
+		// Other fields
+		{
+			name: "bankName",
+			label: "Bank Name",
+			placeholder: "Enter Bank Name",
+		},
+		{
+			name: "branch",
+			label: "Branch",
+			placeholder: "Enter Branch Name",
+		},
+		{
+			name: "sortCode",
+			label: "Sort Code",
+			placeholder: "Enter Sort Code",
+		},
+	];
+
+	// Define additional fields for editing
+	const editFields = [
 		{
 			name: "status",
 			label: "Status",
@@ -198,46 +214,56 @@ function ClientDealViewPage() {
 				{ label: "Expired", value: "Expired" },
 			],
 		},
-
 	];
-
-
 
 	// Combine fields based on the condition
 	const fields = editCDdealId
-		? [
-				...commonFields,
-				...editFields		
-        ]
+		? [...commonFields, ...editFields]
 		: commonFields;
 
-const columns = [
-	{ Header: "ID", accessor: "deal_id" },
-	{ Header: "Client ID", accessor: "clientid" },
-	{ Header: "Issue Date", accessor: "issueDate" },
-	{ Header: "Valid Through", accessor: "validThrough" },
-	{ Header: "Representative", accessor: "representative" },
-	{ Header: "Designation", accessor: "designation" },
-	{ Header: "Contact No", accessor: "contactNo" },
-	{ Header: "Payment Method", accessor: "paymentMethod" },
-	{ Header: "Status", accessor: "status" },
-	{ Header: "Notes", accessor: "notes" },
-	{
-		Header: "Bank Name",
-		accessor: "bankInfo.bankName",
-	},
-	{
-		Header: "Branch",
-		accessor: "bankInfo.branch",
-	},
-	{
-		Header: "Sort Code",
-		accessor: "bankInfo.sortCode",
-	},
-];
-    
+	const columns = [
+		{ Header: "ID", accessor: "deal_id" },
+		{ Header: "Client ID", accessor: "clientid" },
+		{ Header: "Issue Date", accessor: "issue_date" },
+		{ Header: "Valid Through", accessor: "valid_through" },
+		{ Header: "Representative", accessor: "representative" },
+		{ Header: "Designation", accessor: "designation" },
+		{ Header: "Contact No", accessor: "contact_no" },
+		{ Header: "Payment Method", accessor: "payment_method" },
+		{
+			Header: "Bank Name",
+			accessor: "bankName",
+		},
+		{
+			Header: "Branch",
+			accessor: "branch",
+		},
+		{
+			Header: "Sort Code",
+			accessor: "sortCode",
+		},
+		{ Header: "Status", accessor: "status" },
+		{ Header: "Notes", accessor: "notes" },
+	];
 
 	const caption = "Client Deal Information List"; // Optional Caption for the table
+
+	// createClient function to handle creating a new client deal
+	const handleCreateClient = async () => {
+		try {
+			const { success, message } = await createClientDeal(newCDeal);
+			if (!success) {
+				showError(message); // Use the utility function for errors
+			} else {
+				showSuccess(message); // Use the utility function for success
+				onClose();
+				resetForm();
+			}
+		} catch (error) {
+			console.error("Error creating client deal:", error);
+			showError("An error occurred while creating client deal.");
+		}
+	};
 
 	// Function to handle editing a client deal
 	const handleEditCDeal = (data) => {
@@ -247,39 +273,37 @@ const columns = [
 	};
 
 	// Function to handle updating the client
-const handleUpdateCDeal = async () => {
-	try {
-		// Merge bank_info into newCDeal
-    const updatedDealData = {
-        ...newCDeal,
-        bankInfo: {
-            branch: newCDeal.bankInfo.branch,
-            bankName: newCDeal.bankInfo.bankName,
-            sortCode: newCDeal.bankInfo.sortCode,
-        },
-    };
+	const handleUpdateCDeal = async () => {
+		try {
+			// Merge bank_info into newCDeal
+			const updatedDealData = {
+				...newCDeal,
+				bankInfo: {
+					branch: newCDeal.branch,
+					bankName: newCDeal.bankName,
+					sortCode: newCDeal.sortCode,
+				},
+			};
 
+			// Update the client deal with the merged data
+			const { success, message } = await updateClientDeal(
+				editCDdealId,
+				updatedDealData
+			);
 
-		// Update the client deal with the merged data
-		const { success, message } = await updateClientDeal(
-			editCDdealId,
-			updatedDealData
-		);
-
-		if (!success) {
-			showError(message); // Use the utility function for errors
-		} else {
-			showSuccess(message); // Use the utility function for success
-			onClose();
-			resetForm();
-			setEditCDdealId(null);
+			if (!success) {
+				showError(message); // Use the utility function for errors
+			} else {
+				showSuccess(message); // Use the utility function for success
+				onClose();
+				resetForm();
+				setEditCDdealId(null);
+			}
+		} catch (error) {
+			console.error("Error updating client deal:", error);
+			showError("An error occurred while updating the client deal.");
 		}
-	} catch (error) {
-		console.error("Error updating client deal:", error);
-		showError("An error occurred while updating the client deal.");
-	}
-};
-
+	};
 
 	// Delete function
 	const handleDelete = async () => {
@@ -306,6 +330,7 @@ const handleUpdateCDeal = async () => {
 		setDeleteModalOpen(true);
 	};
 
+
 	return (
 		<Box minH="100vh" display="flex" flexDirection="column" px={4}>
 			{/* Full height container */}
@@ -321,6 +346,13 @@ const handleUpdateCDeal = async () => {
 						Client Deals Page
 					</Text>
 
+					{/* Align button to the left */}
+					<Flex justify="flex-start" w="100%" pl={4}>
+						<Button colorScheme="blue" size="lg" onClick={onOpen}>
+							Add Client Deal
+						</Button>
+					</Flex>
+
 					{/* Search Bar Component */}
 					<SearchBar
 						fields={["deal_id", "clientid", "contact"]} // Search by Deal ID, Client ID, and Contact
@@ -329,7 +361,7 @@ const handleUpdateCDeal = async () => {
 					/>
 
 					{/* Loading Spinner */}
-					<div style={{ width: "100%" }}>
+					<div style={{ width: "105%" }}>
 						{loading ? (
 							<Flex justify="center" mt={8}>
 								<Spinner size="xl" />
@@ -372,8 +404,12 @@ const handleUpdateCDeal = async () => {
 				}}
 				formData={newCDeal}
 				handleChange={handleChange}
-				handleSubmit={editCDdealId && handleUpdateCDeal}
-				modalTitle={editCDdealId && "Edit Client"}
+				handleSubmit={
+					editCDdealId ? handleUpdateCDeal : handleCreateClient
+				}
+				modalTitle={
+					editCDdealId ? "Edit Client Deal" : "Add New Client Deal"
+				}
 				fields={fields} // Pass the dynamic field configuration
 			/>
 

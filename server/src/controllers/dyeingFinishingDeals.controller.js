@@ -5,6 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
+
 // Create a new Dyeing Finishing Deal
 const createDyeingFinishingDeals = asyncHandler(async (req, res) => {
 
@@ -74,6 +75,8 @@ const createDyeingFinishingDeals = asyncHandler(async (req, res) => {
 const getAllDyeingFinishingDeals = asyncHandler(async (req, res) => {
 
     const result = await db.select().from(dyeingFinishingDeals).orderBy(dyeingFinishingDeals.dfpid);
+    
+
     return res.status(200).json(
         new ApiResponse(200, result, "Dyeing Finishing Deals fetched successfully")    
     );

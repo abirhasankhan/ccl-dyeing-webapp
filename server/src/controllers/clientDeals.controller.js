@@ -5,15 +5,16 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import {Client} from "../models/client.model.js"
+import { sql } from 'drizzle-orm';
 
 
 // Create a new record
 const createClientDeals = asyncHandler(async (req, res) => {
 
-    const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, remarks } = req.body;
+    const { clientid, payment_method, issue_date, valid_through, representative, designation, contact_no, bankInfo, notes, remarks } = req.body;
 
     // Define required fields and check for missing ones
-    const requiredFields = ['clientid', 'paymentMethod', 'issueDate', 'validThrough', 'representative', 'designation', 'contactNo'];
+    const requiredFields = ['clientid', 'payment_method', 'issue_date', 'valid_through', 'representative', 'designation', 'contact_no'];
     const missingFields = requiredFields.filter(field => !req.body[field]?.trim());
 
     if (missingFields.length > 0) {
@@ -22,12 +23,12 @@ const createClientDeals = asyncHandler(async (req, res) => {
 
     // Normalize inputs by trimming strings where applicable
     const normalizedClientid = clientid?.trim();
-    const normalizedPaymentMethod = paymentMethod?.trim();
-    const normalizedIssueDate = issueDate?.trim();
-    const normalizedValidThrough = validThrough?.trim();
+    const normalizedPaymentMethod = payment_method?.trim();
+    const normalizedIssueDate = issue_date?.trim();
+    const normalizedValidThrough = valid_through?.trim();
     const normalizedRepresentative = representative?.trim();
     const normalizedDesignation = designation?.trim();
-    const normalizedContactNo = contactNo?.trim();
+    const normalizedContactNo = contact_no?.trim();
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
@@ -54,12 +55,12 @@ const createClientDeals = asyncHandler(async (req, res) => {
     // Prepare the new client deal object
     const newClientDeals = {
         clientid: normalizedClientid,
-        paymentMethod: normalizedPaymentMethod,
-        issueDate: normalizedIssueDate,
-        validThrough: normalizedValidThrough,
+        payment_method: normalizedPaymentMethod,
+        issue_date: normalizedIssueDate,
+        valid_through: normalizedValidThrough,
         representative: normalizedRepresentative,
         designation: normalizedDesignation,
-        contactNo: normalizedContactNo,
+        contact_no: normalizedContactNo,
         bankInfo: normalizedBankInfo,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
@@ -82,8 +83,26 @@ const createClientDeals = asyncHandler(async (req, res) => {
 // Get all records
 const getClientDeals = asyncHandler(async (req, res) => {
     try {
-        const result = await db.select().from(clientDeals).orderBy(clientDeals.deal_id); // Sorting by clientid in ascending order
-;
+
+
+        const result = await db
+            .select({
+                deal_id: clientDeals.deal_id,
+                clientid: clientDeals.clientid,
+                payment_method: clientDeals.payment_method,
+                issue_date: clientDeals.issue_date,
+                valid_through: clientDeals.valid_through,
+                representative: clientDeals.representative,
+                designation: clientDeals.designation,
+                contact_no: clientDeals.contact_no,
+                branch: sql`${clientDeals.bankInfo} ->> 'branch'`.as('branch'),      // ✅ Fixed JSON extraction
+                bankName: sql`${clientDeals.bankInfo} ->> 'bankName'`.as('bankName'),
+                sortCode: sql`${clientDeals.bankInfo} ->> 'sortCode'`.as('sortCode'),
+                notes: clientDeals.notes
+            })
+            .from(clientDeals)
+            .orderBy(clientDeals.deal_id);
+
 
         // Format the result to ensure consistency
         const formattedResult = result.map(deal => ({
@@ -111,10 +130,10 @@ const updateClientDeals = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
 
-    const { clientid, paymentMethod, issueDate, validThrough, representative, designation, contactNo, bankInfo, notes, status, remarks } = req.body;
+    const { clientid, payment_method, issue_date, valid_through, representative, designation, contact_no, bankInfo, notes, status, remarks } = req.body;
 
     // Define required fields and check for missing ones
-    const requiredFields = ['clientid', 'paymentMethod', 'issueDate', 'validThrough', 'representative', 'designation', 'contactNo'];
+    const requiredFields = ['clientid', 'payment_method', 'issue_date', 'valid_through', 'representative', 'designation', 'contact_no'];
     const missingFields = requiredFields.filter(field => !req.body[field]?.trim());
 
     if (missingFields.length > 0) {
@@ -123,12 +142,12 @@ const updateClientDeals = asyncHandler(async (req, res) => {
 
     // Normalize inputs by trimming strings where applicable
     const normalizedClientid = clientid?.trim();
-    const normalizedPaymentMethod = paymentMethod?.trim();
-    const normalizedIssueDate = issueDate?.trim();
-    const normalizedValidThrough = validThrough?.trim();
+    const normalizedPaymentMethod = payment_method?.trim();
+    const normalizedIssueDate = issue_date?.trim();
+    const normalizedValidThrough = valid_through?.trim();
     const normalizedRepresentative = representative?.trim();
     const normalizedDesignation = designation?.trim();
-    const normalizedContactNo = contactNo?.trim();
+    const normalizedContactNo = contact_no?.trim();
     const normalizedNotes = notes?.trim() || null;
     const normalizedStatus = status?.trim();
     const normalizedRemarks = remarks?.trim() || null;
@@ -155,12 +174,12 @@ const updateClientDeals = asyncHandler(async (req, res) => {
 
     const updatedClientDeals = {
         clientid: normalizedClientid,
-        paymentMethod: normalizedPaymentMethod,
-        issueDate: normalizedIssueDate,
-        validThrough: normalizedValidThrough,
+        payment_method: normalizedPaymentMethod,
+        issue_date: normalizedIssueDate,
+        valid_through: normalizedValidThrough,
         representative: normalizedRepresentative,
         designation: normalizedDesignation,
-        contactNo: normalizedContactNo,
+        contact_no: normalizedContactNo,
         bankInfo: normalizedBankInfo,
         notes: normalizedNotes,
         status: normalizedStatus,
