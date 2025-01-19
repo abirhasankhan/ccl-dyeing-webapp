@@ -5,6 +5,7 @@ import additionalProcessPricesRoutes from './additionalProcessPrices.route.js';
 import clientDealsRoutes from './clientDeals.route.js';
 import dyeingFinishingDealsRoutes from './dyeingFinishingDeals.route.js';
 import additionalProcessDealsRoutes from './additionalProcessDeals.route.js';
+import dealOrderRoutes from './dealOrders.route.js';
 
 export { 
     authRoutes, 
@@ -13,5 +14,6 @@ export {
     additionalProcessPricesRoutes,
     clientDealsRoutes,
     dyeingFinishingDealsRoutes,
-    additionalProcessDealsRoutes
+    additionalProcessDealsRoutes,
+    dealOrderRoutes,
 };

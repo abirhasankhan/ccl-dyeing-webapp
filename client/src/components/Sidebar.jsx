@@ -60,6 +60,11 @@ const sidebarItems = [
 			},
 		],
 	},
+	{
+		label: "Deal Orders",
+		to: "/deal-order",
+		icon: <FaInfoCircle />,
+	},
 ];
 
 const Sidebar = () => {

@@ -4,7 +4,7 @@ import { eq, ilike } from 'drizzle-orm';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import {Client} from "../models/client.model.js"
+import { Client } from "../models/client.model.js"
 import { sql } from 'drizzle-orm';
 
 
@@ -82,45 +82,41 @@ const createClientDeals = asyncHandler(async (req, res) => {
 
 // Get all records
 const getClientDeals = asyncHandler(async (req, res) => {
-    try {
+
+    const result = await db
+        .select({
+            deal_id: clientDeals.deal_id,
+            clientid: clientDeals.clientid,
+            payment_method: clientDeals.payment_method,
+            issue_date: clientDeals.issue_date,
+            valid_through: clientDeals.valid_through,
+            representative: clientDeals.representative,
+            designation: clientDeals.designation,
+            contact_no: clientDeals.contact_no,
+            branch: sql`${clientDeals.bankInfo} ->> 'branch'`.as('branch'),      // ✅ Fixed JSON extraction
+            bankName: sql`${clientDeals.bankInfo} ->> 'bankName'`.as('bankName'),
+            sortCode: sql`${clientDeals.bankInfo} ->> 'sortCode'`.as('sortCode'),
+            notes: clientDeals.notes,
+            status: clientDeals.status,
+        })
+        .from(clientDeals)
+        .orderBy(clientDeals.deal_id);
 
 
-        const result = await db
-            .select({
-                deal_id: clientDeals.deal_id,
-                clientid: clientDeals.clientid,
-                payment_method: clientDeals.payment_method,
-                issue_date: clientDeals.issue_date,
-                valid_through: clientDeals.valid_through,
-                representative: clientDeals.representative,
-                designation: clientDeals.designation,
-                contact_no: clientDeals.contact_no,
-                branch: sql`${clientDeals.bankInfo} ->> 'branch'`.as('branch'),      // ✅ Fixed JSON extraction
-                bankName: sql`${clientDeals.bankInfo} ->> 'bankName'`.as('bankName'),
-                sortCode: sql`${clientDeals.bankInfo} ->> 'sortCode'`.as('sortCode'),
-                notes: clientDeals.notes
-            })
-            .from(clientDeals)
-            .orderBy(clientDeals.deal_id);
+    // Format the result to ensure consistency
+    const formattedResult = result.map(deal => ({
+        ...deal,
+        bankInfo: deal.bankInfo ? {
+            bankName: deal.bankInfo.bankName || '',
+            branch: deal.bankInfo.branch || '',
+            sortCode: deal.bankInfo.sortCode || '',
+        } : { bankName: '', branch: '', sortCode: '' },  // Default to empty values
+    }));
 
-
-        // Format the result to ensure consistency
-        const formattedResult = result.map(deal => ({
-            ...deal,
-            bankInfo: deal.bankInfo ? {
-                bankName: deal.bankInfo.bankName || '',
-                branch: deal.bankInfo.branch || '',
-                sortCode: deal.bankInfo.sortCode || '',
-            } : { bankName: '', branch: '', sortCode: '' },  // Default to empty values
-        }));
-
-        return res.status(200).json(
-            new ApiResponse(200,  formattedResult , "ClientDeals fetched successfully")
-        );
-    } catch (error) {
-        console.error("Error fetching client deals:", error);
-        return res.status(500).json({ message: "Server Error", error });
-    }
+    return res.status(200).json(
+        new ApiResponse(200,  formattedResult , "ClientDeals fetched successfully")
+    );
+    
 });
 
 
@@ -189,7 +185,7 @@ const updateClientDeals = asyncHandler(async (req, res) => {
     const result = await db.update(clientDeals).set(updatedClientDeals).where(eq(clientDeals.deal_id, id)).returning();
 
     if (result.length === 0) {
-        throw new ApiError(404, "ClientDeals not found");
+        throw new ApiError(500, "Failed to update ClientDeals");
     }
 
     return res.status(200).json(

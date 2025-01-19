@@ -4,6 +4,10 @@ import { additionalProcessPricesSchema } from './additionalProcessPricesSchema.j
 import { clientDealsSchema } from './clientDealsSchema.js';
 import { dyeingFinishingDealsSchema } from './dyeingFinishingDealsSchema.js'
 import { additionalProcessDealsSchema } from './additionalProcessDealsSchema.js'
+import { dealOrdersSchema } from './dealOrdersSchema.js'
+
+
+
 
 (async () => {
     try {
@@ -13,6 +17,7 @@ import { additionalProcessDealsSchema } from './additionalProcessDealsSchema.js'
         await clientDealsSchema();
         await dyeingFinishingDealsSchema();
         await additionalProcessDealsSchema();
+        await dealOrdersSchema();
         
         console.log('Migration applied successfully!');
     } catch (error) {

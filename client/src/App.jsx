@@ -12,6 +12,7 @@ import {
 	ClientDealViewPage,
 	DyeingDealViewPage,
 	AdditionalDealViewPage,
+	DealOrderPage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -60,7 +61,6 @@ function App() {
 						ml={{ base: 0, md: "200px" }} // Make space for sidebar on large screens
 					>
 						<Routes>
-							
 							<Route path="/" element={<HomePage />} />
 							<Route path="/client" element={<ClientPage />} />
 							<Route
@@ -108,6 +108,8 @@ function App() {
 								path="/client-deal/view/additional-deal-view"
 								element={<AdditionalDealViewPage />}
 							/>
+
+							<Route path="/deal-order" element={<DealOrderPage />} />
 						</Routes>
 					</Box>
 				</Box>

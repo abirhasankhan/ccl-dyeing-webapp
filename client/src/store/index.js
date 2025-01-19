@@ -3,7 +3,9 @@ import { useDyeingPriceStore } from "./dyeingPrice.js";
 import { useAdditionalPriceStore } from "./additionalPrice.js";
 import { useClientDealStore } from "./clientDeal.js";
 import { useDyeingFinishingDealsStore } from "./dyeingFinishingDeals.js";
-import { useAdditionalProcessDealsStore } from "./additionalProcessDeals.js"
+import { useAdditionalProcessDealsStore } from "./additionalProcessDeals.js";
+import { useDealOrderStore } from "./dealOrder.js";
+
 
 
 
@@ -13,5 +15,6 @@ export {
     useAdditionalPriceStore, 
     useClientDealStore,
     useDyeingFinishingDealsStore,
-    useAdditionalProcessDealsStore
+    useAdditionalProcessDealsStore,
+    useDealOrderStore,
 };

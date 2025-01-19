@@ -235,9 +235,8 @@ EXECUTE FUNCTION update_appid_timestamp();
 -- Orders Table
 CREATE TABLE Orders (
     orderid VARCHAR(255) PRIMARY KEY,
-    clientid VARCHAR(255) NOT NULL,
     deal_id VARCHAR(20) NOT NULL,
-    order_number VARCHAR(255) UNIQUE NOT NULL,
+    challan_no VARCHAR(255) UNIQUE NOT NULL,
     booking_qty INT NOT NULL,
     total_received_qty INT DEFAULT 0,
     total_returned_qty INT DEFAULT 0,
@@ -245,7 +244,6 @@ CREATE TABLE Orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     remarks TEXT,
-    FOREIGN KEY (clientid) REFERENCES Clients(clientid) ON DELETE CASCADE,
     FOREIGN KEY (deal_id) REFERENCES ClientDeals(deal_id) ON DELETE CASCADE
 );
 
@@ -289,7 +287,7 @@ CREATE TABLE Shipments (
     orderid VARCHAR(255) NOT NULL,
     shipment_date DATE NOT NULL,
     quantity_shipped INT NOT NULL,
-    status VARCHAR(50) DEFAULT 'in transit',
+    status VARCHAR(50) DEFAULT 'In Transit',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     remarks TEXT,
@@ -335,11 +333,12 @@ CREATE TABLE ProductDetails (
     productdetailid VARCHAR(255) PRIMARY KEY,
     shipmentid VARCHAR(255) NOT NULL,
     yarn_count VARCHAR(255),
+    color VARCHAR(255),
     fabric VARCHAR(255),
     gsm FLOAT,
     machine_dia FLOAT,
     finish_dia FLOAT,
-    colorid VARCHAR(255),
+    rolls_received INT,
     total_qty_company INT,
     total_grey_received INT,
     grey_received_qty INT,
@@ -352,7 +351,8 @@ CREATE TABLE ProductDetails (
         total_qty_company >= 0 AND 
         total_grey_received >= 0 AND 
         grey_received_qty >= 0 AND 
-        grey_return_qty >= 0
+        grey_return_qty >= 0 AND 
+        rolls_received >= 0
     )
 );
 
@@ -484,7 +484,7 @@ EXECUTE FUNCTION update_order_returned_qty();
 
 
 
--- /*----------------Dyeing Ongoing Process------------------------*/
+/*----------------Dyeing Ongoing Process------------------------*/
 
 
 -- Machines Table

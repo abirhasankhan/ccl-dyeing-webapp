@@ -9,6 +9,7 @@ import AdditionalPriceDealForm from "./AdditionalPriceDealForm"
 import ClientDealViewPage from "./ClientDealViewPage"
 import DyeingDealViewPage from "./DyeingDealViewPage"
 import AdditionalDealViewPage from "./AdditionalDealViewPage"
+import DealOrderPage from "./DealOrderPage"
 
 
 
@@ -24,5 +25,6 @@ export {
     AdditionalPriceDealForm,
     ClientDealViewPage,
     DyeingDealViewPage,
-    AdditionalDealViewPage
+    AdditionalDealViewPage,
+    DealOrderPage,
 };
