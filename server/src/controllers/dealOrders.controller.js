@@ -1,6 +1,6 @@
 import { db } from "../config/drizzleSetup.js";
 import { dealOrders } from "../models/dealOrders.model.js";
-import { eq, ilike } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
@@ -75,15 +75,35 @@ const createDealOrder = asyncHandler(async (req, res) => {
 });
 
 
-// Get all Deal Orders
 const getAllDealOrders = asyncHandler(async (req, res) => {
-    
-    const result = await db.select().from(dealOrders).orderBy(dealOrders.orderid);
+    const result = await db
+        .select({
+            orderid: dealOrders.orderid,
+            deal_id: dealOrders.deal_id,
+            challan_no: dealOrders.challan_no,
+            booking_qty: dealOrders.booking_qty,
+            total_received_qty: dealOrders.total_received_qty,
+            total_returned_qty: dealOrders.total_returned_qty,
+            status: dealOrders.status,
+            notes: dealOrders.notes,
+            created_at: dealOrders.created_at,
+            updated_at: dealOrders.updated_at,
+            remarks: dealOrders.remarks
+        })
+        .from(dealOrders)
+        .orderBy(desc(dealOrders.orderid)); // Sort by created_at in descending order
+
+    const formattedResult = result.map(order => ({
+        ...order,
+        created_at: new Date(order.created_at).toLocaleString(),
+        updated_at: new Date(order.updated_at).toLocaleString()
+    }));
 
     return res.status(200).json(
-        new ApiResponse(200, result, "Deal Orders fetched successfully")
+        new ApiResponse(200, formattedResult, "Deal Orders fetched successfully")
     );
 });
+
 
 // Update an existing Deal Order
 const updateDealOrder = asyncHandler(async (req, res) => {

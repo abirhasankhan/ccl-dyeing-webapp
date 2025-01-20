@@ -222,6 +222,7 @@ function DealOrderPage() {
 				onClose();
 				resetForm();
 				setEditId(null);
+				fetchDealOrders();
 			}
 		} catch (error) {
 			console.error("Error updating Deal Order:", error);
