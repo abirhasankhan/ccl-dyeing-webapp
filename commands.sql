@@ -374,8 +374,6 @@ BEFORE INSERT ON ProductDetails
 FOR EACH ROW
 EXECUTE FUNCTION generate_product_detail_id();
 
--- Index for Foreign Key
-CREATE INDEX idx_productdetails_shipmentid ON ProductDetails(shipmentid);
 
 -- Function to auto-update 'updated_at' column
 CREATE OR REPLACE FUNCTION update_productdetails_timestamp() 

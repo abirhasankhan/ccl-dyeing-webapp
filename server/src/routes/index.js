@@ -6,6 +6,8 @@ import clientDealsRoutes from './clientDeals.route.js';
 import dyeingFinishingDealsRoutes from './dyeingFinishingDeals.route.js';
 import additionalProcessDealsRoutes from './additionalProcessDeals.route.js';
 import dealOrderRoutes from './dealOrders.route.js';
+import shipmentsRoutes from './shipments.route.js';
+import productDetailsRoutes from './productDetails.route.js'
 
 export { 
     authRoutes, 
@@ -16,4 +18,6 @@ export {
     dyeingFinishingDealsRoutes,
     additionalProcessDealsRoutes,
     dealOrderRoutes,
+    shipmentsRoutes,
+    productDetailsRoutes,
 };

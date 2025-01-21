@@ -59,21 +59,19 @@ const createDealOrder = asyncHandler(async (req, res) => {
         remarks: normalizedRemarks,
     };
 
-    try {
-        const result = await db.insert(dealOrders).values(newDealOrder).returning();
+    const result = await db.insert(dealOrders).values(newDealOrder).returning();
 
-        if (!result.length) {
-            throw new ApiError(500, "Failed to create Deal Order");
-        }
-
-        res.status(201).json(
-            new ApiResponse(201, result[0], "Deal Order registered successfully")
-        );
-    } catch (error) {
-        throw new ApiError(500, `Database error: ${error.message}`);
+    if (!result.length) {
+        throw new ApiError(500, "Failed to create Deal Order");
     }
+
+    res.status(201).json(
+        new ApiResponse(201, result[0], "Deal Order registered successfully")
+    );
+
 });
 
+// Featch all records
 
 const getAllDealOrders = asyncHandler(async (req, res) => {
     const result = await db

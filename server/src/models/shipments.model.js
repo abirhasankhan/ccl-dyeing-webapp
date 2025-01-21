@@ -1,5 +1,5 @@
 import { pgTable, varchar, date, integer, text, timestamp, foreignKey } from 'drizzle-orm/pg-core';
-import { deal_orders } from "./dealOrders.model.js";
+import { dealOrders } from "./dealOrders.model.js";
 
 export const shipments = pgTable('shipments', {
     shipmentid: varchar('shipmentid', 20).primaryKey(), // Primary key
