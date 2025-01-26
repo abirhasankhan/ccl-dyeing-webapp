@@ -287,7 +287,6 @@ CREATE TABLE Shipments (
     orderid VARCHAR(255) NOT NULL,
     shipment_date DATE NOT NULL,
     quantity_shipped INT NOT NULL,
-    status VARCHAR(50) DEFAULT 'In Transit',
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

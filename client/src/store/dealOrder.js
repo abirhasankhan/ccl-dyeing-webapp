@@ -95,10 +95,6 @@ export const useDealOrderStore = create((set, get) => ({
             };
         }
 
-        console.log(id, updatedDealOrder);
-        
-
-
         try {
             const res = await axios.put(`/api/deal-orders/${id}`, updatedDealOrder);
 

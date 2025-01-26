@@ -10,6 +10,7 @@ import ClientDealViewPage from "./ClientDealViewPage"
 import DyeingDealViewPage from "./DyeingDealViewPage"
 import AdditionalDealViewPage from "./AdditionalDealViewPage"
 import DealOrderPage from "./DealOrderPage"
+import ShipmentPage from "./ShipmentPage"
 
 
 
@@ -27,4 +28,5 @@ export {
     DyeingDealViewPage,
     AdditionalDealViewPage,
     DealOrderPage,
+    ShipmentPage
 };

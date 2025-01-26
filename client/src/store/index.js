@@ -5,6 +5,8 @@ import { useClientDealStore } from "./clientDeal.js";
 import { useDyeingFinishingDealsStore } from "./dyeingFinishingDeals.js";
 import { useAdditionalProcessDealsStore } from "./additionalProcessDeals.js";
 import { useDealOrderStore } from "./dealOrder.js";
+import { useShipmentStore } from "./shipments.js";
+import { useProductDetailsStore } from "./productdetails.js";
 
 
 
@@ -17,4 +19,7 @@ export {
     useDyeingFinishingDealsStore,
     useAdditionalProcessDealsStore,
     useDealOrderStore,
+    useShipmentStore,
+    useProductDetailsStore,
+    
 };

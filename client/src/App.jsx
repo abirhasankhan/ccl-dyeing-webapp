@@ -13,6 +13,7 @@ import {
 	DyeingDealViewPage,
 	AdditionalDealViewPage,
 	DealOrderPage,
+	ShipmentPage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -109,7 +110,15 @@ function App() {
 								element={<AdditionalDealViewPage />}
 							/>
 
-							<Route path="/deal-order" element={<DealOrderPage />} />
+							<Route
+								path="/deal-order"
+								element={<DealOrderPage />}
+							/>
+
+							<Route
+								path="/shipments"
+								element={<ShipmentPage />}
+							/>
 						</Routes>
 					</Box>
 				</Box>

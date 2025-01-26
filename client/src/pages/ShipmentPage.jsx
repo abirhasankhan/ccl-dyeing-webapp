@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import { useDealOrderStore } from "../store";
+import { useShipmentStore } from "../store";
 
 import {
 	DataTable,
@@ -21,9 +21,7 @@ import {
 
 import { useToastNotification } from "../hooks/toastUtils";
 
-
-
-function DealOrderPage() {
+function ShipmentPage() {
 	const { showError, showSuccess } = useToastNotification();
 
 	const [data, setData] = useState([]);
@@ -34,26 +32,20 @@ function DealOrderPage() {
 
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
-	const [newDealOrder, setNewDealOrder] = useState({
-		deal_id: "",
-		challan_no: "",
-		booking_qty: "",
-		total_received_qty: "",
-		total_returned_qty: "",
+	const [newShipment, setNewShipment] = useState({
+		orderid: "",
+		shipment_date: "",
+		quantity_shipped: "",
 		notes: "",
-		status: "", // Reset status as well
 	});
 
 	// Reset the form fields
 	const resetForm = () => {
-		setNewDealOrder({
-			deal_id: "",
-			challan_no: "",
-			booking_qty: "",
-			total_received_qty: "",
-			total_returned_qty: "",
+		setNewShipment({
+			orderid: "",
+			shipment_date: "",
+			quantity_shipped: "",
 			notes: "",
-			status: "", // Reset status as well
 		});
 	};
 
@@ -66,28 +58,28 @@ function DealOrderPage() {
 	const [dataToDelete, setDataToDelete] = useState(null);
 
 	const {
-		createDealOrder,
-		fetchDealOrders,
-		updateDealOrder,
-		deleteDealOrder,
-		dealOrders,
-	} = useDealOrderStore();
+		createShipment,
+		fetchShipments,
+		updateShipment,
+		deleteShipment,
+		shipments,
+	} = useShipmentStore();
 
 	// Fetch data on initial load
 	useEffect(() => {
 		const loadData = async () => {
 			setLoading(true);
-			await fetchDealOrders();
+			await fetchShipments();
 			setLoading(false);
 		};
 		loadData();
-	}, [fetchDealOrders]);
+	}, [fetchShipments]);
 
 	// Update DealOrders when the data changes
 	useEffect(() => {
-		setData(dealOrders);
-		setSearchResults(dealOrders);
-	}, [dealOrders]);
+		setData(shipments);
+		setSearchResults(shipments);
+	}, [shipments]);
 
 	// Handle search functionality
 	const handleSearch = (query) => {
@@ -98,9 +90,8 @@ function DealOrderPage() {
 			// Search logic based on multiple fields (id, name, etc.)
 			const results = data.filter((items) => {
 				return (
-					items.orderid.toString().includes(query) ||
-					items.deal_id.toString().includes(query) ||
-					items.challan_no.toString().includes(query)
+					items.shipmentid.toString().includes(query) ||
+					items.orderid.toString().includes(query)
 				);
 			});
 			setSearchResults(results); // Set filtered results
@@ -110,37 +101,26 @@ function DealOrderPage() {
 	const handleChange = (e) => {
 		const { name, value } = e.target;
 
-		setNewDealOrder({ ...newDealOrder, [name]: value });
+		setNewShipment({ ...newShipment, [name]: value });
 	};
 
 	// Define fields that will be shown for both Add and Edit
 	const commonFields = [
 		{
-			name: "deal_id",
-			label: "Deal ID",
-			placeholder: "Enter Deal ID",
+			name: "orderid",
+			label: "Order ID",
+			placeholder: "Enter Order ID",
 		},
 		{
-			name: "challan_no",
-			label: "Challan No",
-			placeholder: "Enter Challan No",
+			name: "shipment_date",
+			label: "Shipment Date",
+			placeholder: "Enter Shipment Date",
+			type: "date",
 		},
 		{
-			name: "booking_qty",
-			label: "Booking Qty",
-			placeholder: "Enter Booking Qty (kgs)",
-			type: "number",
-		},
-		{
-			name: "total_received_qty",
-			label: "Total Received Qty",
-			placeholder: "Enter Total Received Qty (kgs)",
-			type: "number",
-		},
-		{
-			name: "total_returned_qty",
-			label: "Total Returned Qty",
-			placeholder: "Enter Total Returned Qty (kgs)",
+			name: "quantity_shipped",
+			label: "Quantity Shipped",
+			placeholder: "Enter Quantity Shipped (kgs)",
 			type: "number",
 		},
 		{
@@ -150,43 +130,28 @@ function DealOrderPage() {
 		},
 	];
 
-	// Define additional fields for editing
-	const editFields = [
-		{
-			name: "status",
-			label: "Status",
-			type: "select", // Field type select
-			options: [
-				{ label: "Pending", value: "Pending" },
-				{ label: "Completed", value: "Completed" },
-				{ label: "Canceled", value: "Canceled" },
-			],
-		},
-	];
+	const editFields = [];
 
 	const fields = editId
 		? [...commonFields, ...editFields] // Combine common fields and the status field for edit
 		: commonFields;
 
 	const columns = [
-		{ Header: "ID", accessor: "orderid" },
-		{ Header: "Deal ID", accessor: "deal_id" },
-		{ Header: "Challan No", accessor: "challan_no" },
-		{ Header: "Booking Qty", accessor: "booking_qty" },
-		{ Header: "Total Received", accessor: "total_received_qty" },
-		{ Header: "Total Returned", accessor: "total_returned_qty" },
-		{ Header: "Status", accessor: "status" },
+		{ Header: "Shipment ID", accessor: "shipmentid" },
+		{ Header: "Order ID", accessor: "orderid" },
+		{ Header: "Shipment Date", accessor: "shipment_date" },
+		{ Header: "Quantity Shipped", accessor: "quantity_shipped" },
 		{ Header: "Notes", accessor: "notes" },
 		{ Header: "Created At", accessor: "created_at" },
 		{ Header: "Updated At", accessor: "updated_at" },
 	];
 
-	const caption = "Deal Order Information List"; // Optional Caption for the table
+	const caption = "Shipment Information List"; // Optional Caption for the table
 
-	// create function to handle creating a new Deal Order
+	// create function to handle creating a new Data
 	const handleCreate = async () => {
 		try {
-			const { success, message } = await createDealOrder(newDealOrder);
+			const { success, message } = await createShipment(newShipment);
 			if (!success) {
 				showError(message); // Use the utility function for errors
 			} else {
@@ -195,24 +160,24 @@ function DealOrderPage() {
 				resetForm();
 			}
 		} catch (error) {
-			console.error("Error creating Deal Order:", error);
-			showError("An error occurred while creating the Deal Order.");
+			console.error("Error creating shipment:", error);
+			showError("An error occurred while creating the shipment.");
 		}
 	};
 
-	// Function to handle editing a Deal Order
+	// Function to handle editing a data
 	const handleEdit = (data) => {
-		setEditId(data.orderid); // Set the deal order ID to track which deal order we're editing
-		setNewDealOrder(data); // Populate the form with the existing data
+		setEditId(data.shipmentid); // Set the deal order ID to track which shipment we're editing
+		setNewShipment(data); // Populate the form with the existing data
 		onOpen(); // Open the modal
 	};
 
 	// Function to handle updating the Deal Order
 	const handleUpdate = async () => {
 		try {
-			const { success, message } = await updateDealOrder(
+			const { success, message } = await updateShipment(
 				editId,
-				newDealOrder
+				newShipment
 			);
 
 			if (!success) {
@@ -222,27 +187,27 @@ function DealOrderPage() {
 				onClose();
 				resetForm();
 				setEditId(null);
-				fetchDealOrders();
+				fetchShipments();
 			}
 		} catch (error) {
-			console.error("Error updating Deal Order:", error);
-			showError("An error occurred while updating the Deal Order.");
+			console.error("Error updating shipment:", error);
+			showError("An error occurred while updating the shipment.");
 		}
 	};
 
 	// Delete function
 	const handleDelete = async () => {
 		try {
-			const { success, message } = await deleteDealOrder(dataToDelete);
+			const { success, message } = await deleteShipment(dataToDelete);
 			if (!success) {
 				showError(message); // Use the utility function for errors
 			} else {
 				showSuccess(message); // Use the utility function for success
-				fetchDealOrders();
+				fetchShipments();
 			}
 		} catch (error) {
-			console.error("Error deleting deal order:", error);
-			showError("An error occurred while deleting the deal order.");
+			console.error("Error deleting shipment:", error);
+			showError("An error occurred while deleting the shipment.");
 		} finally {
 			setDeleteModalOpen(false);
 			setDataToDelete(null);
@@ -251,7 +216,7 @@ function DealOrderPage() {
 
 	// Open the delete confirmation modal
 	const openDeleteConfirmation = (data) => {
-		setDataToDelete(data.orderid);
+		setDataToDelete(data.shipmentid);
 		setDeleteModalOpen(true);
 	};
 
@@ -267,21 +232,21 @@ function DealOrderPage() {
 						bgClip={"text"}
 						textAlign={"center"}
 					>
-						Deal Order Page
+						Shipment Page
 					</Text>
 
 					{/* Align button to the left */}
 					<Flex justify="flex-start" w="100%" pl={4}>
 						<Button colorScheme="blue" size="lg" onClick={onOpen}>
-							Add Deal Order
+							Add Shipment
 						</Button>
 					</Flex>
 
 					{/* Search Bar Component */}
 					<SearchBar
-						fields={["orderid", "deal_id", "challan_no"]} // Search by ID, Name, and Contact
+						fields={["shipmentid" ,"orderid"]} // Search by ID, Name, and Contact
 						onSearch={handleSearch}
-						placeholder="Search by order id, deal id, or challan no"
+						placeholder="Search by shipment id, order id"
 					/>
 
 					{/* Loading Spinner */}
@@ -311,7 +276,7 @@ function DealOrderPage() {
 								color={"gray.500"}
 								textAlign={"center"}
 							>
-								No Deal Orders found 😢
+								No shipment found 😢
 							</Text>
 						</VStack>
 					)}
@@ -326,12 +291,12 @@ function DealOrderPage() {
 					resetForm(); // Reset form data
 					setEditId(null); // Reset the edit client ID
 				}}
-				formData={newDealOrder}
+				formData={newShipment}
 				handleChange={handleChange}
 				handleSubmit={
 					editId ? handleUpdate : handleCreate
 				}
-				modalTitle={editId ? "Edit Deal Order" : "Add New Deal Order"}
+				modalTitle={editId ? "Edit Shipment" : "Add New Shipment"}
 				fields={fields} // Pass the dynamic field configuration
 			/>
 
@@ -345,4 +310,4 @@ function DealOrderPage() {
 	);
 }
 
-export default DealOrderPage;
+export default ShipmentPage;
