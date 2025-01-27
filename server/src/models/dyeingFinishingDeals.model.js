@@ -6,9 +6,9 @@ import { clientDeals } from "./clientDeals.model.js";
 export const serviceTypeEnum = pgEnum('service_type', ['tube_tk', 'open_tk', 'elasteen_tk']);
 
 export const dyeingFinishingDeals = pgTable("dyeing_finishing_deals", {
-    dfpid: varchar("dfpid", { length: 20 }).primaryKey(),
-    deal_id: varchar("deal_id", { length: 20 }).notNull().references(() => clientDeals.deal_id),
-    color: varchar("color", { length: 50 }).notNull(),
+    dfpid: varchar("dfpid", { length: 255 }).primaryKey(),
+    deal_id: varchar("deal_id", { length: 255 }).notNull().references(() => clientDeals.deal_id),
+    color: varchar("color", { length: 255 }).notNull(),
     shade_percent: varchar("shade_percent", { length: 50 }),
     service_type: serviceTypeEnum().notNull(),
     service_price_tk: decimal("service_price_tk", { precision: 10, scale: 2 }).notNull(),

@@ -18,9 +18,9 @@ export const dyeingFinishingDealsSchema = async () => {
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS "dyeing_finishing_deals" (
-                    dfpid VARCHAR(20) PRIMARY KEY,
-                    deal_id VARCHAR(20) NOT NULL,
-                    color VARCHAR(50) NOT NULL,
+                    dfpid VARCHAR(255) PRIMARY KEY,
+                    deal_id VARCHAR(255) NOT NULL,
+                    color VARCHAR(255) NOT NULL,
                     shade_percent VARCHAR(50),
                     service_type VARCHAR(50) NOT NULL CHECK (service_type IN ('tube_tk', 'open_tk', 'elasteen_tk')),
                     service_price_tk DECIMAL(10, 2) NOT NULL,

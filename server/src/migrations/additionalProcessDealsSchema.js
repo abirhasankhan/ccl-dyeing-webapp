@@ -18,8 +18,8 @@ export const additionalProcessDealsSchema = async () => {
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS "additional_process_deals" (
-                    appid VARCHAR(20) PRIMARY KEY,
-                    deal_id VARCHAR(20) NOT NULL,
+                    appid VARCHAR(255) PRIMARY KEY,
+                    deal_id VARCHAR(255) NOT NULL,
                     process_type VARCHAR(255),
                     total_price DECIMAL(10, 2),
                     notes TEXT,

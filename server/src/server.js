@@ -14,7 +14,8 @@ import {
     additionalProcessDealsRoutes,
     dealOrderRoutes,
     shipmentsRoutes,
-    productDetailsRoutes
+    productDetailsRoutes,
+    machinesRoutes,
 } from './routes/index.js';
 
 // Load environment variables
@@ -46,6 +47,8 @@ app.use('/api/additional-process-deals', additionalProcessDealsRoutes);
 app.use('/api/deal-orders', dealOrderRoutes);
 app.use('/api/shipments', shipmentsRoutes);
 app.use('/api/product-details', productDetailsRoutes);
+app.use('/api/machines', machinesRoutes);
+
 
 
 

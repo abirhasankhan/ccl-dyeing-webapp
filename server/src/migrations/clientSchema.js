@@ -18,7 +18,7 @@ export const clientSchema = async () => {
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS "clients" (
-                    clientid VARCHAR(50) PRIMARY KEY,
+                    clientid VARCHAR(255) PRIMARY KEY,
                     companyname VARCHAR(255) NOT NULL,
                     address TEXT NOT NULL,
                     contact VARCHAR(20) NOT NULL UNIQUE, -- Unique constraint for contact

@@ -16,7 +16,7 @@ export const dyeingFinishingPricesSchema = async () => {
             const createDyeingFinishingPricesQuery = `
                 CREATE TABLE IF NOT EXISTS dyeing_finishing_prices (
                     df_priceid SERIAL PRIMARY KEY,
-                    color VARCHAR(50) NOT NULL,
+                    color VARCHAR(255) NOT NULL,
                     shade_percent VARCHAR(50),
                     tube_tk DECIMAL(10, 2) NOT NULL,
                     open_tk DECIMAL(10, 2) NOT NULL,

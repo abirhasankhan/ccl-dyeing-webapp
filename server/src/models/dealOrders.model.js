@@ -10,8 +10,8 @@ import { clientDeals } from "./clientDeals.model.js";
 
 // Define the `Orders` table
 export const dealOrders = pgTable("deal_orders", {
-    orderid: varchar("orderid", { length: 20 }).primaryKey(),
-    deal_id: varchar("deal_id", { length: 20 })
+    orderid: varchar("orderid", { length: 255 }).primaryKey(),
+    deal_id: varchar("deal_id", { length: 255 })
         .notNull()
         .references(() => clientDeals.deal_id, { onDelete: "cascade" }),
     challan_no: varchar("challan_no", { length: 255 }).notNull().unique(),

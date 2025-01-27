@@ -3,8 +3,8 @@ import { Client } from './client.model.js'; // Import the clients table model
 
 // ClientDeals table definition
 export const clientDeals = pgTable('client_deals', {
-    deal_id: varchar('deal_id', { length: 20 }).primaryKey(),
-    clientid: varchar('clientid', { length: 20 }).notNull().references(() => Client.clientid),
+    deal_id: varchar('deal_id', { length: 255 }).primaryKey(),
+    clientid: varchar('clientid', { length: 255 }).notNull().references(() => Client.clientid),
     // Define the paymentMethod column with CHECK constraint
     payment_method: varchar('payment_method', { length: 10 }).notNull(),
     issue_date: date('issue_date'),

@@ -18,8 +18,8 @@ export const shipmentsSchema = async () => {
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS shipments (
-                    shipmentid VARCHAR(20) PRIMARY KEY,
-                    orderid VARCHAR(20) NOT NULL,
+                    shipmentid VARCHAR(255) PRIMARY KEY,
+                    orderid VARCHAR(255) NOT NULL,
                     shipment_date DATE NOT NULL,
                     quantity_shipped INT NOT NULL,
                     notes TEXT,
@@ -38,7 +38,7 @@ export const shipmentsSchema = async () => {
             `;
 
             // Function to generate ShipmentID before insert
-            const createFunctionGenerateClientIdQuery = `
+            const createFunctionGeneratePrimaryIdQuery = `
                 CREATE OR REPLACE FUNCTION generate_shipment_id() RETURNS TRIGGER AS $$
                 BEGIN
                     NEW.shipmentid := CONCAT('SHIP-', LPAD(NEXTVAL('shipments_seq')::TEXT, 6, '0'));
@@ -48,7 +48,7 @@ export const shipmentsSchema = async () => {
             `;
 
             // Trigger to auto-generate ShipmentID
-            const createTriggerGenerateClientIdQuery = `
+            const createTriggerGeneratePrimaryIdQuery = `
                 CREATE TRIGGER trigger_generate_shipment_id
                 BEFORE INSERT ON Shipments
                 FOR EACH ROW
@@ -77,9 +77,9 @@ export const shipmentsSchema = async () => {
 
             // Execute all queries
             await db.execute(createTableQuery); // Create Clients table
-            await db.execute(createSequenceQuery); // Create sequence for client IDs
-            await db.execute(createFunctionGenerateClientIdQuery); // Create client ID generation function
-            await db.execute(createTriggerGenerateClientIdQuery); // Create trigger for client ID generation
+            await db.execute(createSequenceQuery); // Create sequence for Primary IDs
+            await db.execute(createFunctionGeneratePrimaryIdQuery); // Create Primary ID generation function
+            await db.execute(createTriggerGeneratePrimaryIdQuery); // Create trigger for Primary ID generation
             await db.execute(createFunctionUpdateTimestampQuery); // Create timestamp update function
             await db.execute(createTriggerUpdateTimestampQuery); // Create trigger for updated_at column
 

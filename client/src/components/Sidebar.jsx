@@ -65,9 +65,14 @@ const sidebarItems = [
 		to: "/deal-order",
 		icon: <FaInfoCircle />,
 	},
-		{
+	{
 		label: "Shipments",
 		to: "/shipments",
+		icon: <FaInfoCircle />,
+	},
+	{
+		label: "Product Detail",
+		to: "/product-detail",
 		icon: <FaInfoCircle />,
 	},
 ];

@@ -19,26 +19,24 @@ export const productDetailsSchema = async () => {
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS product_details (
                     productdetailid VARCHAR(255) PRIMARY KEY,
-                    shipmentid VARCHAR(255) NOT NULL,
-                    yarn_count VARCHAR(255),
-                    color VARCHAR(255),
-                    fabric VARCHAR(255),
-                    gsm FLOAT,
-                    machine_dia FLOAT,
-                    finish_dia FLOAT,
-                    rolls_received INT,
-                    total_qty_company INT,
-                    total_grey_received INT,
-                    grey_received_qty INT,
-                    grey_return_qty INT DEFAULT 0,
+                    shipmentid VARCHAR(255) NOT NULL,   -- Links to the shipment
+                    yarn_count VARCHAR(255),            -- Yarn count of the raw material
+                    color VARCHAR(255),                 -- Color of the product
+                    fabric VARCHAR(255),                -- Type of fabric
+                    gsm FLOAT,                          -- Fabric weight (grams per square meter)
+                    machine_dia FLOAT,                  -- Machine diameter
+                    finish_dia FLOAT,                   -- Finished diameter
+                    rolls_received INT,                 -- Number of rolls received
+                    grey_received_qty INT,              -- Quantity of grey fabric received
+                    grey_return_qty INT DEFAULT 0,      -- Grey fabric returned
+                    final_qty INT,                      -- Final quantity after dyeing
+                    rejected_qty INT DEFAULT 0,         -- Rejected quantity
                     notes TEXT,
+                    remarks TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT,
                     FOREIGN KEY (shipmentid) REFERENCES Shipments(shipmentid) ON DELETE CASCADE,
                     CONSTRAINT chk_qty_non_negative CHECK (
-                        total_qty_company >= 0 AND
-                        total_grey_received >= 0 AND
                         grey_received_qty >= 0 AND
                         grey_return_qty >= 0 AND
                         rolls_received >= 0
@@ -52,7 +50,7 @@ export const productDetailsSchema = async () => {
             `;
 
             // Function to generate ProductDetailID
-            const createFunctionGenerateClientIdQuery = `
+            const createFunctionGeneratePrimaryIdQuery = `
                 CREATE OR REPLACE FUNCTION generate_product_detail_id() RETURNS TRIGGER AS $$
                 BEGIN
                     NEW.productdetailid := CONCAT('PD-', LPAD(NEXTVAL('product_details_seq')::TEXT, 6, '0'));
@@ -62,7 +60,7 @@ export const productDetailsSchema = async () => {
             `;
 
             // Trigger to auto-generate ProductDetailID
-            const createTriggerGenerateClientIdQuery = `
+            const createTriggerGeneratePrimaryIdQuery = `
                 CREATE TRIGGER trigger_generate_product_detail_id
                 BEFORE INSERT ON product_details
                 FOR EACH ROW
@@ -90,9 +88,9 @@ export const productDetailsSchema = async () => {
 
             // Execute all queries
             await db.execute(createTableQuery); // Create Clients table
-            await db.execute(createSequenceQuery); // Create sequence for client IDs
-            await db.execute(createFunctionGenerateClientIdQuery); // Create client ID generation function
-            await db.execute(createTriggerGenerateClientIdQuery); // Create trigger for client ID generation
+            await db.execute(createSequenceQuery); // Create sequence for Primary IDs
+            await db.execute(createFunctionGeneratePrimaryIdQuery); // Create Primary ID generation function
+            await db.execute(createTriggerGeneratePrimaryIdQuery); // Create trigger for Primary ID generation
             await db.execute(createFunctionUpdateTimestampQuery); // Create timestamp update function
             await db.execute(createTriggerUpdateTimestampQuery); // Create trigger for updated_at column
 

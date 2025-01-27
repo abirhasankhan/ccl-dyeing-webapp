@@ -14,6 +14,7 @@ import {
 	AdditionalDealViewPage,
 	DealOrderPage,
 	ShipmentPage,
+	ProductDetailPage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -118,6 +119,11 @@ function App() {
 							<Route
 								path="/shipments"
 								element={<ShipmentPage />}
+							/>
+
+							<Route
+								path="/product-detail"
+								element={<ProductDetailPage />}
 							/>
 						</Routes>
 					</Box>

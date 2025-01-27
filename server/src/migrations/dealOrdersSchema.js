@@ -18,8 +18,8 @@ export const dealOrdersSchema = async () => {
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS deal_orders (
-                    orderid VARCHAR(20) PRIMARY KEY,
-                    deal_id VARCHAR(20) NOT NULL,
+                    orderid VARCHAR(255) PRIMARY KEY,
+                    deal_id VARCHAR(255) NOT NULL,
                     challan_no VARCHAR(255) NOT NULL UNIQUE,
                     booking_qty INT NOT NULL,
                     total_received_qty INT DEFAULT 0,

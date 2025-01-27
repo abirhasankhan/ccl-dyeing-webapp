@@ -10,13 +10,19 @@ import { shipments } from "../models/shipments.model.js";
 // Create a new record
 const createProductDetail = asyncHandler(async (req, res) => {
 
-    const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, total_qty_company, total_grey_received, grey_received_qty, grey_return_qty, notes, remarks } = req.body;
+    const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, grey_received_qty, grey_return_qty, notes, remarks } = req.body;
 
     // Required field validation
-    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'total_qty_company', 'total_grey_received', 'grey_return_qty'];
-    const missingFields = requiredFields.filter(field =>
-        typeof req.body[field] !== "string" || !req.body[field].trim()
-    );
+    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'grey_received_qty', 'grey_return_qty'];
+
+    const missingFields = requiredFields.filter(
+        (field) => {
+            const value = req.body[field];
+            return (
+                (typeof value !== "string" && typeof value !== "number") || // Check both string and number types
+                (typeof value === "string" && !value.trim())               // If it's a string, ensure it's not empty
+            );
+        });
 
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
@@ -31,20 +37,20 @@ const createProductDetail = asyncHandler(async (req, res) => {
     const normalizedMachineDia = Number(machine_dia);
     const normalizedFinishDia = Number(finish_dia);
     const normalizedRollsReceived = Number(rolls_received);
-    const normalizedTotalQtyCompany = Number(total_qty_company);
-    const normalizedTotalGreyReceived = Number(total_grey_received);
     const normalizedGreyReceivedQty = Number(grey_received_qty);
     const normalizedGreyReturnQty = Number(grey_return_qty);
+    const normalizedFinalQty = 0;
+    const normalizedRejectedQty = 0;
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
     // Validate numeric values
-    if (isNaN(normalizedGsm) || isNaN(normalizedMachineDia) || isNaN(normalizedFinishDia) || isNaN(normalizedRollsReceived) || isNaN(normalizedTotalQtyCompany) || isNaN(normalizedTotalGreyReceived) || isNaN(normalizedGreyReceivedQty) | isNaN(normalizedGreyReturnQty)) {
+    if (isNaN(normalizedGsm) || isNaN(normalizedMachineDia) || isNaN(normalizedFinishDia) || isNaN(normalizedRollsReceived) || isNaN(normalizedTotalQtyCompany) || isNaN(normalizedTotalGreyReceived) || isNaN(normalizedGreyReceivedQty) || isNaN(normalizedGreyReturnQty)) {
         throw new ApiError(400, "Invalid numeric values provided for GSM, Machine Dia, Finish Dia, Rolls Received, Total Qty Company, Total Grey Received, Grey Received Qty, or Grey Return Qty");
     }
 
     // Check if the Shipment already exists
-    const existingShipment = await db.select().from(shipments).where(eq(shipments.shipmentid, normalizedShipmentid)).get();
+    const existingShipment = await db.select().from(shipments).where(eq(shipments.shipmentid, normalizedShipmentid));
 
     if (!existingShipment.length) {
         throw new ApiError(400, `Shipment with id ${normalizedShipmentid} not exists`);
@@ -59,10 +65,10 @@ const createProductDetail = asyncHandler(async (req, res) => {
         machine_dia: normalizedMachineDia,
         finish_dia: normalizedFinishDia,
         rolls_received: normalizedRollsReceived,
-        total_qty_company: normalizedTotalQtyCompany,
-        total_grey_received: normalizedTotalGreyReceived,
         grey_received_qty: normalizedGreyReceivedQty,
         grey_return_qty: normalizedGreyReturnQty,
+        final_qty: normalizedFinalQty,
+        rejected_qty: normalizedRejectedQty,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     };
@@ -86,6 +92,7 @@ const getAllProductDetail = asyncHandler(async (req, res) => {
 
     const result = await db
         .select({
+            productdetailid: productDetails.productdetailid,
             shipmentid: productDetails.shipmentid,
             yarn_count: productDetails.yarn_count,
             color: productDetails.color,
@@ -124,13 +131,19 @@ const updateProductDetail = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
 
-    const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, total_qty_company, total_grey_received, grey_received_qty, grey_return_qty, notes, remarks } = req.body;
+    const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, grey_received_qty, grey_return_qty, final_qty, rejected_qty, notes, remarks } = req.body;
 
     // Required field validation
-    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'total_qty_company', 'total_grey_received', 'grey_return_qty'];
-    const missingFields = requiredFields.filter(field =>
-        typeof req.body[field] !== "string" || !req.body[field].trim()
-    );
+    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'grey_received_qty', 'final_qty', 'rejected_qty'];
+
+    const missingFields = requiredFields.filter(field => {
+        const value = req.body[field];
+        return (
+            (typeof value !== "string" && typeof value !== "number") || // Check both string and number types
+            (typeof value === "string" && !value.trim())               // If it's a string, ensure it's not empty
+        );
+    });
+
 
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
@@ -145,20 +158,20 @@ const updateProductDetail = asyncHandler(async (req, res) => {
     const normalizedMachineDia = Number(machine_dia);
     const normalizedFinishDia = Number(finish_dia);
     const normalizedRollsReceived = Number(rolls_received);
-    const normalizedTotalQtyCompany = Number(total_qty_company);
-    const normalizedTotalGreyReceived = Number(total_grey_received);
     const normalizedGreyReceivedQty = Number(grey_received_qty);
     const normalizedGreyReturnQty = Number(grey_return_qty);
+    const normalizedFinalQty = Number(final_qty);
+    const normalizedRejectedQty = Number(rejected_qty);
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
     // Validate numeric values
-    if (isNaN(normalizedGsm) || isNaN(normalizedMachineDia) || isNaN(normalizedFinishDia) || isNaN(normalizedRollsReceived) || isNaN(normalizedTotalQtyCompany) || isNaN(normalizedTotalGreyReceived) || isNaN(normalizedGreyReceivedQty) | isNaN(normalizedGreyReturnQty)) {
-        throw new ApiError(400, "Invalid numeric values provided for GSM, Machine Dia, Finish Dia, Rolls Received, Total Qty Company, Total Grey Received, Grey Received Qty, or Grey Return Qty");
+    if (isNaN(normalizedGsm) || isNaN(normalizedMachineDia) || isNaN(normalizedFinishDia) || isNaN(normalizedRollsReceived) || isNaN(normalizedGreyReceivedQty) || isNaN(normalizedGreyReturnQty) || isNaN(normalizedFinalQty) || isNaN(normalizedRejectedQty)) {
+        throw new ApiError(400, "Invalid numeric values provided for GSM, Machine Dia, Finish Dia, Rolls Received, Grey Received Qty, Grey Return Qty, Final Qty, Rejected Qty");
     }
 
     // Check if the Shipment already exists
-    const existingShipment = await db.select().from(shipments).where(eq(shipments.shipmentid, normalizedShipmentid)).get();
+    const existingShipment = await db.select().from(shipments).where(eq(shipments.shipmentid, normalizedShipmentid));
 
     if (!existingShipment.length) {
         throw new ApiError(400, `Shipment with id ${normalizedShipmentid} not exists`);
@@ -173,10 +186,10 @@ const updateProductDetail = asyncHandler(async (req, res) => {
         machine_dia: normalizedMachineDia,
         finish_dia: normalizedFinishDia,
         rolls_received: normalizedRollsReceived,
-        total_qty_company: normalizedTotalQtyCompany,
-        total_grey_received: normalizedTotalGreyReceived,
         grey_received_qty: normalizedGreyReceivedQty,
         grey_return_qty: normalizedGreyReturnQty,
+        final_qty: normalizedFinalQty,
+        rejected_qty: normalizedRejectedQty,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     };

@@ -2,8 +2,8 @@ import { pgTable, varchar, date, integer, text, timestamp, foreignKey } from 'dr
 import { dealOrders } from "./dealOrders.model.js";
 
 export const shipments = pgTable('shipments', {
-    shipmentid: varchar('shipmentid', 20).primaryKey(), // Primary key
-    orderid: varchar("orderid", { length: 20 })
+    shipmentid: varchar('shipmentid', 255).primaryKey(), // Primary key
+    orderid: varchar("orderid", { length: 255 })
         .notNull()
         .references(() => deal_orders.orderid, { onDelete: "cascade" }), // Foreign key to Orders table
     shipment_date: date('shipment_date').notNull(), // Date of shipment

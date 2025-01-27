@@ -8,6 +8,8 @@ import additionalProcessDealsRoutes from './additionalProcessDeals.route.js';
 import dealOrderRoutes from './dealOrders.route.js';
 import shipmentsRoutes from './shipments.route.js';
 import productDetailsRoutes from './productDetails.route.js'
+import machinesRoutes from './machines.route.js'
+
 
 export { 
     authRoutes, 
@@ -20,4 +22,5 @@ export {
     dealOrderRoutes,
     shipmentsRoutes,
     productDetailsRoutes,
+    machinesRoutes,
 };

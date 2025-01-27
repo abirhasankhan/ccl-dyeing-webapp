@@ -18,8 +18,8 @@ export const clientDealsSchema = async () => {
             // Raw SQL query to create the Clients table with unique constraints
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS "client_deals" (
-                    deal_id VARCHAR(20) PRIMARY KEY,
-                    clientid VARCHAR(20) NOT NULL,
+                    deal_id VARCHAR(255) PRIMARY KEY,
+                    clientid VARCHAR(255) NOT NULL,
                     payment_method VARCHAR(10) CHECK (payment_method IN ('Cash', 'Bank', 'Hybrid')) NOT NULL,
                     issue_date DATE,
                     valid_through DATE,

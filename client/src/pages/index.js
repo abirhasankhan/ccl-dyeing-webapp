@@ -11,6 +11,7 @@ import DyeingDealViewPage from "./DyeingDealViewPage"
 import AdditionalDealViewPage from "./AdditionalDealViewPage"
 import DealOrderPage from "./DealOrderPage"
 import ShipmentPage from "./ShipmentPage"
+import ProductDetailPage from "./ProductDetailPage"
 
 
 
@@ -28,5 +29,6 @@ export {
     DyeingDealViewPage,
     AdditionalDealViewPage,
     DealOrderPage,
-    ShipmentPage
+    ShipmentPage,
+    ProductDetailPage
 };

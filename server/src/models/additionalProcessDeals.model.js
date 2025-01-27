@@ -4,8 +4,8 @@ import { clientDeals } from "./clientDeals.model.js";
 
 
 export const additionalProcessDeals = pgTable('additional_process_deals', {
-    appid: varchar('appid', { length: 20 }).primaryKey(),
-    deal_id: varchar('deal_id', { length: 20 }).notNull().references(() => clientDeals.deal_id),
+    appid: varchar('appid', { length: 255 }).primaryKey(),
+    deal_id: varchar('deal_id', { length: 255 }).notNull().references(() => clientDeals.deal_id),
     process_type: varchar('process_type', { length: 255 }),
     total_price: decimal('total_price', { precision: 10, scale: 2 }),
     notes: text('notes'),

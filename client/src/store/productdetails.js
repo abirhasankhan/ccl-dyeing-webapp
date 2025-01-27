@@ -34,6 +34,7 @@ export const useProductDetailsStore = create((set, get) => ({
         }
 
         try {
+            
             const res = await axios.post("/api/product-details", productDetail);
 
             if (res.status >= 200 && res.status < 300) {
