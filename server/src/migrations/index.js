@@ -9,8 +9,10 @@ import { shipmentsSchema } from './shipmentsSchema.js';
 import { productDetailsSchema } from './productDetailsSchema.js';
 import { returnsSchema } from './returnsSchema.js';
 import { machinesSchema } from './machinesSchema.js';
+import { dyeingProcessSchema } from './dyeingProcessSchema.js';
 
-import { triggerSchema } from './triggerSchema.js';
+
+
 
 (async () => {
     try {
@@ -29,14 +31,11 @@ import { triggerSchema } from './triggerSchema.js';
         await productDetailsSchema();
         await returnsSchema();
         await machinesSchema();
+        await dyeingProcessSchema();
+        
         console.log('All schemas applied successfully!');
 
         
-        // console.log('Applying triggers...');
-        // // Apply triggers
-        // await triggerSchema();
-        // console.log('Triggers applied successfully!');
-
         console.log('Migration applied successfully!');
     } catch (error) {
         console.error('Error applying migration:', error);

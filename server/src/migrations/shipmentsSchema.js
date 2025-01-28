@@ -26,9 +26,7 @@ export const shipmentsSchema = async () => {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     remarks TEXT,
-                    CONSTRAINT fk_orders FOREIGN KEY (orderid)
-                        REFERENCES deal_orders(orderid)
-                        ON DELETE CASCADE
+                    FOREIGN KEY (orderid) REFERENCES deal_orders(orderid) ON DELETE CASCADE
                 );
             `;
 

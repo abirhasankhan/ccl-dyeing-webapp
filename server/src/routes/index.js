@@ -9,7 +9,9 @@ import dealOrderRoutes from './dealOrders.route.js';
 import shipmentsRoutes from './shipments.route.js';
 import productDetailsRoutes from './productDetails.route.js';
 import returnsRoutes from './returns.route.js';
-import machinesRoutes from './machines.route.js'
+import machinesRoutes from './machines.route.js';
+import dyeingProcessRoutes from './dyeingProcess.route.js';
+
 
 
 export { 
@@ -25,4 +27,5 @@ export {
     productDetailsRoutes,
     returnsRoutes,
     machinesRoutes,
+    dyeingProcessRoutes,
 };

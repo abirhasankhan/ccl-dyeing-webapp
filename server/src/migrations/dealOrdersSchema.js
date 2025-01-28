@@ -29,7 +29,7 @@ export const dealOrdersSchema = async () => {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     remarks TEXT,
-                    CONSTRAINT fk_deal FOREIGN KEY (deal_id) REFERENCES client_deals(deal_id) ON DELETE CASCADE
+                    FOREIGN KEY (deal_id) REFERENCES client_deals(deal_id) ON DELETE CASCADE
                 );
             `;
 

@@ -35,7 +35,7 @@ export const productDetailsSchema = async () => {
                     remarks TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (shipmentid) REFERENCES Shipments(shipmentid) ON DELETE CASCADE,
+                    FOREIGN KEY (shipmentid) REFERENCES shipments(shipmentid) ON DELETE CASCADE,
                     CONSTRAINT chk_qty_non_negative CHECK (
                         grey_received_qty >= 0 AND
                         grey_return_qty >= 0 AND

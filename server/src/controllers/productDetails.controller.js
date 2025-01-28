@@ -51,12 +51,12 @@ const createProductDetail = asyncHandler(async (req, res) => {
 
     // Validate numeric values
     if (
-        isNaN(normalizedGsm) || normalizedGsm <= 0 ||
-        isNaN(normalizedMachineDia) || normalizedMachineDia <= 0 ||
-        isNaN(normalizedFinishDia) || normalizedFinishDia <= 0 ||
-        isNaN(normalizedRollsReceived) || normalizedRollsReceived <= 0 ||
-        isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty <= 0 ||
-        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty <= 0
+        isNaN(normalizedGsm) || normalizedGsm < 0 ||
+        isNaN(normalizedMachineDia) || normalizedMachineDia < 0 ||
+        isNaN(normalizedFinishDia) || normalizedFinishDia < 0 ||
+        isNaN(normalizedRollsReceived) || normalizedRollsReceived < 0 ||
+        isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty < 0 ||
+        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty < 0
     ) {
         throw new ApiError(400, "All numeric values must be greater than 0.");
     }
@@ -102,30 +102,16 @@ const getAllProductDetail = asyncHandler(async (req, res) => {
 
     // Fetch all product details from the database
     const result = await db
-        .select({
-            productdetailid: productDetails.productdetailid,
-            shipmentid: productDetails.shipmentid,
-            yarn_count: productDetails.yarn_count,
-            color: productDetails.color,
-            fabric: productDetails.fabric,
-            gsm: productDetails.gsm,
-            machine_dia: productDetails.machine_dia,
-            finish_dia: productDetails.finish_dia,
-            rolls_received: productDetails.rolls_received,
-            grey_received_qty: productDetails.grey_received_qty,
-            grey_return_qty: productDetails.grey_return_qty,
-            final_qty: productDetails.final_qty,
-            rejected_qty: productDetails.rejected_qty,
-            notes: productDetails.notes,
-            created_at: productDetails.created_at,
-            updated_at: productDetails.updated_at,
-        })
+        .select()
         .from(productDetails)
         .orderBy(desc(productDetails.productdetailid));
 
     // Format the result (convert dates to readable strings)
+    const formatDate = (date) => (date ? new Date(date).toLocaleString() : "N/A");
+
     const formattedResult = result.map((item) => {
-        const formatDate = (date) => (date ? new Date(date).toLocaleString() : null);
+        // Handle case where the item might be null or undefined
+        if (!item) return {}; // Skip or return an empty object for invalid entries
 
         return {
             ...item,
@@ -184,14 +170,14 @@ const updateProductDetail = asyncHandler(async (req, res) => {
 
     // Validate numeric values
     if (
-        isNaN(normalizedGsm) || normalizedGsm <= 0 ||
-        isNaN(normalizedMachineDia) || normalizedMachineDia <= 0 ||
-        isNaN(normalizedFinishDia) || normalizedFinishDia <= 0 ||
-        isNaN(normalizedRollsReceived) || normalizedRollsReceived <= 0 ||
-        isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty <= 0 ||
-        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty <= 0 ||
-        isNaN(normalizedFinalQty) || normalizedFinalQty <= 0 ||
-        isNaN(normalizedRejectedQty) || normalizedRejectedQty <= 0
+        isNaN(normalizedGsm) || normalizedGsm < 0 ||
+        isNaN(normalizedMachineDia) || normalizedMachineDia < 0 ||
+        isNaN(normalizedFinishDia) || normalizedFinishDia < 0 ||
+        isNaN(normalizedRollsReceived) || normalizedRollsReceived < 0 ||
+        isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty < 0 ||
+        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty < 0 ||
+        isNaN(normalizedFinalQty) || normalizedFinalQty < 0 ||
+        isNaN(normalizedRejectedQty) || normalizedRejectedQty < 0
     ) {
         throw new ApiError(400, "All numeric values must be greater than 0.");
     }
