@@ -15,6 +15,7 @@ import {
     dealOrderRoutes,
     shipmentsRoutes,
     productDetailsRoutes,
+    returnsRoutes,
     machinesRoutes,
 } from './routes/index.js';
 
@@ -48,6 +49,7 @@ app.use('/api/deal-orders', dealOrderRoutes);
 app.use('/api/shipments', shipmentsRoutes);
 app.use('/api/product-details', productDetailsRoutes);
 app.use('/api/machines', machinesRoutes);
+app.use('/api/returns', returnsRoutes);
 
 
 
@@ -55,6 +57,14 @@ app.use('/api/machines', machinesRoutes);
 
 // Global error handler middleware
 app.use((err, req, res, next) => {
+    // Log the full error to the console for debugging
+    console.error("Error occurred:", {
+        message: err.message,
+        stack: err.stack,
+        statusCode: err.statusCode || 500,
+        additionalInfo: err.errors || [],
+    });
+
     if (err instanceof ApiError) {
         // Handle ApiError and send appropriate response
         return res.status(err.statusCode).json({

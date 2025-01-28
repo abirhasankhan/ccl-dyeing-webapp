@@ -1,16 +1,16 @@
 import { db } from "../config/drizzleSetup.js"; // Import your database connection
 
 // Function to create the triggers and functions
-export const createTriggerSchema = async () => {
+export const triggerSchema = async () => {
     try {
         console.log("Creating triggers and functions...");
 
         // Function to update total_received_qty on Shipment Insert
         const createUpdateReceivedQtyFunction = `
-            CREATE OR REPLACE FUNCTION update_order_received_qty() 
+            CREATE OR REPLACE FUNCTION update_deal_orders_received_qty() 
             RETURNS TRIGGER AS $$
             BEGIN
-                UPDATE Orders
+                UPDATE deal_orders
                 SET total_received_qty = COALESCE(total_received_qty, 0) + NEW.quantity_shipped
                 WHERE orderid = NEW.orderid;
 
@@ -19,20 +19,20 @@ export const createTriggerSchema = async () => {
             $$ LANGUAGE plpgsql;
         `;
 
-        // Trigger to execute update_order_received_qty on Shipment Insert
+        // Trigger to execute update_deal_orders_received_qty on Shipment Insert
         const createUpdateReceivedQtyTrigger = `
-            CREATE TRIGGER update_order_received_qty_trigger
-            AFTER INSERT ON Shipments
+            CREATE TRIGGER update_deal_orders_received_qty_trigger
+            AFTER INSERT ON shipments
             FOR EACH ROW
-            EXECUTE FUNCTION update_order_received_qty();
+            EXECUTE FUNCTION update_deal_orders_received_qty();
         `;
 
         // Function to update total_returned_qty on Return Insert
         const createUpdateReturnedQtyFunction = `
-            CREATE OR REPLACE FUNCTION update_order_returned_qty() 
+            CREATE OR REPLACE FUNCTION update_deal_orders_returned_qty() 
             RETURNS TRIGGER AS $$
             BEGIN
-                UPDATE Orders
+                UPDATE deal_orders
                 SET total_returned_qty = COALESCE(total_returned_qty, 0) + NEW.qty_returned
                 WHERE orderid = NEW.orderid;
 
@@ -41,12 +41,12 @@ export const createTriggerSchema = async () => {
             $$ LANGUAGE plpgsql;
         `;
 
-        // Trigger to execute update_order_returned_qty on Return Insert
+        // Trigger to execute update_deal_orders_returned_qty on Return Insert
         const createUpdateReturnedQtyTrigger = `
-            CREATE TRIGGER update_order_returned_qty_trigger
-            AFTER INSERT ON Returns
+            CREATE TRIGGER update_deal_orders_returned_qty_trigger
+            AFTER INSERT ON returns
             FOR EACH ROW
-            EXECUTE FUNCTION update_order_returned_qty();
+            EXECUTE FUNCTION update_deal_orders_returned_qty();
         `;
 
         // Execute all queries
@@ -60,6 +60,3 @@ export const createTriggerSchema = async () => {
         console.error("Error creating triggers and functions:", error);
     }
 };
-
-// Call the function to create the trigger schema
-createTriggerSchema();

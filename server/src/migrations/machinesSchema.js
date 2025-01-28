@@ -19,8 +19,8 @@ export const machinesSchema = async () => {
             const createTableQuery = `
                 CREATE TABLE IF NOT EXISTS machines (
                     machineid VARCHAR(255) PRIMARY KEY NOT NULL, -- Primary key for the machine
-                    name VARCHAR(255) NOT NULL, -- Name of the machine
-                    type VARCHAR(255) NOT NULL, -- Type of the machine (e.g., spinning, weaving, etc.)
+                    machine_name VARCHAR(255) NOT NULL, -- Name of the machine
+                    machine_type VARCHAR(255) NOT NULL, -- Type of the machine (e.g., spinning, weaving, etc.)
                     capacity INT NOT NULL, -- Capacity of the machine (e.g., units per hour)
                     status VARCHAR(50) DEFAULT 'available', -- Status of the machine (e.g., available, busy, maintenance)
                     manufacturer VARCHAR(255), -- Manufacturer of the machine

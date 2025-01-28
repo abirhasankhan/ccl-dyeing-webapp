@@ -10,6 +10,11 @@ import { shipments } from "../models/shipments.model.js";
 // Create a new record
 const createProductDetail = asyncHandler(async (req, res) => {
 
+    // Check if request body is missing
+    if (!req.body) {
+        throw new ApiError(400, "Request body is missing");
+    }
+
     const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, grey_received_qty, grey_return_qty, notes, remarks } = req.body;
 
     // Required field validation
@@ -29,10 +34,10 @@ const createProductDetail = asyncHandler(async (req, res) => {
     }
 
     // Normalize inputs by trimming strings where applicable
-    const normalizedShipmentid = shipmentid.trim();
-    const normalizedYarnCount = yarn_count.trim();
-    const normalizedColor = color.trim();
-    const normalizedFabric = fabric.trim();
+    const normalizedShipmentid = String(shipmentid).trim();
+    const normalizedYarnCount = String(yarn_count).trim();
+    const normalizedColor = String(color).trim();
+    const normalizedFabric = String(fabric).trim();
     const normalizedGsm = Number(gsm);
     const normalizedMachineDia = Number(machine_dia);
     const normalizedFinishDia = Number(finish_dia);
@@ -41,21 +46,29 @@ const createProductDetail = asyncHandler(async (req, res) => {
     const normalizedGreyReturnQty = Number(grey_return_qty);
     const normalizedFinalQty = 0;
     const normalizedRejectedQty = 0;
-    const normalizedNotes = notes?.trim() || null;
-    const normalizedRemarks = remarks?.trim() || null;
+    const normalizedNotes = notes ? String(notes).trim() : null;
+    const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
     // Validate numeric values
-    if (isNaN(normalizedGsm) || isNaN(normalizedMachineDia) || isNaN(normalizedFinishDia) || isNaN(normalizedRollsReceived) || isNaN(normalizedTotalQtyCompany) || isNaN(normalizedTotalGreyReceived) || isNaN(normalizedGreyReceivedQty) || isNaN(normalizedGreyReturnQty)) {
-        throw new ApiError(400, "Invalid numeric values provided for GSM, Machine Dia, Finish Dia, Rolls Received, Total Qty Company, Total Grey Received, Grey Received Qty, or Grey Return Qty");
+    if (
+        isNaN(normalizedGsm) || normalizedGsm <= 0 ||
+        isNaN(normalizedMachineDia) || normalizedMachineDia <= 0 ||
+        isNaN(normalizedFinishDia) || normalizedFinishDia <= 0 ||
+        isNaN(normalizedRollsReceived) || normalizedRollsReceived <= 0 ||
+        isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty <= 0 ||
+        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty <= 0
+    ) {
+        throw new ApiError(400, "All numeric values must be greater than 0.");
     }
+
 
     // Check if the Shipment already exists
     const existingShipment = await db.select().from(shipments).where(eq(shipments.shipmentid, normalizedShipmentid));
-
     if (!existingShipment.length) {
-        throw new ApiError(400, `Shipment with id ${normalizedShipmentid} not exists`);
+        throw new ApiError(404, `Shipment with id ${normalizedShipmentid} does not exist`);
     }
 
+    // Create new product detail
     const newProductDetail = {
         shipmentid: normalizedShipmentid,
         yarn_count: normalizedYarnCount,
@@ -80,16 +93,14 @@ const createProductDetail = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Failed to create Product Details");
     }
 
-    return res.status(201).json(
-        new ApiResponse(201, result[0], "Product Details created successfully")
-    )
-
+    return res.status(201).json(new ApiResponse(201, result[0], "Product Details created successfully"));
 });
 
 
-// Featch all records
+// Get all product details
 const getAllProductDetail = asyncHandler(async (req, res) => {
 
+    // Fetch all product details from the database
     const result = await db
         .select({
             productdetailid: productDetails.productdetailid,
@@ -101,33 +112,39 @@ const getAllProductDetail = asyncHandler(async (req, res) => {
             machine_dia: productDetails.machine_dia,
             finish_dia: productDetails.finish_dia,
             rolls_received: productDetails.rolls_received,
-            total_qty_company: productDetails.total_qty_company,
-            total_grey_received: productDetails.total_grey_received,
             grey_received_qty: productDetails.grey_received_qty,
             grey_return_qty: productDetails.grey_return_qty,
+            final_qty: productDetails.final_qty,
+            rejected_qty: productDetails.rejected_qty,
             notes: productDetails.notes,
             created_at: productDetails.created_at,
             updated_at: productDetails.updated_at,
-            remarks: productDetails.remarks,
         })
         .from(productDetails)
-        .orderBy(desc(productDetails.productdetailid)); 
+        .orderBy(desc(productDetails.productdetailid));
 
-    const formattedResult = result.map(item => ({
-        ...item,
-        created_at: new Date(item.created_at).toLocaleString(),
-        updated_at: new Date(item.updated_at).toLocaleString()
-    }));
+    // Format the result (convert dates to readable strings)
+    const formattedResult = result.map((item) => {
+        const formatDate = (date) => (date ? new Date(date).toLocaleString() : null);
 
+        return {
+            ...item,
+            created_at: formatDate(item.created_at),
+            updated_at: formatDate(item.updated_at),
+        };
+    });
+
+
+    // Return the formatted result
     return res.status(200).json(
-        new ApiResponse(200, formattedResult, " Product Details successfully")
+        new ApiResponse(200, formattedResult, "Product Details fetched successfully")
     );
-
 });
 
 
 // Update an existing record
 const updateProductDetail = asyncHandler(async (req, res) => {
+    
 
     const { id } = req.params;
 
@@ -150,10 +167,10 @@ const updateProductDetail = asyncHandler(async (req, res) => {
     }
 
     // Normalize inputs by trimming strings where applicable
-    const normalizedShipmentid = shipmentid.trim();
-    const normalizedYarnCount = yarn_count.trim();
-    const normalizedColor = color.trim();
-    const normalizedFabric = fabric.trim();
+    const normalizedShipmentid = String(shipmentid).trim();
+    const normalizedYarnCount = String(yarn_count).trim();
+    const normalizedColor = String(color).trim();
+    const normalizedFabric = String(fabric).trim();
     const normalizedGsm = Number(gsm);
     const normalizedMachineDia = Number(machine_dia);
     const normalizedFinishDia = Number(finish_dia);
@@ -162,19 +179,28 @@ const updateProductDetail = asyncHandler(async (req, res) => {
     const normalizedGreyReturnQty = Number(grey_return_qty);
     const normalizedFinalQty = Number(final_qty);
     const normalizedRejectedQty = Number(rejected_qty);
-    const normalizedNotes = notes?.trim() || null;
-    const normalizedRemarks = remarks?.trim() || null;
+    const normalizedNotes = notes ? String(notes).trim() : null;
+    const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
     // Validate numeric values
-    if (isNaN(normalizedGsm) || isNaN(normalizedMachineDia) || isNaN(normalizedFinishDia) || isNaN(normalizedRollsReceived) || isNaN(normalizedGreyReceivedQty) || isNaN(normalizedGreyReturnQty) || isNaN(normalizedFinalQty) || isNaN(normalizedRejectedQty)) {
-        throw new ApiError(400, "Invalid numeric values provided for GSM, Machine Dia, Finish Dia, Rolls Received, Grey Received Qty, Grey Return Qty, Final Qty, Rejected Qty");
+    if (
+        isNaN(normalizedGsm) || normalizedGsm <= 0 ||
+        isNaN(normalizedMachineDia) || normalizedMachineDia <= 0 ||
+        isNaN(normalizedFinishDia) || normalizedFinishDia <= 0 ||
+        isNaN(normalizedRollsReceived) || normalizedRollsReceived <= 0 ||
+        isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty <= 0 ||
+        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty <= 0 ||
+        isNaN(normalizedFinalQty) || normalizedFinalQty <= 0 ||
+        isNaN(normalizedRejectedQty) || normalizedRejectedQty <= 0
+    ) {
+        throw new ApiError(400, "All numeric values must be greater than 0.");
     }
 
     // Check if the Shipment already exists
     const existingShipment = await db.select().from(shipments).where(eq(shipments.shipmentid, normalizedShipmentid));
 
     if (!existingShipment.length) {
-        throw new ApiError(400, `Shipment with id ${normalizedShipmentid} not exists`);
+        throw new ApiError(404, `Shipment with id ${normalizedShipmentid} not exists`);
     }
 
     const updateProductDetail = {

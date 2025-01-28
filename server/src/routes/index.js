@@ -7,7 +7,8 @@ import dyeingFinishingDealsRoutes from './dyeingFinishingDeals.route.js';
 import additionalProcessDealsRoutes from './additionalProcessDeals.route.js';
 import dealOrderRoutes from './dealOrders.route.js';
 import shipmentsRoutes from './shipments.route.js';
-import productDetailsRoutes from './productDetails.route.js'
+import productDetailsRoutes from './productDetails.route.js';
+import returnsRoutes from './returns.route.js';
 import machinesRoutes from './machines.route.js'
 
 
@@ -22,5 +23,6 @@ export {
     dealOrderRoutes,
     shipmentsRoutes,
     productDetailsRoutes,
+    returnsRoutes,
     machinesRoutes,
 };

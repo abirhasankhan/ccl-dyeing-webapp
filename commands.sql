@@ -391,126 +391,109 @@
 
 
 
--- Returns Table
-CREATE TABLE Returns (
-    returnid VARCHAR(255) PRIMARY KEY, 
-    orderid VARCHAR(255) NOT NULL, 
-    return_date DATE NOT NULL, 
-    qty_returned INT NOT NULL CHECK (qty_returned >= 0), 
-    reason_for_return TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    remarks TEXT,	
-    FOREIGN KEY (orderid) REFERENCES Orders(orderid) ON DELETE CASCADE
-);
+-- -- Returns Table
+-- CREATE TABLE Returns (
+--     returnid VARCHAR(255) SERIAL PRIMARY KEY , 
+--     orderid VARCHAR(255) NOT NULL, 
+--     return_date DATE NOT NULL, 
+--     qty_returned INT NOT NULL CHECK (qty_returned >= 0), 
+--     reason_for_return TEXT,
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     remarks TEXT,	
+--     FOREIGN KEY (orderid) REFERENCES Orders(orderid) ON DELETE CASCADE
+-- );
 
--- Sequence for generating return ID
-CREATE SEQUENCE returns_seq START 1;
+-- -- Function to update 'updated_at' column
+-- CREATE OR REPLACE FUNCTION update_returns_timestamp() 
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     NEW.updated_at = CURRENT_TIMESTAMP;
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
--- Function to generate return ID
-CREATE OR REPLACE FUNCTION generate_return_id() RETURNS TRIGGER AS $$
-BEGIN
-    NEW.returnid := CONCAT('RT-', LPAD(NEXTVAL('returns_seq')::TEXT, 6, '0'));
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger for generating return ID
-CREATE TRIGGER trigger_generate_return_id
-BEFORE INSERT ON Returns
-FOR EACH ROW
-EXECUTE FUNCTION generate_return_id();
-
--- Function to update 'updated_at' column
-CREATE OR REPLACE FUNCTION update_returns_timestamp() 
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger to auto-update 'updated_at' column
-CREATE TRIGGER trigger_update_returns_timestamp
-BEFORE UPDATE ON Returns
-FOR EACH ROW
-EXECUTE FUNCTION update_returns_timestamp();
+-- -- Trigger to auto-update 'updated_at' column
+-- CREATE TRIGGER trigger_update_returns_timestamp
+-- BEFORE UPDATE ON Returns
+-- FOR EACH ROW
+-- EXECUTE FUNCTION update_returns_timestamp();
 
 
 
-/* ---Triggers for Updating Quantities--- */
+-- /* ---Triggers for Updating Quantities--- */
 
--- Function to Update total_received_qty on Shipment Insert
-CREATE OR REPLACE FUNCTION update_order_received_qty() 
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE Orders
-    SET total_received_qty = COALESCE(total_received_qty, 0) + NEW.quantity_shipped
-    WHERE orderid = NEW.orderid;
+-- -- Function to Update total_received_qty on Shipment Insert
+-- CREATE OR REPLACE FUNCTION update_order_received_qty() 
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     UPDATE Orders
+--     SET total_received_qty = COALESCE(total_received_qty, 0) + NEW.quantity_shipped
+--     WHERE orderid = NEW.orderid;
 
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
--- Trigger to Execute update_order_received_qty on Shipment Insert
-CREATE TRIGGER update_order_received_qty_trigger
-AFTER INSERT ON Shipments
-FOR EACH ROW
-EXECUTE FUNCTION update_order_received_qty();
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 
--- Function to Update total_returned_qty on Return Insert
-CREATE OR REPLACE FUNCTION update_order_returned_qty() 
-RETURNS TRIGGER AS $$
-BEGIN
-    UPDATE Orders
-    SET total_returned_qty = COALESCE(total_returned_qty, 0) + NEW.qty_returned
-    WHERE orderid = NEW.orderid;
+-- -- Trigger to Execute update_order_received_qty on Shipment Insert
+-- CREATE TRIGGER update_order_received_qty_trigger
+-- AFTER INSERT ON Shipments
+-- FOR EACH ROW
+-- EXECUTE FUNCTION update_order_received_qty();
 
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
 
--- Trigger to Execute update_order_returned_qty on Return Insert
-CREATE TRIGGER update_order_returned_qty_trigger
-AFTER INSERT ON Returns
-FOR EACH ROW
-EXECUTE FUNCTION update_order_returned_qty();
+-- -- Function to Update total_returned_qty on Return Insert
+-- CREATE OR REPLACE FUNCTION update_order_returned_qty() 
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     UPDATE Orders
+--     SET total_returned_qty = COALESCE(total_returned_qty, 0) + NEW.qty_returned
+--     WHERE orderid = NEW.orderid;
+
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
+
+-- -- Trigger to Execute update_order_returned_qty on Return Insert
+-- CREATE TRIGGER update_order_returned_qty_trigger
+-- AFTER INSERT ON Returns
+-- FOR EACH ROW
+-- EXECUTE FUNCTION update_order_returned_qty();
 
 
 
 
 
-/*----------------Dyeing Ongoing Process------------------------*/
+-- /*----------------Dyeing Ongoing Process------------------------*/
 
 
--- Machines Table
-CREATE TABLE Machines (
-    machineid VARCHAR(255) PRIMARY KEY,
-    machine_name VARCHAR(255) NOT NULL UNIQUE,
-    capacity INT NOT NULL, 
-    status VARCHAR(50) DEFAULT 'Available', -- Status: Available, Busy, Maintenance
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    remarks TEXT
-);
+-- -- Machines Table
+-- CREATE TABLE Machines (
+--     machineid VARCHAR(255) PRIMARY KEY,
+--     machine_name VARCHAR(255) NOT NULL UNIQUE,
+--     capacity INT NOT NULL, 
+--     status VARCHAR(50) DEFAULT 'Available', -- Status: Available, Busy, Maintenance
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--     remarks TEXT
+-- );
 
--- Sequence for generating machine id
-CREATE SEQUENCE machines_seq START 1;
+-- -- Sequence for generating machine id
+-- CREATE SEQUENCE machines_seq START 1;
 
--- Function to generate machine id
-CREATE OR REPLACE FUNCTION generate_machine_id() RETURNS TRIGGER AS $$
-BEGIN
-    NEW.machineid := CONCAT('M-', LPAD(NEXTVAL('machines_seq')::TEXT, 3, '0'));
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- -- Function to generate machine id
+-- CREATE OR REPLACE FUNCTION generate_machine_id() RETURNS TRIGGER AS $$
+-- BEGIN
+--     NEW.machineid := CONCAT('M-', LPAD(NEXTVAL('machines_seq')::TEXT, 3, '0'));
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
--- Trigger to auto-generate machine id
-CREATE TRIGGER trigger_generate_machine_id
-BEFORE INSERT ON Machines
-FOR EACH ROW
-EXECUTE FUNCTION generate_machine_id();
+-- -- Trigger to auto-generate machine id
+-- CREATE TRIGGER trigger_generate_machine_id
+-- BEFORE INSERT ON Machines
+-- FOR EACH ROW
+-- EXECUTE FUNCTION generate_machine_id();
 
 
 

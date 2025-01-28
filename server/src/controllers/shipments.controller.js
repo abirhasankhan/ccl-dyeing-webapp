@@ -10,6 +10,11 @@ import { dealOrders } from "../models/dealOrders.model.js";
 // Create a new record
 const createShipment = asyncHandler(async (req, res) => {
 
+    // Check if request body is missing
+    if (!req.body) {
+        throw new ApiError(400, "Request body is missing");
+    }
+
     const { orderid, shipment_date, quantity_shipped, notes, remarks } = req.body;
 
     // Required field validation

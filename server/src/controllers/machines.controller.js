@@ -5,15 +5,20 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
+
 // Create a new machine record
 const createMachine = asyncHandler(async (req, res) => {
 
+    // Check if request body is missing
+    if (!req.body) {
+        throw new ApiError(400, "Request body is missing");
+    }
+
     const {
+        machineid,
         machine_name,
-        type,
+        machine_type,
         capacity,
-        status,
-        location,
         manufacturer,
         model,
         installation_date,
@@ -24,14 +29,14 @@ const createMachine = asyncHandler(async (req, res) => {
 
     // Required field validation
     const requiredFields = [
+        "machineid",
         "machine_name",
-        "type",
+        "machine_type",
         "capacity",
-        "status",
-        "location",
         "manufacturer",
         "model",
     ];
+
     const missingFields = requiredFields.filter(
         (field) => {
             const value = req.body[field];
@@ -46,17 +51,16 @@ const createMachine = asyncHandler(async (req, res) => {
     }
 
     // Normalize inputs by trimming strings where applicable
-    const normalizedMachineName = machine_name.trim();
-    const normalizedType = type.trim();
+    const normalizedMachineid = String(machineid).trim();
+    const normalizedMachineName = String(machine_name).trim();
+    const normalizedType = String(machine_type).trim();
     const normalizedCapacity = Number(capacity);
-    const normalizedStatus = status.trim();
-    const normalizedLocation = location.trim();
-    const normalizedManufacturer = manufacturer.trim();
-    const normalizedModel = model.trim();
+    const normalizedManufacturer = String(manufacturer).trim();
+    const normalizedModel = String(model).trim();
     const normalizedInstallationDate = installation_date ? new Date(installation_date) : null;
     const normalizedLastMaintenanceDate = last_maintenance_date ? new Date(last_maintenance_date) : null;
     const normalizedNextMaintenanceDate = next_maintenance_date ? new Date(next_maintenance_date) : null;
-    const normalizedRemarks = remarks?.trim() || null;
+    const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
     // Validate numeric values
     if (isNaN(normalizedCapacity)) {
@@ -65,11 +69,10 @@ const createMachine = asyncHandler(async (req, res) => {
 
     // Create new machine object
     const newMachine = {
+        machineid: normalizedMachineid,
         machine_name: normalizedMachineName,
-        type: normalizedType,
+        machine_type: normalizedType,
         capacity: normalizedCapacity,
-        status: normalizedStatus,
-        location: normalizedLocation,
         manufacturer: normalizedManufacturer,
         model: normalizedModel,
         installation_date: normalizedInstallationDate,
@@ -88,18 +91,20 @@ const createMachine = asyncHandler(async (req, res) => {
     return res.status(201).json(
         new ApiResponse(201, result[0], "Machine record created successfully")
     );
+
 });
 
 // Fetch all machine records
 const getAllMachines = asyncHandler(async (req, res) => {
+
+    // Fetch all machines from the database
     const result = await db
         .select({
             machineid: machines.machineid,
             machine_name: machines.machine_name,
-            type: machines.type,
+            machine_type: machines.machine_type, // Corrected key to match schema
             capacity: machines.capacity,
             status: machines.status,
-            location: machines.location,
             manufacturer: machines.manufacturer,
             model: machines.model,
             installation_date: machines.installation_date,
@@ -112,20 +117,27 @@ const getAllMachines = asyncHandler(async (req, res) => {
         .from(machines)
         .orderBy(asc(machines.machineid));
 
-    // Format timestamps
-    const formattedResult = result.map((item) => ({
-        ...item,
-        installation_date: item.installation_date ? new Date(item.installation_date).toLocaleString() : null,
-        last_maintenance_date: item.last_maintenance_date ? new Date(item.last_maintenance_date).toLocaleString() : null,
-        next_maintenance_date: item.next_maintenance_date ? new Date(item.next_maintenance_date).toLocaleString() : null,
-        created_at: new Date(item.created_at).toLocaleString(),
-        updated_at: new Date(item.updated_at).toLocaleString(),
-    }));
 
+    // Format timestamps
+    const formattedResult = result.map((item) => {
+        const formatDate = (date) => (date ? new Date(date).toLocaleString() : null);
+
+        return {
+            ...item,
+            installation_date: formatDate(item.installation_date),
+            last_maintenance_date: formatDate(item.last_maintenance_date),
+            next_maintenance_date: formatDate(item.next_maintenance_date),
+            created_at: formatDate(item.created_at),
+            updated_at: formatDate(item.updated_at),
+        };
+    });
+
+    // Return success response
     return res.status(200).json(
         new ApiResponse(200, formattedResult, "Machines fetched successfully")
     );
 });
+
 
 // Update an existing machine record
 const updateMachine = asyncHandler(async (req, res) => {
@@ -133,11 +145,11 @@ const updateMachine = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     const {
+        machineid,
         machine_name,
-        type,
+        machine_type,
         capacity,
         status,
-        location,
         manufacturer,
         model,
         installation_date,
@@ -148,14 +160,15 @@ const updateMachine = asyncHandler(async (req, res) => {
 
     // Required field validation
     const requiredFields = [
+        "machineid",
         "machine_name",
-        "type",
+        "machine_type",
         "capacity",
         "status",
-        "location",
         "manufacturer",
         "model",
     ];
+
     const missingFields = requiredFields.filter(
         (field) => {
             const value = req.body[field];
@@ -170,17 +183,17 @@ const updateMachine = asyncHandler(async (req, res) => {
     }
 
     // Normalize inputs by trimming strings where applicable
-    const normalizedMachineName = machine_name.trim();
-    const normalizedType = type.trim();
+    const normalizedMachineid = String(machineid).trim();
+    const normalizedMachineName = String(machine_name).trim();
+    const normalizedType = String(machine_type).trim();
     const normalizedCapacity = Number(capacity);
     const normalizedStatus = status.trim();
-    const normalizedLocation = location.trim();
-    const normalizedManufacturer = manufacturer.trim();
-    const normalizedModel = model.trim();
+    const normalizedManufacturer = String(manufacturer).trim();
+    const normalizedModel = String(model).trim();
     const normalizedInstallationDate = installation_date ? new Date(installation_date) : null;
     const normalizedLastMaintenanceDate = last_maintenance_date ? new Date(last_maintenance_date) : null;
     const normalizedNextMaintenanceDate = next_maintenance_date ? new Date(next_maintenance_date) : null;
-    const normalizedRemarks = remarks?.trim() || null;
+    const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
     // Validate numeric values
     if (isNaN(normalizedCapacity)) {
@@ -189,11 +202,11 @@ const updateMachine = asyncHandler(async (req, res) => {
 
     // Create update machine object
     const updateMachine = {
+        machineid: normalizedMachineid,
         machine_name: normalizedMachineName,
-        type: normalizedType,
+        machine_type: normalizedType,
         capacity: normalizedCapacity,
         status: normalizedStatus,
-        location: normalizedLocation,
         manufacturer: normalizedManufacturer,
         model: normalizedModel,
         installation_date: normalizedInstallationDate,
@@ -210,13 +223,14 @@ const updateMachine = asyncHandler(async (req, res) => {
         .returning();
 
     if (!result.length) {
-        throw new ApiError(404, "Machine record not found");
+        throw new ApiError(500, "Failed to update machine record");
     }
 
     return res.status(200).json(
         new ApiResponse(200, result[0], "Machine record updated successfully")
     );
 });
+
 
 // Delete a machine record
 const deleteMachine = asyncHandler(async (req, res) => {
@@ -237,4 +251,10 @@ const deleteMachine = asyncHandler(async (req, res) => {
     );
 });
 
-export { createMachine, getAllMachines, updateMachine, deleteMachine };
+
+export { 
+    createMachine, 
+    getAllMachines, 
+    updateMachine, 
+    deleteMachine
+};
