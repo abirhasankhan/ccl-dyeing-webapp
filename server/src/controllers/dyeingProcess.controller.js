@@ -7,9 +7,35 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { productDetails } from "../models/productDetails.model.js";
 import { machines } from "../models/machines.model.js";
 
+// Helper function to update machine status
+const updateMachineStatus = async (db, machineId, status) => {
+    const result = await db
+        .update(machines)
+        .set({ status })
+        .where(eq(machines.machineid, machineId))
+        .returning();
+
+    if (!result.length) {
+        throw new ApiError(500, `Failed to update machine status for machine ID ${machineId}`);
+    }
+};
+
+// Helper function to check if the machine is busy
+const isMachineBusy = async (db, machineId) => {
+    const machine = await db
+        .select()
+        .from(machines)
+        .where(eq(machines.machineid, machineId));
+
+    if (!machine.length) {
+        throw new ApiError(404, `Machine with id ${machineId} does not exist`);
+    }
+
+    return machine[0].status === "Busy";
+};
+
 // Create a new dyeing process record
 const createDyeingProcess = asyncHandler(async (req, res) => {
-
     // Check if request body is missing
     if (!req.body) {
         throw new ApiError(400, "Request body is missing");
@@ -46,10 +72,10 @@ const createDyeingProcess = asyncHandler(async (req, res) => {
 
     // Validate numeric values
     if (
-        isNaN(normalizedBatchQty) || normalizedBatchQty <= 0 ||
-        isNaN(normalizedGreyWeight) || normalizedGreyWeight <= 0 ||
-        isNaN(normalizedFinishWeight) || normalizedFinishWeight <= 0 ||
-        isNaN(normalizedFinishAfterGsm) || normalizedFinishAfterGsm <= 0
+        isNaN(normalizedBatchQty) || normalizedBatchQty < 0 ||
+        isNaN(normalizedGreyWeight) || normalizedGreyWeight < 0 ||
+        isNaN(normalizedFinishWeight) || normalizedFinishWeight < 0 ||
+        isNaN(normalizedFinishAfterGsm) || normalizedFinishAfterGsm < 0
     ) {
         throw new ApiError(400, "All numeric values must be greater than 0.");
     }
@@ -65,7 +91,13 @@ const createDyeingProcess = asyncHandler(async (req, res) => {
         throw new ApiError(404, `Machine with id ${normalizedMachineId} does not exist`);
     }
 
-    // Create new dyeing process
+    // Check if the machine is busy
+    const machineBusy = await isMachineBusy(db, normalizedMachineId);
+    if (machineBusy) {
+        throw new ApiError(400, `Machine with id ${normalizedMachineId} is already busy`);
+    }
+
+    // Create new dyeing process object
     const newDyeingProcess = {
         productdetailid: normalizedProductDetailId,
         machineid: normalizedMachineId,
@@ -78,22 +110,34 @@ const createDyeingProcess = asyncHandler(async (req, res) => {
         remarks: normalizedRemarks,
     };
 
-    // Insert into database
-    const result = await db.insert(dyeingProcess).values(newDyeingProcess).returning();
+    // Start a transaction
+    const result = await db.transaction(async (tx) => {
+        // Insert into dyeingProcess table
+        const newProcess = await tx
+            .insert(dyeingProcess)
+            .values(newDyeingProcess)
+            .returning();
 
-    if (!result.length) {
-        throw new ApiError(500, "Failed to create Dyeing Process");
-    }
+        if (!newProcess.length) {
+            throw new ApiError(500, "Failed to create Dyeing Process");
+        }
 
-    return res.status(201).json(new ApiResponse(201, result[0], "Dyeing Process created successfully"));
+        // Update machine status if the dyeing process is in progress
+        if (normalizedStatus === "In Progress") {
+            await updateMachineStatus(tx, normalizedMachineId, "Busy");
+        }
+
+        return newProcess[0];
+    });
+
+    return res.status(201).json(new ApiResponse(201, result, "Dyeing Process created successfully"));
 });
 
 // Get all dyeing process records
 const getAllDyeingProcess = asyncHandler(async (req, res) => {
-
     const result = await db
         .select()
-        .from(dyeingProcess) // Directly select from the table
+        .from(dyeingProcess)
         .orderBy(desc(dyeingProcess.processid));
 
     // Format the result (convert dates to readable strings)
@@ -118,10 +162,8 @@ const getAllDyeingProcess = asyncHandler(async (req, res) => {
     );
 });
 
-
 // Update an existing dyeing process record
 const updateDyeingProcess = asyncHandler(async (req, res) => {
-
     const { id } = req.params;
 
     const { productdetailid, machineid, batch_qty, grey_weight, finish_weight, finish_after_gsm, status, notes, remarks } = req.body;
@@ -173,7 +215,27 @@ const updateDyeingProcess = asyncHandler(async (req, res) => {
         throw new ApiError(404, `Machine with id ${normalizedMachineId} does not exist`);
     }
 
-    // Update dyeing process
+    // Fetch the existing dyeing process to get the current machine ID
+    const existingProcess = await db
+        .select()
+        .from(dyeingProcess)
+        .where(eq(dyeingProcess.processid, id));
+
+    if (!existingProcess.length) {
+        throw new ApiError(404, "Dyeing Process not found");
+    }
+
+    const currentMachineId = existingProcess[0].machineid;
+
+    // Check if the machine is busy (only if the machine ID is being changed)
+    if (normalizedMachineId !== currentMachineId) {
+        const machineBusy = await isMachineBusy(db, normalizedMachineId);
+        if (machineBusy) {
+            throw new ApiError(400, `Machine with id ${normalizedMachineId} is already busy`);
+        }
+    }
+
+    // Update dyeing process object
     const updateDyeingProcess = {
         productdetailid: normalizedProductDetailId,
         machineid: normalizedMachineId,
@@ -186,35 +248,75 @@ const updateDyeingProcess = asyncHandler(async (req, res) => {
         remarks: normalizedRemarks,
     };
 
-    const result = await db
-        .update(dyeingProcess)
-        .set(updateDyeingProcess)
-        .where(eq(dyeingProcess.processid, id))
-        .returning();
+    // Start a transaction
+    const result = await db.transaction(async (tx) => {
+        // Update dyeingProcess table
+        const updatedProcess = await tx
+            .update(dyeingProcess)
+            .set(updateDyeingProcess)
+            .where(eq(dyeingProcess.processid, id))
+            .returning();
 
-    if (!result.length) {
-        throw new ApiError(500, "Failed to update Dyeing Process");
-    }
+        if (!updatedProcess.length) {
+            throw new ApiError(500, "Failed to update Dyeing Process");
+        }
+
+        // Update machine status based on the new status
+        if (normalizedStatus === "Finished") {
+            await updateMachineStatus(tx, normalizedMachineId, "Available");
+        } else if (normalizedStatus === "In Progress") {
+            await updateMachineStatus(tx, normalizedMachineId, "Busy");
+        }
+
+        // If the machine ID was changed, update the old machine's status to available
+        if (normalizedMachineId !== currentMachineId) {
+            await updateMachineStatus(tx, currentMachineId, "Available");
+        }
+
+        return updatedProcess[0];
+    });
 
     return res.status(200).json(
-        new ApiResponse(200, result[0], "Dyeing Process updated successfully")
+        new ApiResponse(200, result, "Dyeing Process updated successfully")
     );
 });
 
 // Delete a dyeing process record
 const deleteDyeingProcess = asyncHandler(async (req, res) => {
-
     const { id } = req.params;
 
-    const deletedDyeingProcess = await db.delete(dyeingProcess).where(eq(dyeingProcess.processid, id)).returning();
+    // Start a transaction
+    const result = await db.transaction(async (tx) => {
+        // Fetch the dyeing process to get the machine ID
+        const existingProcess = await tx
+            .select()
+            .from(dyeingProcess)
+            .where(eq(dyeingProcess.processid, id));
 
-    // Check if anything was deleted
-    if (!deletedDyeingProcess.length) {
-        throw new ApiError(404, "Dyeing Process not found");
-    }
+        if (!existingProcess.length) {
+            throw new ApiError(404, "Dyeing Process not found");
+        }
+
+        const machineId = existingProcess[0].machineid;
+
+        // Delete the dyeing process
+        const deletedDyeingProcess = await tx
+            .delete(dyeingProcess)
+            .where(eq(dyeingProcess.processid, id))
+            .returning();
+
+        if (!deletedDyeingProcess.length) {
+            throw new ApiError(404, "Dyeing Process not found");
+        }
+
+        // Update machine status to available
+        await updateMachineStatus(tx, machineId, "Available");
+
+        return deletedDyeingProcess[0];
+    });
 
     return res.status(200).json(
-        new ApiResponse(200, deletedDyeingProcess, "Dyeing Process deleted successfully")
+        new ApiResponse(200, result, "Dyeing Process deleted successfully")
     );
 });
 

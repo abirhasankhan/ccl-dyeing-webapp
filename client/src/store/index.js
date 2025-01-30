@@ -7,6 +7,8 @@ import { useAdditionalProcessDealsStore } from "./additionalProcessDeals.js";
 import { useDealOrderStore } from "./dealOrder.js";
 import { useShipmentStore } from "./shipments.js";
 import { useProductDetailsStore } from "./productdetails.js";
+import { useMachineStore } from "./machine.js";
+
 
 
 
@@ -21,5 +23,6 @@ export {
     useDealOrderStore,
     useShipmentStore,
     useProductDetailsStore,
+    useMachineStore,
     
 };

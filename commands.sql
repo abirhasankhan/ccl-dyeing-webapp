@@ -22,58 +22,6 @@ EXECUTE FUNCTION update_order_received_qty();
 
 
 
-----------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE DyeingProcess (
-    processid VARCHAR(255) PRIMARY KEY, -- Unique ID for the dyeing process
-    productid VARCHAR(255) NOT NULL,    -- Links to the Products table
-    machineid VARCHAR(255) NOT NULL,    -- Machine used for dyeing
-    batch_qty INT NOT NULL,             -- Quantity in the batch
-    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Start time of the process
-    end_time TIMESTAMP,                 -- End time of the process
-    grey_weight FLOAT,                  -- Weight of grey fabric
-    finish_weight FLOAT,                -- Weight after dyeing
-    finish_after_gsm FLOAT,             -- Actual GSM after finishing
-    status VARCHAR(50) DEFAULT 'In Progress', -- Status of the dyeing process (e.g., In Progress, Completed)
-    process_loss FLOAT GENERATED ALWAYS AS ((grey_weight - finish_weight) / NULLIF(grey_weight, 0) * 100) STORED, -- Calculated process loss
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for record creation
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for updates
-    remarks TEXT,                       -- Additional notes
-    FOREIGN KEY (productid) REFERENCES Products(productid), -- Links to the Products table
-    FOREIGN KEY (machineid) REFERENCES Machines(machineid) -- Links to the Machines table
-);
-
--- Sequence for generating processid
-CREATE SEQUENCE dyeing_process_seq START 1;
-
--- Function to generate processid
-CREATE OR REPLACE FUNCTION generate_process_id() RETURNS TRIGGER AS $$ 
-BEGIN
-    NEW.processid := CONCAT('DP-', LPAD(NEXTVAL('dyeing_process_seq')::TEXT, 6, '0')); 
-    RETURN NEW; 
-END; 
-$$ LANGUAGE plpgsql;
-
--- Trigger to auto-generate processid
-CREATE TRIGGER trigger_generate_process_id
-BEFORE INSERT ON DyeingProcess
-FOR EACH ROW
-EXECUTE FUNCTION generate_process_id();
-
--- Function to update 'updated_at' column
-CREATE OR REPLACE FUNCTION update_dyeing_process_timestamp() 
-RETURNS TRIGGER AS $$ 
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP; 
-    RETURN NEW; 
-END; 
-$$ LANGUAGE plpgsql;
-
--- Trigger to update 'updated_at' column
-CREATE TRIGGER trigger_update_dyeing_process_timestamp
-BEFORE UPDATE ON DyeingProcess
-FOR EACH ROW
-EXECUTE FUNCTION update_dyeing_process_timestamp();
 
 -----------------------------------------------------------------
 

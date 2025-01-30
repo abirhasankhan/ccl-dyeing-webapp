@@ -15,6 +15,7 @@ import {
 	DealOrderPage,
 	ShipmentPage,
 	ProductDetailPage,
+	MachinePage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -73,18 +74,15 @@ function App() {
 								path="/services/additional-prices"
 								element={<AdditionalPricePage />}
 							/>
-
 							{/* Main Multistep Form, updated path */}
 							<Route
 								path="/client-deal/create"
 								element={<MultiStepForm />}
 							/>
-
 							<Route
 								path="/client-deal"
 								element={<ClientDealPageForm />}
 							/>
-
 							<Route
 								path="/dyeing-finishing-deal"
 								element={<DyeingFinishingDealsForm />}
@@ -93,29 +91,23 @@ function App() {
 								path="/additional-price-deal"
 								element={<AdditionalPriceDealForm />}
 							/>
-
 							{/* Other routes */}
-
 							<Route
 								path="/client-deal/view/client-deal-view"
 								element={<ClientDealViewPage />}
 							/>
-
 							<Route
 								path="/client-deal/view/dyeing-deal-view"
 								element={<DyeingDealViewPage />}
 							/>
-
 							<Route
 								path="/client-deal/view/additional-deal-view"
 								element={<AdditionalDealViewPage />}
 							/>
-
 							<Route
 								path="/deal-order"
 								element={<DealOrderPage />}
 							/>
-
 							<Route
 								path="/shipments"
 								element={<ShipmentPage />}
@@ -124,6 +116,10 @@ function App() {
 							<Route
 								path="/product-detail"
 								element={<ProductDetailPage />}
+							/>
+							<Route
+								path="/machines"
+								element={<MachinePage />}
 							/>
 						</Routes>
 					</Box>

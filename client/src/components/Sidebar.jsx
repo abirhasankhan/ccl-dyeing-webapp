@@ -75,6 +75,11 @@ const sidebarItems = [
 		to: "/product-detail",
 		icon: <FaInfoCircle />,
 	},
+	{
+		label: "Machines",
+		to: "/machines",
+		icon: <FaInfoCircle />,
+	},
 ];
 
 const Sidebar = () => {

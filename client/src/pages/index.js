@@ -5,13 +5,15 @@ import DyeingPricePage from "./DyeingPricePage";
 import AdditionalPricePage from "./AdditionalPricePage";
 import ClientDealPageForm from "./ClientDealPageForm";
 import DyeingFinishingDealsForm from "./DyeingFinishingDealsForm";
-import AdditionalPriceDealForm from "./AdditionalPriceDealForm"
-import ClientDealViewPage from "./ClientDealViewPage"
-import DyeingDealViewPage from "./DyeingDealViewPage"
-import AdditionalDealViewPage from "./AdditionalDealViewPage"
-import DealOrderPage from "./DealOrderPage"
-import ShipmentPage from "./ShipmentPage"
-import ProductDetailPage from "./ProductDetailPage"
+import AdditionalPriceDealForm from "./AdditionalPriceDealForm";
+import ClientDealViewPage from "./ClientDealViewPage";
+import DyeingDealViewPage from "./DyeingDealViewPage";
+import AdditionalDealViewPage from "./AdditionalDealViewPage";
+import DealOrderPage from "./DealOrderPage";
+import ShipmentPage from "./ShipmentPage";
+import ProductDetailPage from "./ProductDetailPage";
+import MachinePage from "./MachinePage";
+
 
 
 
@@ -30,5 +32,6 @@ export {
     AdditionalDealViewPage,
     DealOrderPage,
     ShipmentPage,
-    ProductDetailPage
+    ProductDetailPage,
+    MachinePage,
 };
