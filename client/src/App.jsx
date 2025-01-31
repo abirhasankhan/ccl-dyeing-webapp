@@ -16,6 +16,7 @@ import {
 	ShipmentPage,
 	ProductDetailPage,
 	MachinePage,
+	DyeingProcessPage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -112,15 +113,17 @@ function App() {
 								path="/shipments"
 								element={<ShipmentPage />}
 							/>
-
 							<Route
 								path="/product-detail"
 								element={<ProductDetailPage />}
 							/>
 							<Route
-								path="/machines"
-								element={<MachinePage />}
+								path="/dyeing-process"
+								element={<DyeingProcessPage />}
 							/>
+							<Route 
+								path="/machines" 
+								element={<MachinePage />} />
 						</Routes>
 					</Box>
 				</Box>

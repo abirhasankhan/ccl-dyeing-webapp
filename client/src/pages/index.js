@@ -13,6 +13,8 @@ import DealOrderPage from "./DealOrderPage";
 import ShipmentPage from "./ShipmentPage";
 import ProductDetailPage from "./ProductDetailPage";
 import MachinePage from "./MachinePage";
+import DyeingProcessPage from "./DyeingProcessPage";
+
 
 
 
@@ -34,4 +36,5 @@ export {
     ShipmentPage,
     ProductDetailPage,
     MachinePage,
+    DyeingProcessPage,
 };

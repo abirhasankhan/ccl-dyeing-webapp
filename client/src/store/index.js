@@ -8,6 +8,8 @@ import { useDealOrderStore } from "./dealOrder.js";
 import { useShipmentStore } from "./shipments.js";
 import { useProductDetailsStore } from "./productdetails.js";
 import { useMachineStore } from "./machine.js";
+import { useDyeingProcessStore } from "./dyeingProcess.js";
+
 
 
 
@@ -24,5 +26,6 @@ export {
     useShipmentStore,
     useProductDetailsStore,
     useMachineStore,
+    useDyeingProcessStore,
     
 };

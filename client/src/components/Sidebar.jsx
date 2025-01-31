@@ -76,11 +76,17 @@ const sidebarItems = [
 		icon: <FaInfoCircle />,
 	},
 	{
+		label: "Dyeing Process",
+		to: "/dyeing-process",
+		icon: <FaInfoCircle />,
+	},
+	{
 		label: "Machines",
 		to: "/machines",
 		icon: <FaInfoCircle />,
 	},
 ];
+
 
 const Sidebar = () => {
 	const [open, setOpen] = useState({}); // Track open/close state for each submenu
