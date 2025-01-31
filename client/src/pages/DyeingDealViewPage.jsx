@@ -37,8 +37,9 @@ function DyeingDealViewPage() {
 		deal_id: "",
 		color: "",
 		shade_percent: "",
-		service_type: "",
-		service_price_tk: "",
+		tube_tk: "",
+		open_tk: "",
+		elasteen_tk: "",
 		double_dyeing_tk: "",
 		notes: "",
 	});
@@ -49,8 +50,9 @@ function DyeingDealViewPage() {
 			deal_id: "",
 			color: "",
 			shade_percent: "",
-			service_type: "",
-			service_price_tk: "",
+			tube_tk: "",
+			open_tk: "",
+			elasteen_tk: "",
 			double_dyeing_tk: "",
 			notes: "",
 		});
@@ -141,14 +143,19 @@ function DyeingDealViewPage() {
 			placeholder: "Enter Shade Parcent",
 		},
 		{
-			name: "service_type",
-			label: "Service Type",
-			placeholder: "Enter Service Type",
+			name: "tube_tk",
+			label: "Tube TK",
+			placeholder: "Enter Tube TK",
 		},
 		{
-			name: "service_price_tk",
-			label: "Service Price Tk",
-			placeholder: "Enter Service Price Tk",
+			name: "open_tk",
+			label: "Open TK",
+			placeholder: "Enter Open TK",
+		},
+		{
+			name: "elasteen_tk",
+			label: "Elasteen TK",
+			placeholder: "Enter Elasteen TK",
 		},
 		{
 			name: "double_dyeing_tk",
@@ -175,10 +182,10 @@ function DyeingDealViewPage() {
 		{ Header: "Deal ID", accessor: "deal_id" },
 		{ Header: "Color", accessor: "color" },
 		{ Header: "Shade Parcent", accessor: "shade_percent" },
-		{ Header: "Service Type", accessor: "service_type" },
-		{ Header: "Service Price Tk", accessor: "service_price_tk" },
+		{ Header: "Tube TK", accessor: "tube_tk" },
+		{ Header: "Open TK", accessor: "open_tk" },
+		{ Header: "Elasteen TK", accessor: "elasteen_tk" },
 		{ Header: "Double Dyeing Tk", accessor: "double_dyeing_tk" },
-		{ Header: "Total Price", accessor: "total_price" },
 		{ Header: "Notes", accessor: "notes" },
 	];
 

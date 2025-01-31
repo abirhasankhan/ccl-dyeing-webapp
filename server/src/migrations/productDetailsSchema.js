@@ -29,8 +29,6 @@ export const productDetailsSchema = async () => {
                     rolls_received INT,                 -- Number of rolls received
                     grey_received_qty INT,              -- Quantity of grey fabric received
                     grey_return_qty INT DEFAULT 0,      -- Grey fabric returned
-                    final_qty INT,                      -- Final quantity after dyeing
-                    rejected_qty INT DEFAULT 0,         -- Rejected quantity
                     notes TEXT,
                     remarks TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

@@ -15,8 +15,6 @@ export const productDetails = pgTable("product_details", {
     rolls_received: integer("rolls_received"),
     grey_received_qty: integer("grey_received_qty"),
     grey_return_qty: integer("grey_return_qty").default(0),
-    final_qty: integer("final_qty"),
-    rejected_qty: integer("rejected_qty"),
     notes: text("notes"),
     created_at: timestamp("created_at").defaultNow(),
     updated_at: timestamp("updated_at").defaultNow(),

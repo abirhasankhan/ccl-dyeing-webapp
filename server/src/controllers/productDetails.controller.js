@@ -18,7 +18,7 @@ const createProductDetail = asyncHandler(async (req, res) => {
     const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, grey_received_qty, grey_return_qty, notes, remarks } = req.body;
 
     // Required field validation
-    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'grey_received_qty', 'grey_return_qty'];
+    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'grey_received_qty',];
 
     const missingFields = requiredFields.filter(
         (field) => {
@@ -44,8 +44,6 @@ const createProductDetail = asyncHandler(async (req, res) => {
     const normalizedRollsReceived = Number(rolls_received);
     const normalizedGreyReceivedQty = Number(grey_received_qty);
     const normalizedGreyReturnQty = Number(grey_return_qty);
-    const normalizedFinalQty = 0;
-    const normalizedRejectedQty = 0;
     const normalizedNotes = notes ? String(notes).trim() : null;
     const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
@@ -80,8 +78,6 @@ const createProductDetail = asyncHandler(async (req, res) => {
         rolls_received: normalizedRollsReceived,
         grey_received_qty: normalizedGreyReceivedQty,
         grey_return_qty: normalizedGreyReturnQty,
-        final_qty: normalizedFinalQty,
-        rejected_qty: normalizedRejectedQty,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     };
@@ -134,10 +130,10 @@ const updateProductDetail = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
 
-    const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, grey_received_qty, grey_return_qty, final_qty, rejected_qty, notes, remarks } = req.body;
+    const { shipmentid, yarn_count, color, fabric, gsm, machine_dia, finish_dia, rolls_received, grey_received_qty, grey_return_qty, notes, remarks } = req.body;
 
     // Required field validation
-    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'grey_received_qty', 'final_qty', 'rejected_qty'];
+    const requiredFields = ['shipmentid', 'yarn_count', 'color', 'fabric', 'gsm', 'machine_dia', 'finish_dia', 'rolls_received', 'grey_received_qty'];
 
     const missingFields = requiredFields.filter(field => {
         const value = req.body[field];
@@ -163,8 +159,6 @@ const updateProductDetail = asyncHandler(async (req, res) => {
     const normalizedRollsReceived = Number(rolls_received);
     const normalizedGreyReceivedQty = Number(grey_received_qty);
     const normalizedGreyReturnQty = Number(grey_return_qty);
-    const normalizedFinalQty = Number(final_qty);
-    const normalizedRejectedQty = Number(rejected_qty);
     const normalizedNotes = notes ? String(notes).trim() : null;
     const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
@@ -175,9 +169,7 @@ const updateProductDetail = asyncHandler(async (req, res) => {
         isNaN(normalizedFinishDia) || normalizedFinishDia < 0 ||
         isNaN(normalizedRollsReceived) || normalizedRollsReceived < 0 ||
         isNaN(normalizedGreyReceivedQty) || normalizedGreyReceivedQty < 0 ||
-        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty < 0 ||
-        isNaN(normalizedFinalQty) || normalizedFinalQty < 0 ||
-        isNaN(normalizedRejectedQty) || normalizedRejectedQty < 0
+        isNaN(normalizedGreyReturnQty) || normalizedGreyReturnQty < 0
     ) {
         throw new ApiError(400, "All numeric values must be greater than 0.");
     }
@@ -200,8 +192,6 @@ const updateProductDetail = asyncHandler(async (req, res) => {
         rolls_received: normalizedRollsReceived,
         grey_received_qty: normalizedGreyReceivedQty,
         grey_return_qty: normalizedGreyReturnQty,
-        final_qty: normalizedFinalQty,
-        rejected_qty: normalizedRejectedQty,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     };

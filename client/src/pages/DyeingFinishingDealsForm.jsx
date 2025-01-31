@@ -51,7 +51,7 @@ const DyeingFinishingDealsForm = ({ dealId, onPrev, onNext, onSkip }) => {
 				/>
 
 				{/* Service Type Dropdown */}
-
+				{/* 
 				<Controller
 					name="service_type"
 					control={methods.control}
@@ -74,13 +74,30 @@ const DyeingFinishingDealsForm = ({ dealId, onPrev, onNext, onSkip }) => {
 					<Box color="red.500">
 						{methods.formState.errors.service_type.message}
 					</Box>
-				)}
+				)} */}
 
 				<FormInput
-					label="Service Price (TK)"
-					name="service_price_tk"
+					label="Tube TK"
+					name="tube_tk"
 					type="number"
-					isRequired
+					defaultValue={0} // Default value is 0
+					isRequired={false} // Optional field
+				/>
+
+				<FormInput
+					label="Open TK"
+					name="open_tk"
+					type="number"
+					defaultValue={0} // Default value is 0
+					isRequired={false} // Optional field
+				/>
+
+				<FormInput
+					label="Elasteen TK"
+					name="elasteen_tk"
+					type="number"
+					defaultValue={0} // Default value is 0
+					isRequired={false} // Optional field
 				/>
 
 				{/* Double Dyeing TK (Optional, Default to 0) */}

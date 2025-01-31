@@ -13,8 +13,9 @@ const createDyeingFinishingDeals = asyncHandler(async (req, res) => {
         deal_id,
         color,
         shade_percent,
-        service_type,
-        service_price_tk,
+        tube_tk,
+        open_tk,
+        elasteen_tk,
         double_dyeing_tk,
         notes,
         remarks
@@ -31,9 +32,10 @@ const createDyeingFinishingDeals = asyncHandler(async (req, res) => {
     const normalizedDeal_id = deal_id.trim();
     const normalizedColor = color.trim();
     const normalizedShade_percent = shade_percent?.trim() || null;
-    const normalizedService_type = service_type.trim();
-    const normalizedService_price_tk = parseFloat(service_price_tk);
-    const normalizedDouble_dyeing_tk = parseFloat(double_dyeing_tk) || 0;
+    const normalizedTube_tk = tube_tk?.trim() || 0;
+    const normalizedOpen_tk = open_tk?.trim() || 0;
+    const normalizedElasteen_tk = elasteen_tk?.trim() || 0;
+    const normalizedDouble_dyeing_tk = double_dyeing_tk?.trim() || 55; // Trim or set to 55
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
@@ -47,10 +49,10 @@ const createDyeingFinishingDeals = asyncHandler(async (req, res) => {
         deal_id: normalizedDeal_id,
         color: normalizedColor,
         shade_percent: normalizedShade_percent,
-        service_type: normalizedService_type,
-        service_price_tk: normalizedService_price_tk,
+        tube_tk: normalizedTube_tk,
+        open_tk: normalizedOpen_tk,
+        elasteen_tk: normalizedElasteen_tk,
         double_dyeing_tk: normalizedDouble_dyeing_tk,
-        total_price: normalizedService_price_tk + normalizedDouble_dyeing_tk,
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     };
@@ -86,7 +88,9 @@ const getAllDyeingFinishingDeals = asyncHandler(async (req, res) => {
 const updateDyeingFinishingDeals = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
-    const { deal_id, color, shade_percent, service_type, service_price_tk, double_dyeing_tk, notes, remarks } = req.body;
+    const { deal_id, color, shade_percent, tube_tk,
+        open_tk,
+        elasteen_tk, double_dyeing_tk, notes, remarks } = req.body;
 
     // Check if the Dyeing Finishing Deal exists
     const existingDeal = await db
@@ -102,23 +106,21 @@ const updateDyeingFinishingDeals = asyncHandler(async (req, res) => {
     const normalizedDeal_id = deal_id?.trim();
     const normalizedColor = color?.trim();
     const normalizedShade_percent = shade_percent?.trim() || null;
-    const normalizedService_type = service_type?.trim();
-    const normalizedService_price_tk = parseFloat(service_price_tk);
-    const normalizedDouble_dyeing_tk = parseFloat(double_dyeing_tk) || 0;
+    const normalizedTube_tk = tube_tk?.trim() || 0;
+    const normalizedOpen_tk = open_tk?.trim() || 0;
+    const normalizedElasteen_tk = elasteen_tk?.trim() || 0;
+    const normalizedDouble_dyeing_tk = double_dyeing_tk?.trim() || 55; // Trim or set to 55
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
-    // Validate numeric inputs
-    if (isNaN(normalizedService_price_tk) || isNaN(normalizedDouble_dyeing_tk)) {
-        throw new ApiError(400, "Invalid numeric values provided");
-    }
 
     const updatedDyeingFinishingDeals = {
         deal_id: normalizedDeal_id,
         color: normalizedColor,
         shade_percent: normalizedShade_percent,
-        service_type: normalizedService_type,
-        service_price_tk: normalizedService_price_tk,
+        tube_tk: normalizedTube_tk,
+        open_tk: normalizedOpen_tk,
+        elasteen_tk: normalizedElasteen_tk,
         double_dyeing_tk: normalizedDouble_dyeing_tk,
         notes: normalizedNotes,
         remarks: normalizedRemarks,

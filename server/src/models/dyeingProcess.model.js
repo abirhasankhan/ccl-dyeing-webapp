@@ -25,7 +25,10 @@ export const dyeingProcess = pgTable("dyeing_process", {
     end_time: timestamp("end_time"), // End time of the process
     grey_weight: real("grey_weight"), // Weight of grey fabric
     finish_weight: real("finish_weight"), // Weight after dyeing
-    finish_after_gsm: real("finish_after_gsm"), // Actual GSM after finishing
+    finish_after_gsm: real("finish_after_gsm"), // GSM after finishing
+    process_loss: real("process_loss"), // Process loss %
+    final_qty: integer("final_qty"), // ✅ Total successful fabric quantity after dyeing
+    rejected_qty: integer("rejected_qty"), // ✅ Fabric rejected after dyeing
     status: varchar("status", { length: 50 }).default("In Progress"), // Status of the dyeing process
     notes: text("notes"), // Additional notes
     created_at: timestamp("created_at").defaultNow(), // Timestamp for record creation
@@ -33,7 +36,8 @@ export const dyeingProcess = pgTable("dyeing_process", {
     remarks: text("remarks"), // Remarks
 });
 
-// // Define relationships (if needed)
+
+// Define relationships (if needed)
 export const dyeingProcessRelations = relations(dyeingProcess, ({ one }) => ({
     productDetails: one(productDetails, {
         fields: [dyeingProcess.productdetailid],

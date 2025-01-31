@@ -20,8 +20,8 @@ const updateMachineStatus = async (db, machineId, status) => {
     }
 };
 
-// Helper function to check if the machine is busy
-const isMachineBusy = async (db, machineId) => {
+// Helper function to check if the machine is busy or under maintenance
+const isMachineUnavailable = async (db, machineId) => {
     const machine = await db
         .select()
         .from(machines)
@@ -31,8 +31,9 @@ const isMachineBusy = async (db, machineId) => {
         throw new ApiError(404, `Machine with id ${machineId} does not exist`);
     }
 
-    return machine[0].status === "Busy";
+    return machine[0].status === "Busy" || machine[0].status === "Under Maintenance";
 };
+
 
 // Create a new dyeing process record
 const createDyeingProcess = asyncHandler(async (req, res) => {
@@ -92,7 +93,7 @@ const createDyeingProcess = asyncHandler(async (req, res) => {
     }
 
     // Check if the machine is busy
-    const machineBusy = await isMachineBusy(db, normalizedMachineId);
+    const machineBusy = await isMachineUnavailable(db, normalizedMachineId);
     if (machineBusy) {
         throw new ApiError(400, `Machine with id ${normalizedMachineId} is already busy`);
     }
@@ -140,12 +141,12 @@ const getAllDyeingProcess = asyncHandler(async (req, res) => {
         .from(dyeingProcess)
         .orderBy(desc(dyeingProcess.processid));
 
-    // Format the result (convert dates to readable strings)
+    // Helper function to format dates
     const formatDate = (date) => (date ? new Date(date).toLocaleString() : "N/A");
 
+    // Format process_loss and dates
     const formattedResult = result.map((item) => {
-        // Handle case where the item might be null or undefined
-        if (!item) return {}; // Skip or return an empty object for invalid entries
+        if (!item) return {}; // Skip null or undefined entries
 
         return {
             ...item,
@@ -153,10 +154,10 @@ const getAllDyeingProcess = asyncHandler(async (req, res) => {
             end_time: formatDate(item.end_time),
             created_at: formatDate(item.created_at),
             updated_at: formatDate(item.updated_at),
+            process_loss: item.process_loss ? `${parseFloat(item.process_loss).toFixed(2)}%` : "0%", // Format as percentage
         };
     });
 
-    // Return the formatted result
     return res.status(200).json(
         new ApiResponse(200, formattedResult, "Dyeing Processes fetched successfully")
     );
@@ -164,12 +165,13 @@ const getAllDyeingProcess = asyncHandler(async (req, res) => {
 
 // Update an existing dyeing process record
 const updateDyeingProcess = asyncHandler(async (req, res) => {
+
     const { id } = req.params;
 
-    const { productdetailid, machineid, batch_qty, grey_weight, finish_weight, finish_after_gsm, status, notes, remarks } = req.body;
+    const { productdetailid, machineid, batch_qty, grey_weight, finish_weight, finish_after_gsm, status, notes, remarks, final_qty, rejected_qty } = req.body;
 
     // Required field validation
-    const requiredFields = ['productdetailid', 'machineid', 'batch_qty', 'grey_weight', 'finish_weight', 'finish_after_gsm'];
+    const requiredFields = ['productdetailid', 'machineid', 'batch_qty', 'grey_weight', 'finish_weight', 'finish_after_gsm', 'final_qty', 'rejected_qty'];
 
     const missingFields = requiredFields.filter(field => {
         const value = req.body[field];
@@ -190,16 +192,21 @@ const updateDyeingProcess = asyncHandler(async (req, res) => {
     const normalizedGreyWeight = Number(grey_weight);
     const normalizedFinishWeight = Number(finish_weight);
     const normalizedFinishAfterGsm = Number(finish_after_gsm);
+    const normalizedFinalQty = Number(final_qty);
+    const normalizedRejectedQty = Number(rejected_qty);
     const normalizedStatus = status ? String(status).trim() : "In Progress";
+    const normalizedEndTime = new Date();
     const normalizedNotes = notes ? String(notes).trim() : null;
     const normalizedRemarks = remarks ? String(remarks).trim() : null;
 
     // Validate numeric values
     if (
-        isNaN(normalizedBatchQty) || normalizedBatchQty <= 0 ||
-        isNaN(normalizedGreyWeight) || normalizedGreyWeight <= 0 ||
-        isNaN(normalizedFinishWeight) || normalizedFinishWeight <= 0 ||
-        isNaN(normalizedFinishAfterGsm) || normalizedFinishAfterGsm <= 0
+        isNaN(normalizedBatchQty) || normalizedBatchQty < 0 ||
+        isNaN(normalizedGreyWeight) || normalizedGreyWeight < 0 ||
+        isNaN(normalizedFinishWeight) || normalizedFinishWeight < 0 ||
+        isNaN(normalizedFinishAfterGsm) || normalizedFinishAfterGsm < 0 ||
+        isNaN(normalizedFinalQty) || normalizedFinalQty < 0 ||
+        isNaN(normalizedRejectedQty) || normalizedRejectedQty < 0
     ) {
         throw new ApiError(400, "All numeric values must be greater than 0.");
     }
@@ -229,7 +236,7 @@ const updateDyeingProcess = asyncHandler(async (req, res) => {
 
     // Check if the machine is busy (only if the machine ID is being changed)
     if (normalizedMachineId !== currentMachineId) {
-        const machineBusy = await isMachineBusy(db, normalizedMachineId);
+        const machineBusy = await isMachineUnavailable(db, normalizedMachineId);
         if (machineBusy) {
             throw new ApiError(400, `Machine with id ${normalizedMachineId} is already busy`);
         }
@@ -243,6 +250,9 @@ const updateDyeingProcess = asyncHandler(async (req, res) => {
         grey_weight: normalizedGreyWeight,
         finish_weight: normalizedFinishWeight,
         finish_after_gsm: normalizedFinishAfterGsm,
+        final_qty: normalizedFinalQty,
+        rejected_qty: normalizedRejectedQty,
+        end_time: normalizedEndTime,
         status: normalizedStatus,
         notes: normalizedNotes,
         remarks: normalizedRemarks,

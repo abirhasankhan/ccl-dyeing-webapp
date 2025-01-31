@@ -43,7 +43,7 @@ const AdditionalPriceDealForm = ({ dealId, onPrev, onSkip, setStep }) => {
 				/>
 				<FormInput
 					label="Additional Price (TK)"
-					name="total_price"
+					name="price_tk"
 					type="number"
 					isRequired
 				/>

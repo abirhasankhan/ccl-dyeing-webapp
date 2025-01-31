@@ -51,7 +51,7 @@ app.use('/api/shipments', shipmentsRoutes);
 app.use('/api/product-details', productDetailsRoutes);
 app.use('/api/returns', returnsRoutes);
 app.use('/api/machines', machinesRoutes);
-app.use('/api/dyeing-process', dyeingProcessRoutes);
+app.use('/api/dyeing-processes', dyeingProcessRoutes);
 
 
 

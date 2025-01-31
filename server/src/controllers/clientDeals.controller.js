@@ -1,11 +1,55 @@
 import { db } from "../config/drizzleSetup.js";
 import { clientDeals } from "../models/clientDeals.model.js";
+import { dyeingFinishingDeals } from "../models/dyeingFinishingDeals.model.js";
+import { additionalProcessDeals } from "../models/additionalProcessDeals.model.js";
+
 import { eq, ilike } from 'drizzle-orm';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { Client } from "../models/client.model.js"
 import { sql } from 'drizzle-orm';
+import PDFDocument from 'pdfkit';
+
+
+// Function to generate a PDF document
+const generatePDF = (deal) => {
+    return new Promise((resolve, reject) => {
+        const doc = new PDFDocument();
+        let buffers = [];
+
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+            const pdfData = Buffer.concat(buffers);
+            resolve(pdfData);
+        });
+
+        doc.on('error', (err) => {
+            reject(err);
+        });
+
+        doc.fontSize(16).text("Client Deal Details", { align: 'center' });
+        doc.moveDown();
+
+        doc.fontSize(12)
+            .text(`Deal ID: ${deal.deal_id}`)
+            .text(`Client ID: ${deal.clientid}`)
+            .text(`Payment Method: ${deal.payment_method}`)
+            .text(`Issue Date: ${deal.issue_date}`)
+            .text(`Valid Through: ${deal.valid_through}`)
+            .text(`Representative: ${deal.representative}`)
+            .text(`Designation: ${deal.designation}`)
+            .text(`Contact No: ${deal.contact_no}`)
+            .text(`Bank Name: ${deal.bankName}`)
+            .text(`Branch: ${deal.branch}`)
+            .text(`Sort Code: ${deal.sortCode}`)
+            .text(`Notes: ${deal.notes || 'N/A'}`)
+            .text(`Status: ${deal.status || 'N/A'}`)
+            .moveDown();
+
+        doc.end();
+    });
+};
 
 
 // Create a new record
@@ -80,10 +124,13 @@ const createClientDeals = asyncHandler(async (req, res) => {
 });
 
 
-// Get all records
+// Get all records and generate PDFs
 const getClientDeals = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
 
-    const result = await db
+    // Fetch client deals with pagination
+    const clientDealsQuery = db
         .select({
             deal_id: clientDeals.deal_id,
             clientid: clientDeals.clientid,
@@ -93,30 +140,113 @@ const getClientDeals = asyncHandler(async (req, res) => {
             representative: clientDeals.representative,
             designation: clientDeals.designation,
             contact_no: clientDeals.contact_no,
-            branch: sql`${clientDeals.bankInfo} ->> 'branch'`.as('branch'),      // ✅ Fixed JSON extraction
-            bankName: sql`${clientDeals.bankInfo} ->> 'bankName'`.as('bankName'),
-            sortCode: sql`${clientDeals.bankInfo} ->> 'sortCode'`.as('sortCode'),
+            branch: sql`COALESCE(${clientDeals.bankInfo} ->> 'branch', 'N/A')`.as('branch'),
+            bankName: sql`COALESCE(${clientDeals.bankInfo} ->> 'bankName', 'N/A')`.as('bankName'),
+            sortCode: sql`COALESCE(${clientDeals.bankInfo} ->> 'sortCode', 'N/A')`.as('sortCode'),
             notes: clientDeals.notes,
             status: clientDeals.status,
         })
         .from(clientDeals)
-        .orderBy(clientDeals.deal_id);
+        .orderBy(clientDeals.deal_id)
+        .limit(limit)
+        .offset(offset);
 
+    // Fetch dyeingFinishingDeals
+    const dyeingFinishingDealsQuery = db
+        .select({
+            deal_id: dyeingFinishingDeals.deal_id,
+            color: dyeingFinishingDeals.color,
+            shade_percent: dyeingFinishingDeals.shade_percent,
+            tube_tk: dyeingFinishingDeals.tube_tk,
+            open_tk: dyeingFinishingDeals.open_tk,
+            elasteen_tk: dyeingFinishingDeals.elasteen_tk,
+            double_dyeing_tk: dyeingFinishingDeals.double_dyeing_tk,
+            notes: dyeingFinishingDeals.notes,
+        })
+        .from(dyeingFinishingDeals);
 
-    // Format the result to ensure consistency
-    const formattedResult = result.map(deal => ({
-        ...deal,
-        bankInfo: deal.bankInfo ? {
-            bankName: deal.bankInfo.bankName || '',
-            branch: deal.bankInfo.branch || '',
-            sortCode: deal.bankInfo.sortCode || '',
-        } : { bankName: '', branch: '', sortCode: '' },  // Default to empty values
-    }));
+    // Fetch additionalProcessDeals
+    const additionalProcessDealsQuery = db
+        .select({
+            deal_id: additionalProcessDeals.deal_id,
+            process_type: additionalProcessDeals.process_type,
+            price_tk: additionalProcessDeals.price_tk,
+            notes: additionalProcessDeals.notes,
+        })
+        .from(additionalProcessDeals);
+
+    // Execute all queries concurrently
+    const [clientDealsResult, dyeingFinishingDealsResult, additionalProcessDealsResult] = await Promise.all([
+        clientDealsQuery,
+        dyeingFinishingDealsQuery,
+        additionalProcessDealsQuery,
+    ]);
+
+    // Check if query results are valid
+    if (!clientDealsResult || !Array.isArray(clientDealsResult)) {
+        throw new ApiError(500, "Failed to fetch client deals");
+    }
+
+    if (!dyeingFinishingDealsResult || !Array.isArray(dyeingFinishingDealsResult)) {
+        throw new ApiError(500, "Failed to fetch dyeing finishing deals");
+    }
+
+    if (!additionalProcessDealsResult || !Array.isArray(additionalProcessDealsResult)) {
+        throw new ApiError(500, "Failed to fetch additional process deals");
+    }
+
+    // Combine clientDeals with dyeingFinishingDeals and additionalProcessDeals
+    const combinedDeals = clientDealsResult.map((clientDeal) => {
+        // Find all dyeingFinishingDeals for this deal
+        const dyeingFinishingDeals = dyeingFinishingDealsResult
+            ?.filter((dfDeal) => dfDeal.deal_id === clientDeal.deal_id)
+            .map((dfDeal) => ({
+                color: dfDeal.color,
+                shade_percent: dfDeal.shade_percent,
+                tube_tk: dfDeal.tube_tk,
+                open_tk: dfDeal.open_tk,
+                elasteen_tk: dfDeal.elasteen_tk,
+                double_dyeing_tk: dfDeal.double_dyeing_tk,
+                notes: dfDeal.notes,
+            })) || [];
+
+        // Find all additionalProcessDeals for this deal
+        const additionalProcessDeals = additionalProcessDealsResult
+            ?.filter((apDeal) => apDeal.deal_id === clientDeal.deal_id)
+            .map((apDeal) => ({
+                process_type: apDeal.process_type,
+                price_tk: apDeal.price_tk,
+                notes: apDeal.notes,
+            })) || [];
+
+        return {
+            ...clientDeal,
+            dyeingFinishingDeals: dyeingFinishingDeals,
+            additionalProcessDeals: additionalProcessDeals,
+        };
+    });
+
+    // Generate PDFs for each deal
+    const pdfFiles = [];
+    for (const deal of combinedDeals) {
+        try {
+            const pdfData = await generatePDF(deal);
+            pdfFiles.push({
+                ...deal,
+                filename: `deal_${deal.deal_id}.pdf`,
+            });
+        } catch (error) {
+            console.error(`Failed to generate PDF for deal ${deal.deal_id}:`, error);
+        }
+    }
+
+    if (pdfFiles.length === 0) {
+        throw new ApiError(500, "Failed to generate any PDFs");
+    }
 
     return res.status(200).json(
-        new ApiResponse(200,  formattedResult , "ClientDeals fetched successfully")
+        new ApiResponse(200, pdfFiles, "ClientDeals PDFs generated successfully")
     );
-    
 });
 
 

@@ -197,20 +197,7 @@ function ProductDetailPage() {
 		},
 	];
 
-	const editFields = [
-		{
-			name: "final_qty",
-			label: "Final Qty After Dyeing",
-			placeholder: "Enter Final Qty",
-			type: "number",
-		},
-		{
-			name: "rejected_qty",
-			label: "Rejected Qty After Dyeing",
-			placeholder: "Enter Rejected Qty",
-			type: "number",
-		},
-	];
+	const editFields = [];
 
 	const fields = editId ? [...commonFields, ...editFields] : commonFields;
 
@@ -226,8 +213,6 @@ function ProductDetailPage() {
 		{ Header: "Rolls Received", accessor: "rolls_received" },
 		{ Header: "Grey Received Quantity", accessor: "grey_received_qty" },
 		{ Header: "Grey Return Quantity", accessor: "grey_return_qty" },
-		{ Header: "Final Qty", accessor: "final_qty" },
-		{ Header: "Rejected Qty", accessor: "rejected_qty" },
 		{ Header: "Notes", accessor: "notes" },
 		{ Header: "Created At", accessor: "created_at" },
 		{ Header: "Updated At", accessor: "updated_at" },

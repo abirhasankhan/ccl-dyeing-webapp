@@ -19,6 +19,8 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.38.3",
     "express": "^4.21.2",
+    "file-saver": "^2.0.5",
+    "pdfkit": "^0.16.0",
     "pg": "^8.13.1"
   },
   "devDependencies": {

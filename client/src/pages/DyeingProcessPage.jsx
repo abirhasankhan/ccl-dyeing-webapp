@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
-import { useDyeingProcessStore } from "../store"; // Import the dyeing process store
+import { useDyeingProcessStore, useMachineStore } from "../store"; // Import both stores
 import {
 	DataTable,
 	FormModal,
@@ -25,6 +25,7 @@ function DyeingProcessPage() {
 	const [data, setData] = useState([]); // Stores all dyeing process records
 	const [searchResults, setSearchResults] = useState([]); // Stores filtered dyeing process records
 	const [loading, setLoading] = useState(false); // Loading state
+	const [availableMachines, setAvailableMachines] = useState([]); // Stores available machines
 
 	const { isOpen, onOpen, onClose } = useDisclosure(); // Modal control
 
@@ -37,7 +38,6 @@ function DyeingProcessPage() {
 		finish_after_gsm: "",
 		status: "In Progress", // Default status
 		notes: "",
-		remarks: "",
 	});
 
 	// Reset the form fields
@@ -51,7 +51,6 @@ function DyeingProcessPage() {
 			finish_after_gsm: "",
 			status: "In Progress",
 			notes: "",
-			remarks: "",
 		});
 	};
 
@@ -71,21 +70,34 @@ function DyeingProcessPage() {
 		dyeingProcesses,
 	} = useDyeingProcessStore();
 
+	// Import machine store methods and state
+	const { fetchMachines, machines } = useMachineStore();
+
 	// Fetch data on initial load
 	useEffect(() => {
 		const loadData = async () => {
 			setLoading(true);
 			await fetchDyeingProcesses();
+			await fetchMachines(); // Fetch machines
 			setLoading(false);
 		};
 		loadData();
-	}, [fetchDyeingProcesses]);
+	}, [fetchDyeingProcesses, fetchMachines]);
 
 	// Update dyeing process data when the store changes
 	useEffect(() => {
 		setData(dyeingProcesses);
 		setSearchResults(dyeingProcesses);
 	}, [dyeingProcesses]);
+
+	// Update available machines when the machines store changes
+	useEffect(() => {
+		// Filter machines with status "Available"
+		const available = machines.filter(
+			(machine) => machine.status === "Available"
+		);
+		setAvailableMachines(available);
+	}, [machines]);
 
 	// Handle search functionality
 	const handleSearch = (query) => {
@@ -123,8 +135,12 @@ function DyeingProcessPage() {
 		{
 			name: "machineid",
 			label: "Machine ID",
-			placeholder: "Enter Machine ID",
-			type: "text",
+			placeholder: "Select Machine",
+			type: "select", // Change to select
+			options: availableMachines.map((machine) => ({
+				value: machine.machineid,
+				label: `${machine.machine_name} (${machine.machineid})`,
+			})),
 		},
 		{
 			name: "batch_qty",
@@ -156,16 +172,22 @@ function DyeingProcessPage() {
 			placeholder: "Enter Notes",
 			type: "text",
 		},
-		{
-			name: "remarks",
-			label: "Remarks",
-			placeholder: "Enter Remarks",
-			type: "text",
-		},
 	];
 
 	// Define additional fields for editing
 	const editFields = [
+		{
+			name: "final_qty",
+			label: "Final Qty After Dyeing",
+			placeholder: "Enter Final Qty",
+			type: "number",
+		},
+		{
+			name: "rejected_qty",
+			label: "Rejected Qty After Dyeing",
+			placeholder: "Enter Rejected Qty",
+			type: "number",
+		},
 		{
 			name: "status",
 			label: "Status",
@@ -186,11 +208,15 @@ function DyeingProcessPage() {
 		{ Header: "Machine ID", accessor: "machineid" },
 		{ Header: "Batch Quantity", accessor: "batch_qty" },
 		{ Header: "Grey Weight", accessor: "grey_weight" },
+		{ Header: "Start Time", accessor: "start_time" },
+		{ Header: "End Time", accessor: "end_time" },
 		{ Header: "Finish Weight", accessor: "finish_weight" },
 		{ Header: "Finish After GSM", accessor: "finish_after_gsm" },
+		{ Header: "Process Loss", accessor: "process_loss" },
+		{ Header: "Final Qty", accessor: "final_qty" },
+		{ Header: "Rejected Qty", accessor: "rejected_qty" },
 		{ Header: "Status", accessor: "status" },
 		{ Header: "Notes", accessor: "notes" },
-		{ Header: "Remarks", accessor: "remarks" },
 	];
 
 	const caption = "Dyeing Process List";

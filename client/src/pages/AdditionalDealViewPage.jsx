@@ -39,7 +39,7 @@ function AdditionalDealViewPage() {
 		appid: "",
 		deal_id: "",
 		process_type: "",
-		total_price: "",
+		price_tk: "",
 		notes: "",
 	});
 
@@ -48,7 +48,7 @@ function AdditionalDealViewPage() {
 			appid: "",
 			deal_id: "",
 			process_type: "",
-			total_price: "",
+			price_tk: "",
 			notes: "",
 		});
 	};
@@ -119,8 +119,8 @@ function AdditionalDealViewPage() {
 			placeholder: "Enter Process Type",
 		},
 		{
-			name: "total_price",
-			label: "Total Price",
+			name: "price_tk",
+			label: "Price TK",
 			placeholder: "Enter Total Price",
 		},
 		{
@@ -142,7 +142,7 @@ function AdditionalDealViewPage() {
 		{ Header: "ID", accessor: "appid" },
 		{ Header: "Deal ID", accessor: "deal_id" },
 		{ Header: "Process Type", accessor: "process_type" },
-		{ Header: "Total Price", accessor: "total_price" },
+		{ Header: "Price TK", accessor: "price_tk" },
 		{ Header: "Notes", accessor: "notes" },
 	];
 

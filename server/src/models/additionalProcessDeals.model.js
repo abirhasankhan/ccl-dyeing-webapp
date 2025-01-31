@@ -7,7 +7,7 @@ export const additionalProcessDeals = pgTable('additional_process_deals', {
     appid: varchar('appid', { length: 255 }).primaryKey(),
     deal_id: varchar('deal_id', { length: 255 }).notNull().references(() => clientDeals.deal_id),
     process_type: varchar('process_type', { length: 255 }),
-    total_price: decimal('total_price', { precision: 10, scale: 2 }),
+    price_tk: decimal('price_tk', { precision: 10, scale: 2 }),
     notes: text('notes'),
     remarks: text('remarks'),
     created_at: timestamp('created_at').defaultNow(),

@@ -21,7 +21,7 @@ export const additionalProcessDealsSchema = async () => {
                     appid VARCHAR(255) PRIMARY KEY,
                     deal_id VARCHAR(255) NOT NULL,
                     process_type VARCHAR(255),
-                    total_price DECIMAL(10, 2),
+                    price_tk DECIMAL(10, 2),
                     notes TEXT,
                     remarks TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

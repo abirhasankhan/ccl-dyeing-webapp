@@ -9,10 +9,10 @@ import { ApiResponse } from "../utils/apiResponse.js";
 // create a new Additional Process Deal
 const createAdditionalProcessDeals = asyncHandler(async (req, res) => {
 
-    const { deal_id, process_type, total_price, notes, remarks } = req.body;
+    const { deal_id, process_type, price_tk, notes, remarks } = req.body;
 
     // Required field validation
-    const requiredFields = ['deal_id', 'process_type', 'total_price'];
+    const requiredFields = ['deal_id', 'process_type', 'price_tk'];
     const missingFields = requiredFields.filter(field => !req.body[field]?.trim());
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
@@ -21,7 +21,7 @@ const createAdditionalProcessDeals = asyncHandler(async (req, res) => {
     // Normalize inputs by trimming strings where applicable
     const normalizedDeal_id = deal_id?.trim();
     const normalizedProcess_type = process_type?.trim();
-    const normalizedTotal_price = total_price?.trim();
+    const normalizedTotal_price = price_tk?.trim();
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
@@ -33,7 +33,7 @@ const createAdditionalProcessDeals = asyncHandler(async (req, res) => {
     const newAdditionalProcessDeals = {
         deal_id: normalizedDeal_id,
         process_type: normalizedProcess_type,
-        total_price: normalizedTotal_price,    
+        price_tk: normalizedTotal_price,    
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     } 
@@ -67,7 +67,7 @@ const getAllAdditionalProcessDeals = asyncHandler(async (req, res) => {
 const updateAdditionalProcessDeals = asyncHandler(async (req, res) => {
 
     const { id } = req.params;
-    const { deal_id, process_type, total_price, notes, remarks } = req.body;
+    const { deal_id, process_type, price_tk, notes, remarks } = req.body;
 
     // Check if the AdditionalProcessDeal exists
     const existingDeal = await db
@@ -82,7 +82,7 @@ const updateAdditionalProcessDeals = asyncHandler(async (req, res) => {
     // Normalize inputs by trimming strings where applicable
     const normalizedDeal_id = deal_id?.trim();
     const normalizedProcess_type = process_type?.trim();
-    const normalizedTotal_price = total_price?.trim();
+    const normalizedTotal_price = price_tk?.trim();
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
 
@@ -94,7 +94,7 @@ const updateAdditionalProcessDeals = asyncHandler(async (req, res) => {
     const updatedAdditionalProcessDeals = {
         deal_id: normalizedDeal_id,
         process_type: normalizedProcess_type,
-        total_price: normalizedTotal_price,    
+        price_tk: normalizedTotal_price,    
         notes: normalizedNotes,
         remarks: normalizedRemarks,
     };
