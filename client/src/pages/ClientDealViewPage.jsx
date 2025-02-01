@@ -25,7 +25,6 @@ import { useToastNotification } from "../hooks/toastUtils";
 
 function ClientDealViewPage() {
 
-	const [itemsPerPage] = useState(10); // You can adjust this based on your preference
 	const { showError, showSuccess } = useToastNotification();
 
 	const [cdeal, setcdeal] = useState({});
