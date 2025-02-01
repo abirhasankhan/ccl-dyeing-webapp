@@ -11,6 +11,7 @@ import productDetailsRoutes from './productDetails.route.js';
 import returnsRoutes from './returns.route.js';
 import machinesRoutes from './machines.route.js';
 import dyeingProcessRoutes from './dyeingProcess.route.js';
+import storeRoutes from './store.route.js';
 
 
 
@@ -28,4 +29,5 @@ export {
     returnsRoutes,
     machinesRoutes,
     dyeingProcessRoutes,
+    storeRoutes,
 };

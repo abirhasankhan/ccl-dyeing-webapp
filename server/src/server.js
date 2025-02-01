@@ -18,6 +18,7 @@ import {
     returnsRoutes,
     machinesRoutes,
     dyeingProcessRoutes,
+    storeRoutes
 } from './routes/index.js';
 
 // Load environment variables
@@ -52,6 +53,7 @@ app.use('/api/product-details', productDetailsRoutes);
 app.use('/api/returns', returnsRoutes);
 app.use('/api/machines', machinesRoutes);
 app.use('/api/dyeing-processes', dyeingProcessRoutes);
+app.use('/api/stores', storeRoutes);
 
 
 

@@ -17,6 +17,7 @@ import {
 	ProductDetailPage,
 	MachinePage,
 	DyeingProcessPage,
+	StorePage,
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -121,6 +122,10 @@ function App() {
 								path="/dyeing-process"
 								element={<DyeingProcessPage />}
 							/>
+							<Route 
+								path="/stores" 
+								element={<StorePage />} />
+
 							<Route 
 								path="/machines" 
 								element={<MachinePage />} />

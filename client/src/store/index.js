@@ -9,6 +9,8 @@ import { useShipmentStore } from "./shipments.js";
 import { useProductDetailsStore } from "./productdetails.js";
 import { useMachineStore } from "./machine.js";
 import { useDyeingProcessStore } from "./dyeingProcess.js";
+import { useStoreStore } from "./store.js";
+
 
 
 
@@ -27,5 +29,6 @@ export {
     useProductDetailsStore,
     useMachineStore,
     useDyeingProcessStore,
+    useStoreStore,
     
 };

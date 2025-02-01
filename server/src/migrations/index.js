@@ -10,6 +10,10 @@ import { productDetailsSchema } from './productDetailsSchema.js';
 import { returnsSchema } from './returnsSchema.js';
 import { machinesSchema } from './machinesSchema.js';
 import { dyeingProcessSchema } from './dyeingProcessSchema.js';
+import { storeSchema } from './storeSchema.js';
+import { invoicesSchema } from './invoicesSchema.js';
+import { paymentsSchema } from './paymentsSchema.js';
+
 
 
 
@@ -32,6 +36,9 @@ import { dyeingProcessSchema } from './dyeingProcessSchema.js';
         await returnsSchema();
         await machinesSchema();
         await dyeingProcessSchema();
+        await storeSchema();
+        await invoicesSchema();
+        await paymentsSchema();
         
         console.log('All schemas applied successfully!');
 

@@ -81,6 +81,16 @@ const sidebarItems = [
 		icon: <FaInfoCircle />,
 	},
 	{
+		label: "Stores",
+		to: "/stores",
+		icon: <FaInfoCircle />,
+	},
+	{
+		label: "Bills",
+		to: "/bills",
+		icon: <FaInfoCircle />,
+	},
+	{
 		label: "Machines",
 		to: "/machines",
 		icon: <FaInfoCircle />,

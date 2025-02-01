@@ -14,6 +14,8 @@ import ShipmentPage from "./ShipmentPage";
 import ProductDetailPage from "./ProductDetailPage";
 import MachinePage from "./MachinePage";
 import DyeingProcessPage from "./DyeingProcessPage";
+import StorePage from "./StorePage";
+
 
 
 
@@ -37,4 +39,5 @@ export {
     ProductDetailPage,
     MachinePage,
     DyeingProcessPage,
+    StorePage,
 };
