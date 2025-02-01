@@ -3,12 +3,11 @@ import { clientDeals } from "../models/clientDeals.model.js";
 import { dyeingFinishingDeals } from "../models/dyeingFinishingDeals.model.js";
 import { additionalProcessDeals } from "../models/additionalProcessDeals.model.js";
 
-import { eq, ilike } from 'drizzle-orm';
+import { eq, ilike, count, sql } from 'drizzle-orm';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { Client } from "../models/client.model.js"
-import { sql } from 'drizzle-orm';
 import PDFDocument from 'pdfkit';
 
 
@@ -126,7 +125,6 @@ const createClientDeals = asyncHandler(async (req, res) => {
 
 // Get all records and generate PDFs
 const getClientDeals = asyncHandler(async (req, res) => {
-
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
@@ -141,9 +139,15 @@ const getClientDeals = asyncHandler(async (req, res) => {
             representative: clientDeals.representative,
             designation: clientDeals.designation,
             contact_no: clientDeals.contact_no,
-            branch: sql`COALESCE(${clientDeals.bankInfo} ->> 'branch', 'N/A')`.as('branch'),
-            bankName: sql`COALESCE(${clientDeals.bankInfo} ->> 'bankName', 'N/A')`.as('bankName'),
-            sortCode: sql`COALESCE(${clientDeals.bankInfo} ->> 'sortCode', 'N/A')`.as('sortCode'),
+            branch: sql`
+                    COALESCE(NULLIF(${clientDeals.bankInfo} ->> 'branch', ''), 'N/A')
+                `.as('branch'),
+                            bankName: sql`
+                    COALESCE(NULLIF(${clientDeals.bankInfo} ->> 'bankName', ''), 'N/A')
+                `.as('bankName'),
+                            sortCode: sql`
+                    COALESCE(NULLIF(${clientDeals.bankInfo} ->> 'sortCode', ''), 'N/A')
+                `.as('sortCode'),
             notes: clientDeals.notes,
             status: clientDeals.status,
         })
@@ -152,10 +156,10 @@ const getClientDeals = asyncHandler(async (req, res) => {
         .limit(limit)
         .offset(offset);
 
-    // Fetch client
+    // Fetch client data
     const clientQuery = db
         .select({
-            clientid: Client.clientid, // Ensure we fetch clientid
+            clientid: Client.clientid,
             companyname: Client.companyname,
             address: Client.address,
             contact: Client.contact,
@@ -163,7 +167,7 @@ const getClientDeals = asyncHandler(async (req, res) => {
         })
         .from(Client);
 
-    // Fetch dyeingFinishingDeals
+    // Fetch related deals
     const dyeingFinishingDealsQuery = db
         .select({
             deal_id: dyeingFinishingDeals.deal_id,
@@ -177,7 +181,6 @@ const getClientDeals = asyncHandler(async (req, res) => {
         })
         .from(dyeingFinishingDeals);
 
-    // Fetch additionalProcessDeals
     const additionalProcessDealsQuery = db
         .select({
             deal_id: additionalProcessDeals.deal_id,
@@ -195,28 +198,13 @@ const getClientDeals = asyncHandler(async (req, res) => {
         clientQuery,
     ]);
 
+    // Helper function to format dates
+    const formatDate = (date) => (date ? new Date(date).toLocaleString() : "N/A");
 
-    // Check if query results are valid
-    if (!clientDealsResult || !Array.isArray(clientDealsResult)) {
-        throw new ApiError(500, "Failed to fetch client deals");
-    }
+    // Format client deals, dates, and related data
+    const formattedClientDeals = clientDealsResult.map((clientDeal) => {
+        if (!clientDeal) return {}; // Skip invalid entries
 
-    if (!clientQueryResult || !Array.isArray(clientQueryResult)) {
-        throw new ApiError(500, "Failed to fetch clients");
-    }
-
-    if (!dyeingFinishingDealsResult || !Array.isArray(dyeingFinishingDealsResult)) {
-        throw new ApiError(500, "Failed to fetch dyeing finishing deals");
-    }
-
-    if (!additionalProcessDealsResult || !Array.isArray(additionalProcessDealsResult)) {
-        throw new ApiError(500, "Failed to fetch additional process deals");
-    }
-
-    // Combine clientDeals with dyeingFinishingDeals and additionalProcessDeals
-    const combinedDeals = clientDealsResult.map((clientDeal) => {
-
-        // Find all Client for this deal
         const client = clientQueryResult
             .filter((c) => c.clientid === clientDeal.clientid)
             .map((c) => ({
@@ -226,8 +214,6 @@ const getClientDeals = asyncHandler(async (req, res) => {
                 email: c.email,
             })) || [];
 
-
-        // Find all dyeingFinishingDeals for this deal
         const dyeingFinishingDeals = dyeingFinishingDealsResult
             ?.filter((dfDeal) => dfDeal.deal_id === clientDeal.deal_id)
             .map((dfDeal) => ({
@@ -240,7 +226,6 @@ const getClientDeals = asyncHandler(async (req, res) => {
                 notes: dfDeal.notes,
             })) || [];
 
-        // Find all additionalProcessDeals for this deal
         const additionalProcessDeals = additionalProcessDealsResult
             ?.filter((apDeal) => apDeal.deal_id === clientDeal.deal_id)
             .map((apDeal) => ({
@@ -249,17 +234,25 @@ const getClientDeals = asyncHandler(async (req, res) => {
                 notes: apDeal.notes,
             })) || [];
 
+        // Format the dates
         return {
             ...clientDeal,
-            client: client,
-            dyeingFinishingDeals: dyeingFinishingDeals,
-            additionalProcessDeals: additionalProcessDeals,
+            client,
+            dyeingFinishingDeals,
+            additionalProcessDeals,
+            issue_date: formatDate(clientDeal.issue_date),
+            valid_through: formatDate(clientDeal.valid_through),
         };
     });
 
+    // Assuming you have a query to count total records
+    const totalCountResult = await db.select({ total: count() }).from(clientDeals);
+    const totalCount = totalCountResult[0].total;
+    const totalPages = Math.ceil(totalCount / limit);
+
     // Generate PDFs for each deal
     const pdfFiles = [];
-    for (const deal of combinedDeals) {
+    for (const deal of formattedClientDeals) {
         try {
             const pdfData = await generatePDF(deal);
             pdfFiles.push({
@@ -276,9 +269,10 @@ const getClientDeals = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(
-        new ApiResponse(200, pdfFiles, "ClientDeals PDFs generated successfully")
+        new ApiResponse(200, { deals: pdfFiles, page, limit, totalCount, totalPages }, "ClientDeals PDFs generated successfully")
     );
 });
+
 
 
 

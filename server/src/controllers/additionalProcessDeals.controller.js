@@ -8,50 +8,54 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 // create a new Additional Process Deal
 const createAdditionalProcessDeals = asyncHandler(async (req, res) => {
+    const { deal_id, additionalProcessDeals } = req.body;
 
-    const { deal_id, process_type, price_tk, notes, remarks } = req.body;
-
-    // Required field validation
-    const requiredFields = ['deal_id', 'process_type', 'price_tk'];
-    const missingFields = requiredFields.filter(field => !req.body[field]?.trim());
-    if (missingFields.length > 0) {
-        throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
+    // Required field validation for the overall request
+    if (!deal_id || !additionalProcessDeals || !Array.isArray(additionalProcessDeals) || additionalProcessDeals.length === 0) {
+        throw new ApiError(400, "Missing or invalid additional process deals data");
     }
 
-    // Normalize inputs by trimming strings where applicable
-    const normalizedDeal_id = deal_id?.trim();
-    const normalizedProcess_type = process_type?.trim();
-    const normalizedTotal_price = price_tk?.trim();
-    const normalizedNotes = notes?.trim() || null;
-    const normalizedRemarks = remarks?.trim() || null;
+    // Iterate through each additional process deal
+    for (const deal of additionalProcessDeals) {
+        const { process_type, price_tk, notes, remarks } = deal;
 
-    // Validate numeric values
-    if (isNaN(normalizedTotal_price)) {
-        throw new ApiError(400, "Invalid numeric values provided for Total Price");
-    }
+        // Validate required fields for each deal
+        const requiredFields = ['process_type', 'price_tk'];
+        const missingFields = requiredFields.filter(field => !deal[field]);
+        if (missingFields.length > 0) {
+            throw new ApiError(400, `Missing required fields in deal: ${missingFields.join(', ')}`);
+        }
 
-    const newAdditionalProcessDeals = {
-        deal_id: normalizedDeal_id,
-        process_type: normalizedProcess_type,
-        price_tk: normalizedTotal_price,    
-        notes: normalizedNotes,
-        remarks: normalizedRemarks,
-    } 
+        // Normalize inputs and parse numbers correctly
+        const normalizedDeal = {
+            deal_id: deal_id.trim(),
+            process_type: process_type.trim(),
+            price_tk: !isNaN(parseFloat(price_tk)) ? parseFloat(price_tk) : 0,  // Handle numeric values
+            notes: notes?.trim() || null,
+            remarks: remarks?.trim() || null,
+        };
 
-    // Insert into database
-    const result = await db
-        .insert(additionalProcessDeals)
-        .values(newAdditionalProcessDeals)
-        .returning();
+        // Validate numeric fields
+        if (isNaN(normalizedDeal.price_tk)) {
+            throw new ApiError(400, "Invalid numeric value provided for price_tk");
+        }
 
-    if (result.length === 0) {
-        throw new ApiError(500, "Failed to create Additional Process Deal");
+        // Insert each deal into the database
+        const result = await db
+            .insert(additionalProcessDeals)
+            .values(normalizedDeal)
+            .returning();
+
+        if (result.length === 0) {
+            throw new ApiError(500, `Failed to create Additional Process Deal for process type: ${normalizedDeal.process_type}`);
+        }
     }
 
     return res.status(201).json(
-        new ApiResponse(201, result, "Additional Process Deal created successfully")
+        new ApiResponse(201, null, "Additional Process Deals created successfully")
     );
-})
+});
+
 
 // Get all Additional Process Deals
 const getAllAdditionalProcessDeals = asyncHandler(async (req, res) => {

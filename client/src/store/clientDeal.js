@@ -2,11 +2,15 @@ import { create } from 'zustand';
 import axios from 'axios';
 
 export const useClientDealStore = create((set, get) => ({
-    clientDeals: [], // Stores all client deals
-    filteredClientDeals: [], // Stores filtered client deals
-    searchTerm: '', // Search term for filtering
-    searchBy: 'deal_id', // Field to search by (default: deal_id)
-    loading: false, // Loading state
+    clientDeals: [],
+    filteredClientDeals: [],
+    searchTerm: '',
+    searchBy: 'deal_id',
+    loading: false,
+    page: 1, // Add pagination states
+    limit: 10,
+    totalCount: 0,
+    totalPages: 0,
 
     // Setter for client deals
     setClientDeals: (clientDeals) => set({ clientDeals }),
@@ -71,39 +75,60 @@ export const useClientDealStore = create((set, get) => ({
     },
 
     // Fetch all client deals
-    fetchClientDeals: async () => {
+    fetchClientDeals: async (page = 1, limit = 10) => {
+        // Start loading
         set({ loading: true });
 
         try {
-            const res = await axios.get("/api/client-deals");
+            // Pass page and limit as query parameters
+            const res = await axios.get("/api/client-deals", { params: { page, limit } });
 
-            if (res.status === 200 && Array.isArray(res.data.data)) {
-                // Format dates and bankInfo
-                const formattedData = res.data.data.map((deal) => ({
+            // Expecting the API to return an object containing a deals array and pagination metadata
+            if (
+                res.status === 200 &&
+                res.data.data &&
+                Array.isArray(res.data.data.deals)
+            ) {
+                const { deals, totalCount, totalPages } = res.data.data;
+
+                // Format dates and bankInfo for each deal
+                const formattedData = deals.map((deal) => ({
                     ...deal,
                     issue_date: get().formatDate(deal.issue_date),
                     valid_through: get().formatDate(deal.valid_through),
                     created_at: get().formatDate(deal.created_at),
                     updated_at: get().formatDate(deal.updated_at),
-                    bankInfo: deal.bankInfo || { bankName: '', branch: '', sortCode: '' },
+                    bankInfo: deal.bankInfo || { bankName: "", branch: "", sortCode: "" },
                 }));
 
-                set({ clientDeals: formattedData, filteredClientDeals: formattedData });
+                // Update the store with the deals and pagination info
+                set({
+                    clientDeals: formattedData,
+                    filteredClientDeals: formattedData,
+                    page,
+                    limit,
+                    totalCount,
+                    totalPages,
+                });
             } else {
                 throw new Error("Failed to fetch client deals. Unexpected response format.");
             }
         } catch (error) {
             const errorMessage =
-                error.response?.data?.message || "An error occurred while fetching client deals.";
-
+                error.response?.data?.message ||
+                "An error occurred while fetching client deals.";
             return {
                 success: false,
                 message: errorMessage,
             };
         } finally {
+            // End loading
             set({ loading: false });
         }
     },
+
+
+
 
     // Update a client deal
     updateClientDeal: async (dealId, updatedDeal) => {

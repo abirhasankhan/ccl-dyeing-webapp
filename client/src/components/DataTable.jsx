@@ -21,6 +21,7 @@ const DataTable = ({
 	onEdit,
 	onDelete,
 	rowsPerPage = 10,
+	customActions, // New prop to allow custom actions
 }) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [sortConfig, setSortConfig] = useState({
@@ -89,7 +90,7 @@ const DataTable = ({
 									key={column.accessor}
 									isNumeric={column.isNumeric}
 									onClick={() => requestSort(column.accessor)}
-									style={{ cursor: "pointer" }} // Make it look clickable
+									style={{ cursor: "pointer" }}
 								>
 									{column.Header}
 									{sortConfig.key === column.accessor && (
@@ -102,6 +103,7 @@ const DataTable = ({
 									)}
 								</Th>
 							))}
+							<Th>PDF</Th>
 							<Th>Actions</Th>
 						</Tr>
 					</Thead>
@@ -116,6 +118,12 @@ const DataTable = ({
 										{row[column.accessor]}
 									</Td>
 								))}
+								<Td>
+									<HStack spacing={4}>
+										{/* Render custom actions if provided */}
+										{customActions && customActions(row)}
+									</HStack>
+								</Td>
 								<Td>
 									<HStack spacing={4}>
 										<Button
