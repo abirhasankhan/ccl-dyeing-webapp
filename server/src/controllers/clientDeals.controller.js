@@ -126,6 +126,7 @@ const createClientDeals = asyncHandler(async (req, res) => {
 
 // Get all records and generate PDFs
 const getClientDeals = asyncHandler(async (req, res) => {
+
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 
@@ -150,6 +151,17 @@ const getClientDeals = asyncHandler(async (req, res) => {
         .orderBy(clientDeals.deal_id)
         .limit(limit)
         .offset(offset);
+
+    // Fetch client
+    const clientQuery = db
+        .select({
+            clientid: Client.clientid, // Ensure we fetch clientid
+            companyname: Client.companyname,
+            address: Client.address,
+            contact: Client.contact,
+            email: Client.email,
+        })
+        .from(Client);
 
     // Fetch dyeingFinishingDeals
     const dyeingFinishingDealsQuery = db
@@ -176,15 +188,21 @@ const getClientDeals = asyncHandler(async (req, res) => {
         .from(additionalProcessDeals);
 
     // Execute all queries concurrently
-    const [clientDealsResult, dyeingFinishingDealsResult, additionalProcessDealsResult] = await Promise.all([
+    const [clientDealsResult, dyeingFinishingDealsResult, additionalProcessDealsResult, clientQueryResult] = await Promise.all([
         clientDealsQuery,
         dyeingFinishingDealsQuery,
         additionalProcessDealsQuery,
+        clientQuery,
     ]);
+
 
     // Check if query results are valid
     if (!clientDealsResult || !Array.isArray(clientDealsResult)) {
         throw new ApiError(500, "Failed to fetch client deals");
+    }
+
+    if (!clientQueryResult || !Array.isArray(clientQueryResult)) {
+        throw new ApiError(500, "Failed to fetch clients");
     }
 
     if (!dyeingFinishingDealsResult || !Array.isArray(dyeingFinishingDealsResult)) {
@@ -197,6 +215,18 @@ const getClientDeals = asyncHandler(async (req, res) => {
 
     // Combine clientDeals with dyeingFinishingDeals and additionalProcessDeals
     const combinedDeals = clientDealsResult.map((clientDeal) => {
+
+        // Find all Client for this deal
+        const client = clientQueryResult
+            .filter((c) => c.clientid === clientDeal.clientid)
+            .map((c) => ({
+                companyname: c.companyname,
+                address: c.address,
+                contact: c.contact,
+                email: c.email,
+            })) || [];
+
+
         // Find all dyeingFinishingDeals for this deal
         const dyeingFinishingDeals = dyeingFinishingDealsResult
             ?.filter((dfDeal) => dfDeal.deal_id === clientDeal.deal_id)
@@ -221,6 +251,7 @@ const getClientDeals = asyncHandler(async (req, res) => {
 
         return {
             ...clientDeal,
+            client: client,
             dyeingFinishingDeals: dyeingFinishingDeals,
             additionalProcessDeals: additionalProcessDeals,
         };

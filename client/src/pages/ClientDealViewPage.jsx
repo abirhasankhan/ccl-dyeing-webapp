@@ -215,204 +215,243 @@ function ClientDealViewPage() {
 		: commonFields;
 
 	// Function to generate a PDF using jsPDF
+	const generatePDF = (deal) => {
+		const doc = new jsPDF();
+		const pageWidth = doc.internal.pageSize.width;
+		const pageHeight = doc.internal.pageSize.height;
+		const marginX = 10;
+		let y = 20;
+		const lineHeight = 10;
 
-const generatePDF = (deal) => {
-	const doc = new jsPDF();
+		// Helper function to add watermark to all pages
+		const addWatermark = () => {
+			doc.setFontSize(50);
+			doc.setFont("helvetica", "bold");
+			doc.setTextColor(200, 200, 200);
+			doc.setGState(new doc.GState({ opacity: 0.3 }));
+			doc.text("Crystal Composite Ltd", pageWidth / 4, pageHeight / 2, {
+				angle: 45,
+			});
+			doc.setTextColor(0, 0, 0);
+			doc.setGState(new doc.GState({ opacity: 1 }));
+		};
 
-	// Add watermark
-	doc.setFontSize(60); // Large font size for watermark
-	doc.setFont("helvetica", "bold");
-	doc.setTextColor(200, 200, 200); // Light gray color for watermark
-	doc.setGState(new doc.GState({ opacity: 0.3 })); // Semi-transparent watermark
-	doc.text("CONFIDENTIAL", 40, 150, { angle: 45 }); // Rotated watermark text
+		// Apply watermark to the first page
+		addWatermark();
 
-	// Reset opacity and color for the rest of the document
-	doc.setGState(new doc.GState({ opacity: 1 }));
-	doc.setTextColor(0, 0, 0); // Reset text color to black
+		// Override addPage to apply watermark on all pages
+		const originalAddPage = doc.addPage;
+		doc.addPage = function () {
+			originalAddPage.apply(this, arguments);
+			addWatermark();
+		};
 
-	// Add company logo (assuming you have a logo image)
-	const logoUrl =
-		"https://res.cloudinary.com/diy56o5uu/image/upload/v1727518197/gqi7mkawt9pucefuqvgb.png"; // Replace with your logo URL
-	doc.addImage(logoUrl, "PNG", 10, 10, 50, 20); // Adjust dimensions as needed
+		// Add company logo
+		const logoUrl =
+			"https://res.cloudinary.com/diy56o5uu/image/upload/v1727518197/gqi7mkawt9pucefuqvgb.png";
+		doc.addImage(logoUrl, "PNG", marginX, 10, 50, 20);
 
-	// Add company name and address
-	doc.setFontSize(16);
-	doc.setFont("helvetica", "bold");
-	doc.text("Your Company Name", 70, 20);
-	doc.setFontSize(12);
-	doc.setFont("helvetica", "normal");
-	doc.text("123 Company Address, City, State, ZIP", 70, 30);
-	doc.text("Phone: (123) 456-7890 | Email: info@company.com", 70, 40);
+		// Company Details
+		doc.setFontSize(16)
+			.setFont("helvetica", "bold")
+			.text("Crystal Composite Ltd", 70, 20);
+		doc.setFontSize(12).text(
+			"629 Khejur Bagan, Ashulia, Savar, Dhaka, Bangladesh",
+			70,
+			30
+		);
+		doc.setFont("helvetica", "normal").text(
+			"Email: composite@crystalgroupbd.com | Web: www.crystalbd.com",
+			70,
+			40
+		);
 
-	// Add a separator line
-	doc.setDrawColor(0);
-	doc.setLineWidth(0.5);
-	doc.line(10, 50, 200, 50);
+		// Separator line
+		doc.setDrawColor(0)
+			.setLineWidth(0.5)
+			.line(marginX, 50, pageWidth - marginX, 50);
 
-	// Add title
-	doc.setFontSize(18);
-	doc.setFont("helvetica", "bold");
-	doc.text("Client Deal Details", 10, 60);
+		// Title
+		doc.setFontSize(18)
+			.setFont("helvetica", "bold")
+			.text("Trade Agreement", marginX, 60);
 
-	// Add deal details
-	doc.setFontSize(12);
-	doc.setFont("helvetica", "normal");
-	let y = 70; // Vertical position for text
-	const lineHeight = 10; // Space between lines
+		// Trade Agreement Text
+		doc.setFontSize(12).setFont("helvetica", "normal");
+		y = 70;
 
-	doc.text(`Deal ID: ${deal.deal_id}`, 10, y);
-	y += lineHeight;
+		const tradeAgreementText = `This Trade Agreement No. ${deal.deal_id}, set on ${deal.issue_date}, is between:\n`;
 
-	doc.text(`Client ID: ${deal.clientid}`, 10, y);
-	y += lineHeight;
+		doc.setFont("helvetica", "bold").text(tradeAgreementText, marginX, y, {
+			maxWidth: pageWidth - 2 * marginX,
+		});
+		y += 5;
 
-	doc.text(`Payment Method: ${deal.payment_method}`, 10, y);
-	y += lineHeight;
+		const clientDetails = `${
+			deal.client?.[0]?.companyname || "Unknown Client"
+		}, Address: ${
+			deal.client?.[0]?.address || "Unknown Address"
+		}\n& Crystal Composite Ltd. Address: 629 Khejur Bagan, Ashulia, Savar, Dhaka.\n`;
 
-	doc.text(`Issue Date: ${deal.issue_date}`, 10, y);
-	y += lineHeight;
+		doc.setFont("helvetica", "bold").text(clientDetails, marginX, y, {
+			maxWidth: pageWidth - 2 * marginX,
+		});
+		y += 15;
 
-	doc.text(`Valid Through: ${deal.valid_through}`, 10, y);
-	y += lineHeight;
+		const offerDetails = `Based on Price Offer No: 1x for the Purpose of Dyeing & Finishing W/ Enzyme + Silicon Fabric.\nValid through: ${deal.valid_through}.`;
 
-	doc.text(`Representative: ${deal.representative}`, 10, y);
-	y += lineHeight;
+		doc.setFont("helvetica", "normal").text(offerDetails, marginX, y, {
+			maxWidth: pageWidth - 2 * marginX,
+		});
+		y += 40;
 
-	doc.text(`Designation: ${deal.designation}`, 10, y);
-	y += lineHeight;
-
-	doc.text(`Contact No: ${deal.contact_no}`, 10, y);
-	y += lineHeight;
-
-	doc.text(`Bank Name: ${deal.bankName}`, 10, y);
-	y += lineHeight;
-
-	doc.text(`Branch: ${deal.branch}`, 10, y);
-	y += lineHeight;
-
-	doc.text(`Sort Code: ${deal.sortCode}`, 10, y);
-	y += lineHeight;
-
-	doc.text(`Notes: ${deal.notes || "N/A"}`, 10, y);
-	y += lineHeight;
-
-	doc.text(`Status: ${deal.status || "N/A"}`, 10, y);
-	y += lineHeight;
-
-	// Add a separator line before tables
-	doc.setDrawColor(0);
-	doc.setLineWidth(0.5);
-	doc.line(10, y + 10, 200, y + 10);
-	y += 20;
-
-	// Add Dyeing Finishing Deals table
-	if (deal.dyeingFinishingDeals && deal.dyeingFinishingDeals.length > 0) {
-		doc.setFontSize(14);
-		doc.setFont("helvetica", "bold");
-		doc.text("Dyeing Finishing Deals", 10, y);
-		y += lineHeight;
-
-		// Table headers
-		const dyeingHeaders = [
-			"Color",
-			"Shade %",
-			"Tube Tk",
-			"Open Tk",
-			"Elasteen Tk",
-			"Double Dyeing Tk",
-			"Notes",
+		// Dynamic deal details
+		const details = [
+			["Agreement No", deal.deal_id],
+			["Payment Method", deal.payment_method],
+			["Issue Date", deal.issue_date],
+			["Valid Through", deal.valid_through],
+			["Representative", deal.representative],
+			["Designation", deal.designation],
+			["Contact No", deal.contact_no],
+			["Notes", deal.notes || "N/A"],
 		];
-		const dyeingData = deal.dyeingFinishingDeals.map((df) => [
-			df.color || "N/A",
-			df.shade_percent || "N/A",
-			df.tube_tk || "N/A",
-			df.open_tk || "N/A",
-			df.elasteen_tk || "N/A",
-			df.double_dyeing_tk || "N/A",
-			df.notes || "N/A",
-		]);
 
-		// Add table
-		doc.autoTable({
-			startY: y,
-			head: [dyeingHeaders],
-			body: dyeingData,
-			theme: "grid",
-			styles: { fontSize: 10 },
+		details.forEach(([key, value]) => {
+			doc.setFont("helvetica", "bold").text(`${key}:`, marginX, y);
+			doc.setFont("helvetica", "normal").text(value, marginX + 50, y);
+			y += lineHeight;
 		});
 
-		y = doc.autoTable.previous.finalY + 10; // Update y position after table
-	}
+		// Separator before tables
+		doc.line(marginX, y + 10, pageWidth - marginX, y + 10);
+		y += 20;
 
-	// Add Additional Process Deals table
-	if (deal.additionalProcessDeals && deal.additionalProcessDeals.length > 0) {
-		doc.setFontSize(14);
-		doc.setFont("helvetica", "bold");
-		doc.text("Additional Process Deals", 10, y);
+		// Dyeing Finishing Deals Table
+		if (deal.dyeingFinishingDeals?.length) {
+			doc.setFontSize(14)
+				.setFont("helvetica", "bold")
+				.text("Dyeing Finishing Deals Prices", marginX, y);
+			y += lineHeight;
+
+			doc.autoTable({
+				startY: y,
+				head: [
+					[
+						"Color",
+						"Shade %",
+						"Tube Tk",
+						"Open Tk",
+						"Elasteen Tk",
+						"Double Dyeing Tk",
+						"Notes",
+					],
+				],
+				body: deal.dyeingFinishingDeals.map((df) => [
+					df.color || "N/A",
+					df.shade_percent || "N/A",
+					df.tube_tk || "N/A",
+					df.open_tk || "N/A",
+					df.elasteen_tk || "N/A",
+					df.double_dyeing_tk || "N/A",
+					df.notes || "N/A",
+				]),
+				theme: "grid",
+				styles: { fontSize: 10 },
+				margin: { left: marginX, right: marginX },
+			});
+
+			y = doc.autoTable.previous.finalY + 10;
+		}
+
+		// Additional Process Deals Table
+		if (deal.additionalProcessDeals?.length) {
+			doc.setFontSize(14)
+				.setFont("helvetica", "bold")
+				.text("Additional Process Deals", marginX, y);
+			y += lineHeight;
+
+			doc.autoTable({
+				startY: y,
+				head: [["Process Type", "Price Tk", "Notes"]],
+				body: deal.additionalProcessDeals.map((ap) => [
+					ap.process_type || "N/A",
+					ap.price_tk || "N/A",
+					ap.notes || "N/A",
+				]),
+				theme: "grid",
+				styles: { fontSize: 10 },
+				margin: { left: marginX, right: marginX },
+			});
+
+			y = doc.autoTable.previous.finalY + 10;
+		}
+
+		// Special Notes Section
+		doc.setFontSize(12)
+			.setFont("helvetica", "bold")
+			.text("Special Notes:", marginX, y + 10);
 		y += lineHeight;
+		doc.setFont("helvetica", "normal").text(
+			`➤ One Way Transport Facility.
+	➤ Payment Must be Cash/LC.
+	➤ Cheque will be valid after money collection.
+	➤ Fabrics security must be maintained for delivery.
+	➤ No claims will be accepted after delivery.
+	➤ Bill will be made on Grey Weight.`,
+			marginX,
+			y + 5,
+			{ maxWidth: pageWidth - 2 * marginX }
+		);
+		y += 40;
 
-		// Table headers
-		const additionalHeaders = ["Process Type", "Price Tk", "Notes"];
-		const additionalData = deal.additionalProcessDeals.map((ap) => [
-			ap.process_type || "N/A",
-			ap.price_tk || "N/A",
-			ap.notes || "N/A",
-		]);
+		// Separator before signatures
+		doc.line(marginX, y, pageWidth - marginX, y);
+		y += 10;
 
-		// Add table
-		doc.autoTable({
-			startY: y,
-			head: [additionalHeaders],
-			body: additionalData,
-			theme: "grid",
-			styles: { fontSize: 10 },
-		});
+		// Authorized Signatures Section
+		doc.setFontSize(12)
+			.setFont("helvetica", "bold")
+			.text("Authorized Signatures:", marginX, y);
+		y += lineHeight + 5; // Add space before signatures
 
-		y = doc.autoTable.previous.finalY + 10; // Update y position after table
-	}
+		// Representative 1 (Left Side)
+		const rep1X = marginX;
+		const rep1Y = y;
+		doc.setFontSize(10).setFont("helvetica", "normal");
+		doc.text("Representative 1:", rep1X, rep1Y);
+		doc.line(rep1X, rep1Y + 5, rep1X + 70, rep1Y + 5); // Signature line
+		doc.text("Name: ________________________", rep1X, rep1Y + 15);
+		doc.text("Designation: __________________", rep1X, rep1Y + 25);
+		doc.text("Crystal Composite Ltd", rep1X, rep1Y + 35);
 
-	// Add a separator line before signatures
-	doc.setDrawColor(0);
-	doc.setLineWidth(0.5);
-	doc.line(10, y + 10, 200, y + 10);
-	y += 20;
+		// Representative 2 (Right Side - Aligned Properly)
+		const rep2X = pageWidth - 100; // Adjusted X position to avoid overlap
+		const rep2Y = y;
+		doc.text("Representative 2:", rep2X, rep2Y);
+		doc.line(rep2X, rep2Y + 5, rep2X + 70, rep2Y + 5); // Signature line
+		doc.text("Name: ________________________", rep2X, rep2Y + 15);
+		doc.text("Designation: __________________", rep2X, rep2Y + 25);
+		doc.text(
+			`${deal.client?.[0]?.companyname || "Unknown Client"}`,
+			rep2X,
+			rep2Y + 35
+		);
 
-	// Add signature fields for two company representatives
-	doc.setFontSize(12);
-	doc.setFont("helvetica", "bold");
-	doc.text("Authorized Signatures", 10, y);
-	y += lineHeight;
+		// Add extra space below the signature section
+		y += 50;
 
-	// First representative signature
-	doc.setFontSize(10);
-	doc.setFont("helvetica", "normal");
-	doc.text("Representative 1:", 10, y);
-	doc.line(40, y, 100, y); // Signature line
-	doc.text("Name: ________________________", 10, y + 5);
-	doc.text("Designation: __________________", 10, y + 10);
-	y += 20;
+		// Footer
+		doc.setFontSize(10).setFont("helvetica", "italic");
+		doc.text("Thank you for choosing Crystal Composite Ltd!", marginX, 280);
+		doc.text(
+			"For any inquiries, contact us at info@crystalbd.com",
+			marginX,
+			290
+		);
 
-	// Second representative signature
-	doc.text("Representative 2:", 10, y);
-	doc.line(40, y, 100, y); // Signature line
-	doc.text("Name: ________________________", 10, y + 5);
-	doc.text("Designation: __________________", 10, y + 10);
-	y += 20;
-
-	// Add a footer
-	doc.setFontSize(10);
-	doc.setFont("helvetica", "italic");
-	doc.text("Thank you for choosing Your Company Name!", 10, 280);
-	doc.text(
-		"For any inquiries, please contact us at info@company.com",
-		10,
-		290
-	);
-
-	return doc;
-};
-
-
+		return doc;
+	};
 
 	// Function to handle viewing a PDF
 	const handleViewPDF = (deal) => {
@@ -425,6 +464,169 @@ const generatePDF = (deal) => {
 	const handleDownloadPDF = (deal) => {
 		const doc = generatePDF(deal);
 		doc.save(`client_deal_${deal.deal_id}.pdf`); // Download the PDF
+	};
+
+	// Function to generate a PDF for dyeingFinishingDeals and additionalProcessDeals
+	const generateDealsPDF = (deal) => {
+		const doc = new jsPDF();
+		const pageWidth = doc.internal.pageSize.width;
+		const marginX = 10;
+		let y = 20;
+		const lineHeight = 10;
+
+		// Add company logo
+		const logoUrl =
+			"https://res.cloudinary.com/diy56o5uu/image/upload/v1727518197/gqi7mkawt9pucefuqvgb.png";
+		doc.addImage(logoUrl, "PNG", marginX, 10, 50, 20);
+
+		// Company Details
+		doc.setFontSize(16)
+			.setFont("helvetica", "bold")
+			.text("Crystal Composite Ltd", 70, 20);
+		doc.setFontSize(12).text(
+			"629 Khejur Bagan, Ashulia, Savar, Dhaka, Bangladesh",
+			70,
+			30
+		);
+		doc.setFont("helvetica", "normal").text(
+			"Email: composite@crystalgroupbd.com | Web: www.crystalbd.com",
+			70,
+			40
+		);
+
+		// Separator line
+		doc.setDrawColor(0)
+			.setLineWidth(0.5)
+			.line(marginX, 50, pageWidth - marginX, 50);
+
+		// Title
+		doc.setFontSize(18)
+			.setFont("helvetica", "bold")
+			.text("Deals Prices Details", marginX, 60);
+
+		y = 70;
+
+		// Dynamic deal details
+		const details = [
+			["Agreement No", deal.deal_id],
+			["Issue Date", deal.issue_date],
+			["Valid Through", deal.valid_through],
+		];
+
+		// Client Details Formatting with Wrapping
+		const clientText = `Client: ${
+			deal.client?.[0]?.companyname || "Unknown Client"
+		}\nAddress: ${
+			deal.client?.[0]?.address || "Unknown Address"
+		}`;
+
+		const wrappedClientText = doc.splitTextToSize(
+			clientText,
+			pageWidth - 2 * marginX
+		);
+		doc.setFont("helvetica", "semibold").text(wrappedClientText, marginX, y);
+
+		y += wrappedClientText.length * lineHeight; // Adjust Y based on wrapped text height
+		y += 5; // Extra padding
+
+		// Deal details section
+		details.forEach(([key, value]) => {
+			doc.setFont("helvetica", "bold").text(`${key}:`, marginX, y);
+			doc.setFont("helvetica", "normal").text(
+				value || "N/A",
+				marginX + 50,
+				y
+			);
+			y += lineHeight;
+		});
+
+		// Separator before tables
+		doc.line(marginX, y + 5, pageWidth - marginX, y + 5);
+		y += 15;
+
+		// Dyeing Finishing Deals Table
+		if (deal.dyeingFinishingDeals?.length) {
+			doc.setFontSize(14)
+				.setFont("helvetica", "bold")
+				.text("Dyeing Finishing Deals Prices", marginX, y);
+			y += lineHeight;
+
+			doc.autoTable({
+				startY: y,
+				head: [
+					[
+						"Color",
+						"Shade %",
+						"Tube Tk",
+						"Open Tk",
+						"Elasteen Tk",
+						"Double Dyeing Tk",
+						"Notes",
+					],
+				],
+				body: deal.dyeingFinishingDeals.map((df) => [
+					df.color || "N/A",
+					df.shade_percent || "N/A",
+					df.tube_tk || "N/A",
+					df.open_tk || "N/A",
+					df.elasteen_tk || "N/A",
+					df.double_dyeing_tk || "N/A",
+					df.notes || "N/A",
+				]),
+				theme: "grid",
+				styles: { fontSize: 10 },
+				margin: { left: marginX, right: marginX },
+			});
+
+			y = doc.autoTable.previous.finalY + 15; // Ensuring space before the next section
+		}
+
+		// Additional Process Deals Table
+		if (deal.additionalProcessDeals?.length) {
+			doc.setFontSize(14)
+				.setFont("helvetica", "bold")
+				.text("Additional Process Deals", marginX, y);
+			y += lineHeight;
+
+			doc.autoTable({
+				startY: y,
+				head: [["Process Type", "Price Tk", "Notes"]],
+				body: deal.additionalProcessDeals.map((ap) => [
+					ap.process_type || "N/A",
+					ap.price_tk || "N/A",
+					ap.notes || "N/A",
+				]),
+				theme: "grid",
+				styles: { fontSize: 10 },
+				margin: { left: marginX, right: marginX },
+			});
+
+			y = doc.autoTable.previous.finalY + 15; // Adding proper spacing
+		}
+
+		// Footer
+		doc.setFontSize(10).setFont("helvetica", "italic");
+		doc.text("Thank you for choosing Crystal Composite Ltd!", marginX, y + 10);
+		doc.text(
+			"For any inquiries, contact us at info@crystalbd.com",
+			marginX,
+			y + 20
+		);
+
+		return doc;
+	};
+
+	// Function to handle viewing a PDF for deals tables
+	const handleViewDealsPDF = (deal) => {
+		const doc = generateDealsPDF(deal);
+		const pdfUrl = doc.output("bloburl"); // Generate a URL for the PDF
+		window.open(pdfUrl, "_blank"); // Open the PDF in a new tab
+	};
+
+	// Function to handle downloading a PDF for deals tables
+	const handleDownloadDealsPDF = (deal) => {
+		const doc = generateDealsPDF(deal);
+		doc.save(`deals_details_${deal.deal_id}.pdf`); // Download the PDF
 	};
 
 	// createClient function to handle creating a new client deal
@@ -557,6 +759,7 @@ const generatePDF = (deal) => {
 										<Th>Sort Code</Th>
 										<Th>Status</Th>
 										<Th>Notes</Th>
+										<Th>PDF</Th>
 										<Th>Actions</Th>
 									</Tr>
 								</Thead>
@@ -585,7 +788,7 @@ const generatePDF = (deal) => {
 															handleViewPDF(deal)
 														}
 													>
-														View PDF
+														View Full PDF
 													</Button>
 													<Button
 														colorScheme="green"
@@ -596,8 +799,35 @@ const generatePDF = (deal) => {
 															)
 														}
 													>
-														Download PDF
+														Download Full PDF
 													</Button>
+													<Button
+														colorScheme="teal"
+														size="sm"
+														onClick={() =>
+															handleViewDealsPDF(
+																deal
+															)
+														}
+													>
+														View Deals Prices PDF
+													</Button>
+													<Button
+														colorScheme="purple"
+														size="sm"
+														onClick={() =>
+															handleDownloadDealsPDF(
+																deal
+															)
+														}
+													>
+														Download Deals Prices
+														PDF
+													</Button>
+												</Flex>
+											</Td>
+											<Td>
+												<Flex gap={2}>
 													<Button
 														colorScheme="yellow"
 														size="sm"
