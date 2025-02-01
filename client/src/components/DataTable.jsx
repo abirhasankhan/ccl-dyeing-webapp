@@ -21,7 +21,7 @@ const DataTable = ({
 	onEdit,
 	onDelete,
 	rowsPerPage = 10,
-	customActions, // New prop to allow custom actions
+	customActions,
 }) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [sortConfig, setSortConfig] = useState({
@@ -103,27 +103,32 @@ const DataTable = ({
 									)}
 								</Th>
 							))}
-							<Th>PDF</Th>
 							<Th>Actions</Th>
 						</Tr>
 					</Thead>
 					<Tbody>
 						{currentPageData.map((row) => (
 							<Tr key={row.id || Math.random().toString(36)}>
-								{columns.map((column) => (
-									<Td
-										key={column.accessor}
-										isNumeric={column.isNumeric}
-									>
-										{row[column.accessor]}
-									</Td>
-								))}
-								<Td>
-									<HStack spacing={4}>
-										{/* Render custom actions if provided */}
-										{customActions && customActions(row)}
-									</HStack>
-								</Td>
+								{columns.map((column) => {
+									if (column.isPDFColumn) {
+										return (
+											<Td key={column.accessor}>
+												<HStack spacing={4}>
+													{customActions &&
+														customActions(row)}
+												</HStack>
+											</Td>
+										);
+									}
+									return (
+										<Td
+											key={column.accessor}
+											isNumeric={column.isNumeric}
+										>
+											{row[column.accessor]}
+										</Td>
+									);
+								})}
 								<Td>
 									<HStack spacing={4}>
 										<Button

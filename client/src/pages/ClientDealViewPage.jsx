@@ -229,6 +229,12 @@ function ClientDealViewPage() {
 		{ Header: "Notes", accessor: "notes" },
 		{ Header: "Created At", accessor: "created_at" },
 		{ Header: "Updated At", accessor: "updated_at" },
+		// Add the PDF column conditionally
+		{
+			Header: "PDF Actions", // Custom header name
+			accessor: "pdfActions", // Unique accessor
+			isPDFColumn: true, // Flag to identify this as the PDF column
+		},
 	];
 
 	const caption = "Client Deal Details";
@@ -822,12 +828,11 @@ function ClientDealViewPage() {
 								customActions={(row) => (
 									<HStack spacing={2}>
 										<Button
-											colorScheme="orange" // Changed to orange
+											colorScheme="orange"
 											onClick={() => handleViewPDF(row)}
 										>
 											View Client Deal
 										</Button>
-
 										<Button
 											colorScheme="green"
 											onClick={() =>
@@ -836,18 +841,16 @@ function ClientDealViewPage() {
 										>
 											Download Client Deal
 										</Button>
-
 										<Button
-											colorScheme="yellow" // Changed to yellow
+											colorScheme="yellow"
 											onClick={() =>
 												handleViewDealsPDF(row)
 											}
 										>
 											View Client Deal Prices
 										</Button>
-
 										<Button
-											colorScheme="pink" // Red for onDelete
+											colorScheme="pink"
 											onClick={() =>
 												handleDownloadDealsPDF(row)
 											}
@@ -856,8 +859,8 @@ function ClientDealViewPage() {
 										</Button>
 									</HStack>
 								)}
-								onEdit={handleEditCDeal} // Blue for onEdit
-								onDelete={openDeleteConfirmation} // Red for onDelete
+								onEdit={handleEditCDeal}
+								onDelete={openDeleteConfirmation}
 							/>
 						)}
 					</div>
