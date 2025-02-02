@@ -25,13 +25,13 @@ export const dyeingProcessSchema = async () => {
                     batch_qty INT NOT NULL,             -- Quantity in the batch
                     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Start time of the process
                     end_time TIMESTAMP,                 -- End time of the process
-                    grey_weight FLOAT,                  -- Weight of grey fabric
-                    finish_weight FLOAT,                -- Weight after dyeing
-                    finish_after_gsm FLOAT,             -- Actual GSM after finishing
+                    grey_weight REAL,                  -- Weight of grey fabric
+                    finish_weight REAL,                -- Weight after dyeing
+                    finish_after_gsm REAL,             -- Actual GSM after finishing
                     final_qty INT,                      -- Final quantity after dyeing
                     rejected_qty INT DEFAULT 0,         -- Rejected quantity
                     status VARCHAR(50) DEFAULT 'In Progress', -- Status of the dyeing process (e.g., In Progress, Completed)
-                    process_loss FLOAT GENERATED ALWAYS AS ((grey_weight - finish_weight) / NULLIF(grey_weight, 0) * 100) STORED, -- Calculated process loss
+                    process_loss REAL GENERATED ALWAYS AS ((grey_weight - finish_weight) / NULLIF(grey_weight, 0) * 100) STORED, -- Calculated process loss
                     notes TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for record creation
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for updates

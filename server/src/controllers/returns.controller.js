@@ -60,9 +60,6 @@ const createReturn = asyncHandler(async (req, res) => {
         remarks: normalizedRemarks,
     };
 
-    // Log the input object
-    console.log("New Return Record:", newReturn);
-
     // Insert into database
     const result = await db.transaction(async (tx) => {
         // Insert return record

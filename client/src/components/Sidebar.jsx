@@ -86,8 +86,13 @@ const sidebarItems = [
 		icon: <FaInfoCircle />,
 	},
 	{
-		label: "Bills",
-		to: "/bills",
+		label: "Invoice",
+		to: "/invoice",
+		icon: <FaInfoCircle />,
+	},
+	{
+		label: "Payment",
+		to: "/payment",
 		icon: <FaInfoCircle />,
 	},
 	{

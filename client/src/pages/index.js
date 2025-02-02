@@ -15,6 +15,12 @@ import ProductDetailPage from "./ProductDetailPage";
 import MachinePage from "./MachinePage";
 import DyeingProcessPage from "./DyeingProcessPage";
 import StorePage from "./StorePage";
+import InvoicePage from "./InvoicePage";
+import PaymentPage from "./PaymentPage";
+
+import RegisterPage from "./RegisterPage";
+import LoginPage from "./LoginPage";
+
 
 
 
@@ -40,4 +46,8 @@ export {
     MachinePage,
     DyeingProcessPage,
     StorePage,
+    InvoicePage,
+    PaymentPage,
+    RegisterPage,
+    LoginPage
 };

@@ -8,6 +8,7 @@ export const invoices = pgTable("invoices", {
         .notNull()
         .references(() => dyeingProcess.processid, { onDelete: "cascade" }), // Foreign Key
     amount: real("amount").notNull(), // Total amount
+    paid_amount: real("paid_amount").default(0), //Amount paid so far(default 0)
     issued_date: timestamp("issued_date").defaultNow(), // Invoice issued date
     due_date: timestamp("due_date").notNull(), // Due date for payment
     status: varchar("status", { length: 50 }).default("Unpaid"), // Status: Unpaid, Paid, Partially Paid

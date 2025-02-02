@@ -19,6 +19,7 @@ export const invoicesSchema = async () => {
                     invoiceid VARCHAR(255) PRIMARY KEY, 
                     processid VARCHAR(255) NOT NULL, 
                     amount REAL NOT NULL, 
+                    paid_amount REAL DEFAULT 0,
                     issued_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
                     due_date TIMESTAMP NOT NULL, 
                     status VARCHAR(50) DEFAULT 'Unpaid', 

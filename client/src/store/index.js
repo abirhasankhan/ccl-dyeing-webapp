@@ -1,3 +1,6 @@
+import { useAuthStore } from "./auth.js";
+import { useUserStore } from "./user.js";
+
 import { useClientStore } from "./client.js";
 import { useDyeingPriceStore } from "./dyeingPrice.js";
 import { useAdditionalPriceStore } from "./additionalPrice.js";
@@ -10,7 +13,8 @@ import { useProductDetailsStore } from "./productdetails.js";
 import { useMachineStore } from "./machine.js";
 import { useDyeingProcessStore } from "./dyeingProcess.js";
 import { useStoreStore } from "./store.js";
-
+import { useInvoiceStore } from "./invoices.js";
+import { usePaymentStore } from "./payment.js";
 
 
 
@@ -18,6 +22,8 @@ import { useStoreStore } from "./store.js";
 
 
 export { 
+    useAuthStore,
+    useUserStore,
     useClientStore, 
     useDyeingPriceStore, 
     useAdditionalPriceStore, 
@@ -30,5 +36,7 @@ export {
     useMachineStore,
     useDyeingProcessStore,
     useStoreStore,
+    useInvoiceStore,
+    usePaymentStore
     
 };

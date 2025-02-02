@@ -30,7 +30,7 @@ const createDealOrder = asyncHandler(async (req, res) => {
     const normalizedTotalReturnedQty = Number(total_returned_qty) || 0;
     const normalizedNotes = notes?.trim() || null;
     const normalizedRemarks = remarks?.trim() || null;
-    const normalizedStatus = remarks?.trim() || "Pending";
+    const normalizedStatus = status?.trim() || "Pending";
 
     // Validate numeric values
     if (isNaN(normalizedBookingQty) || isNaN(normalizedTotalReceivedQty) || isNaN(normalizedTotalReturnedQty)) {

@@ -23,9 +23,9 @@ export const productDetailsSchema = async () => {
                     yarn_count VARCHAR(255),            -- Yarn count of the raw material
                     color VARCHAR(255),                 -- Color of the product
                     fabric VARCHAR(255),                -- Type of fabric
-                    gsm FLOAT,                          -- Fabric weight (grams per square meter)
-                    machine_dia FLOAT,                  -- Machine diameter
-                    finish_dia FLOAT,                   -- Finished diameter
+                    gsm REAL,                          -- Fabric weight (grams per square meter)
+                    machine_dia REAL,                  -- Machine diameter
+                    finish_dia REAL,                   -- Finished diameter
                     rolls_received INT,                 -- Number of rolls received
                     grey_received_qty INT,              -- Quantity of grey fabric received
                     grey_return_qty INT DEFAULT 0,      -- Grey fabric returned

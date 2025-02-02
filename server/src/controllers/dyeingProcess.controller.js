@@ -37,6 +37,7 @@ const isMachineUnavailable = async (db, machineId) => {
 
 // Create a new dyeing process record
 const createDyeingProcess = asyncHandler(async (req, res) => {
+    
     // Check if request body is missing
     if (!req.body) {
         throw new ApiError(400, "Request body is missing");
@@ -113,6 +114,7 @@ const createDyeingProcess = asyncHandler(async (req, res) => {
 
     // Start a transaction
     const result = await db.transaction(async (tx) => {
+        
         // Insert into dyeingProcess table
         const newProcess = await tx
             .insert(dyeingProcess)

@@ -1,4 +1,5 @@
-import authRoutes from './auth.route.js';
+import adminRoutes from './admin.routes.js';
+import usersRoutes from './users.route.js';
 import clientRoutes from './client.route.js';
 import dyeingFinishingPricesRoutes from './dyeingFinishingPrices.route.js';
 import additionalProcessPricesRoutes from './additionalProcessPrices.route.js';
@@ -12,11 +13,17 @@ import returnsRoutes from './returns.route.js';
 import machinesRoutes from './machines.route.js';
 import dyeingProcessRoutes from './dyeingProcess.route.js';
 import storeRoutes from './store.route.js';
+import invoicesRoutes from './invoices.route.js';
+import paymentRoutes from './payments.route.js';
 
 
 
-export { 
-    authRoutes, 
+
+
+
+export {
+    adminRoutes,
+    usersRoutes,
     clientRoutes, 
     dyeingFinishingPricesRoutes, 
     additionalProcessPricesRoutes,
@@ -30,4 +37,6 @@ export {
     machinesRoutes,
     dyeingProcessRoutes,
     storeRoutes,
+    invoicesRoutes,
+    paymentRoutes
 };

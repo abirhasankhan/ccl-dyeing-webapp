@@ -125,6 +125,7 @@ const createClientDeals = asyncHandler(async (req, res) => {
 
 // Get all records and generate PDFs
 const getClientDeals = asyncHandler(async (req, res) => {
+    
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
 

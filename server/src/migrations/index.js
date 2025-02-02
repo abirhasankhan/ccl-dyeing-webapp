@@ -1,3 +1,4 @@
+import { userSchema } from './userSchema.js';
 import { clientSchema } from './clientSchema.js';
 import { dyeingFinishingPricesSchema } from './dyeingFinishingPricesSchema.js';
 import { additionalProcessPricesSchema } from './additionalProcessPricesSchema.js';
@@ -24,6 +25,7 @@ import { paymentsSchema } from './paymentsSchema.js';
         console.log('Starting schema migrations...');
 
         // Apply all schema migrations sequentially
+        await userSchema();
         await clientSchema();
         await dyeingFinishingPricesSchema();
         await additionalProcessPricesSchema();

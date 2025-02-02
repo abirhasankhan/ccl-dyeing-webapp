@@ -1,6 +1,6 @@
 import { pgTable, varchar, timestamp, real, text } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { invoices } from "./invoice.model.js"; // Linked to invoices
+import { invoices } from "./invoices.model.js"; // Linked to invoices
 
 export const payments = pgTable("payments", {
     paymentid: varchar("paymentid", { length: 255 }).primaryKey(), // Primary Key
