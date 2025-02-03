@@ -244,7 +244,7 @@ function AdditionalDealViewPage() {
 						bgClip={"text"}
 						textAlign={"center"}
 					>
-						Additional Pprocess Deals Page
+						Additional Process Deals Page
 					</Text>
 
 					{/* Align button to the left */}

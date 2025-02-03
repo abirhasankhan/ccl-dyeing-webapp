@@ -1,207 +1,113 @@
-import React, { useState } from "react";
 import {
-	Button,
-	Text,
+	Flex,
+	IconButton,
+	useColorMode,
+	useColorModeValue,
+	Box,
 	Menu,
 	MenuButton,
 	MenuList,
 	MenuItem,
-	Box,
+	MenuDivider,
+	Avatar,
+	Text,
+	HStack,
+	useBreakpointValue,
 } from "@chakra-ui/react";
+import { FiMenu, FiSun, FiMoon, FiChevronDown } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { IoMoon } from "react-icons/io5";
-import { LuSun } from "react-icons/lu";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import { useColorMode } from "@chakra-ui/react";
 
-const Navbar = () => {
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+const Navbar = ({ onMenuToggle }) => {
 	const { colorMode, toggleColorMode } = useColorMode();
+	const isMobile = useBreakpointValue({ base: true, md: false });
+	const bg = useColorModeValue("white", "gray.800");
+	const color = useColorModeValue("gray.800", "white");
+	const borderColor = useColorModeValue("gray.200", "gray.700");
 
 	return (
-		<nav
-			className={`flex flex-col md:flex-row justify-between items-center p-4 ${
-				colorMode === "light" ? "bg-gray-800" : "bg-gray-900"
-			} text-white`}
+		<Flex
+			as="nav"
+			align="center"
+			justify="space-between"
+			px={{ base: 4, md: 8 }}
+			py={4}
+			bg={bg}
+			color={color}
+			borderBottomWidth="1px"
+			borderColor={borderColor}
+			position="sticky"
+			top="0"
+			zIndex="sticky"
+			boxShadow="sm"
 		>
-			<div className="container mx-auto flex justify-between items-center">
-				{/* Logo and Title */}
+			<HStack spacing={4}>
+				{isMobile && (
+					<IconButton
+						icon={<FiMenu />}
+						variant="ghost"
+						onClick={onMenuToggle}
+						aria-label="Open menu"
+						size="lg"
+					/>
+				)}
+
 				<Text
-					fontSize={{
-						base: "22",
-						sm: "28",
-					}}
-					fontWeight={"bold"}
-					textTransform={"uppercase"}
-					textAlign={"center"}
-					bgGradient={"linear(to-r, cyan.400, blue.500)"}
-					bgClip={"text"}
+					as={Link}
+					to="/"
+					fontSize="2xl"
+					fontWeight="bold"
+					letterSpacing="tighter"
+					_hover={{ textDecoration: "none" }}
 				>
-					<Link to="/">Crystal Group 🛒</Link>
+					🏭 DyePro ERP
 				</Text>
+			</HStack>
 
-				{/* Right-side Buttons */}
-				<Box className="hidden md:flex items-center space-x-4">
-					{/* Theme Toggle Button */}
-					<Button
-						onClick={toggleColorMode}
-						className="hover:bg-gray-600"
-						aria-label="Toggle theme"
-					>
-						{colorMode === "light" ? <IoMoon /> : <LuSun />}
-					</Button>
+			<HStack spacing={{ base: 2, md: 4 }}>
+				<IconButton
+					icon={colorMode === "light" ? <FiMoon /> : <FiSun />}
+					onClick={toggleColorMode}
+					variant="ghost"
+					aria-label="Toggle theme"
+					size="lg"
+				/>
 
-					{/* Profile Menu */}
-					<Menu>
-						<MenuButton
-							as={Button}
-							rightIcon={<ChevronDownIcon />}
-							className="text-xl font-semibold transition-all"
-						>
-							Profile
-						</MenuButton>
-						<MenuList>
-							<MenuItem
-								as={Link}
-								to="/profile"
-								bg={
-									colorMode === "light"
-										? "gray.100"
-										: "gray.700"
-								}
-								color={
-									colorMode === "light" ? "black" : "white"
-								}
-								_hover={{
-									bg:
-										colorMode === "light"
-											? "gray.200"
-											: "gray.600",
-								}}
-							>
-								View Profile
-							</MenuItem>
-							<MenuItem
-								onClick={() => alert("Logged out")}
-								bg={
-									colorMode === "light"
-										? "gray.100"
-										: "gray.700"
-								}
-								color={
-									colorMode === "light" ? "black" : "white"
-								}
-								_hover={{
-									bg:
-										colorMode === "light"
-											? "gray.200"
-											: "gray.600",
-								}}
-							>
-								Logout
-							</MenuItem>
-						</MenuList>
-					</Menu>
-				</Box>
-
-				{/* Mobile Menu Button */}
-				<Button
-					className="md:hidden"
-					onClick={() => setIsMenuOpen(!isMenuOpen)}
-					aria-label="Toggle navigation"
-				>
-					<svg
-						className="w-6 h-6"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						{isMenuOpen ? (
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M6 18L18 6M6 6l12 12"
+				<Menu>
+					<MenuButton>
+						<HStack spacing={3}>
+							<Avatar
+								size="md"
+								name="Admin User"
+								src="https://avatars.githubusercontent.com/u/65373372?v=4"
 							/>
-						) : (
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="2"
-								d="M4 6h16M4 12h16m-7 6h7"
-							/>
-						)}
-					</svg>
-				</Button>
-			</div>
-
-			{/* Mobile Links */}
-			{isMenuOpen && (
-				<Box className="md:hidden flex flex-col bg-gray-700 px-4 py-2 space-y-2">
-					{/* Theme Toggle Button */}
-					<Button
-						onClick={toggleColorMode}
-						className="hover:bg-gray-600 w-full my-2"
-						aria-label="Toggle theme"
-					>
-						{colorMode === "light" ? <IoMoon /> : <LuSun />}
-					</Button>
-
-					{/* Profile Menu */}
-					<Menu>
-						<MenuButton
-							as={Button}
-							rightIcon={<ChevronDownIcon />}
-							className="w-full text-xl font-semibold mt-2"
-						>
-							Profile
-						</MenuButton>
-						<MenuList>
-							<MenuItem
-								as={Link}
-								to="/profile"
-								bg={
-									colorMode === "light"
-										? "gray.100"
-										: "gray.700"
-								}
-								color={
-									colorMode === "light" ? "black" : "white"
-								}
-								_hover={{
-									bg:
-										colorMode === "light"
-											? "gray.200"
-											: "gray.600",
-								}}
-							>
-								View Profile
-							</MenuItem>
-							<MenuItem
-								onClick={() => alert("Logged out")}
-								bg={
-									colorMode === "light"
-										? "gray.100"
-										: "gray.700"
-								}
-								color={
-									colorMode === "light" ? "black" : "white"
-								}
-								_hover={{
-									bg:
-										colorMode === "light"
-											? "gray.200"
-											: "gray.600",
-								}}
-							>
-								Logout
-							</MenuItem>
-						</MenuList>
-					</Menu>
-				</Box>
-			)}
-		</nav>
+							{!isMobile && (
+								<>
+									<Box textAlign="left">
+										<Text fontWeight="semibold">
+											Admin User
+										</Text>
+										<Text fontSize="sm" color="gray.500">
+											System Administrator
+										</Text>
+									</Box>
+									<FiChevronDown />
+								</>
+							)}
+						</HStack>
+					</MenuButton>
+					<MenuList>
+						<MenuItem as={Link} to="/profile">
+							My Profile
+						</MenuItem>
+						<MenuItem as={Link} to="/settings">
+							Account Settings
+						</MenuItem>
+						<MenuDivider />
+						<MenuItem color="red.500">Logout</MenuItem>
+					</MenuList>
+				</Menu>
+			</HStack>
+		</Flex>
 	);
 };
 

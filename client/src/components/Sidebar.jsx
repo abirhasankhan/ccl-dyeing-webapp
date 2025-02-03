@@ -1,176 +1,129 @@
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+// Sidebar.jsx
 import {
-	FaHome,
-	FaInfoCircle,
-	FaPhone,
-	FaCode,
-	FaBriefcase,
-} from "react-icons/fa"; // Adding icons
-import { useColorMode } from "@chakra-ui/react"; // Import Chakra UI's useColorMode hook
+	Box,
+	Flex,
+	Icon,
+	Text,
+	Collapse,
+	useColorModeValue,
+	useDisclosure,
+} from "@chakra-ui/react";
+import { NavLink, useLocation } from "react-router-dom";
+import { FiChevronDown } from "react-icons/fi";
+import { sidebarItems } from "./sidebarItems";
 
-// Example data for sidebar items
-const sidebarItems = [
-	{ label: "Home", to: "/", icon: <FaHome /> },
-	{ label: "Client", to: "/client", icon: <FaInfoCircle /> },
-	{
-		label: "Services",
-		to: "#",
-		icon: <FaBriefcase />,
-		subItems: [
-			{
-				label: "Dyeing Prices",
-				to: "/services/dyeing-prices",
-				icon: <FaCode />,
-			},
-			{
-				label: "Additional Prices",
-				to: "/services/additional-prices",
-				icon: <FaCode />,
-			},
-		],
-	},
-	{
-		label: "Client Deal",
-		to: "#",
-		icon: <FaPhone />,
-		subItems: [
-			{ label: "Create", to: "/client-deal/create", icon: <FaPhone /> },
-			{
-				label: "View",
-				to: "#",
-				icon: <FaPhone />,
-				subItems: [
-					{
-						label: "Client Deals",
-						to: "/client-deal/view/client-deal-view",
-						icon: <FaCode />,
-					},
-					{
-						label: "Dyeing Prices Deals",
-						to: "/client-deal/view/dyeing-deal-view",
-						icon: <FaCode />,
-					},
-					{
-						label: "Additional Prices Deals",
-						to: "/client-deal/view/additional-deal-view",
-						icon: <FaCode />,
-					},
-				],
-			},
-		],
-	},
-	{
-		label: "Deal Orders",
-		to: "/deal-order",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Shipments",
-		to: "/shipments",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Product Detail",
-		to: "/product-detail",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Dyeing Process",
-		to: "/dyeing-process",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Stores",
-		to: "/stores",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Invoice",
-		to: "/invoice",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Payment",
-		to: "/payment",
-		icon: <FaInfoCircle />,
-	},
-	{
-		label: "Machines",
-		to: "/machines",
-		icon: <FaInfoCircle />,
-	},
-];
+const SidebarItem = ({ item, level = 0 }) => {
+	const { isOpen, onToggle } = useDisclosure();
+	const location = useLocation();
+	const isActive = location.pathname === item.to;
+	const hasChildren = item.subItems?.length > 0;
 
-
-const Sidebar = () => {
-	const [open, setOpen] = useState({}); // Track open/close state for each submenu
-	const { colorMode } = useColorMode(); // Get current color mode
-
-	// Toggle submenu visibility
-	const toggleSubmenu = (index) => {
-		setOpen((prevState) => ({
-			...prevState,
-			[index]: !prevState[index], // Toggle submenu visibility
-		}));
-	};
-
-	// Recursive render function for multilevel submenus
-	const renderMenuItem = (item, index) => (
-		<li key={index}>
-			{!item.subItems ? (
-				<NavLink
-					to={item.to}
-					className={({ isActive }) =>
-						`flex items-center space-x-4 p-3 rounded-lg transition-all ${
-							isActive
-								? "bg-yellow-400 text-gray-800 font-bold"
-								: "hover:bg-gray-700 hover:text-yellow-400"
-						}`
-					}
-				>
-					{item.icon && <span className="text-lg">{item.icon}</span>}
-					<span className="text-lg font-medium">{item.label}</span>
-				</NavLink>
-			) : (
-				<>
-					<div
-						className="flex justify-between items-center cursor-pointer text-lg font-medium p-3 rounded-lg hover:bg-gray-700"
-						onClick={() => toggleSubmenu(index)}
-					>
-						<span>
-							{item.icon && (
-								<span className="text-lg">{item.icon}</span>
-							)}{" "}
-							{item.label}
-						</span>
-						<span>{open[index] ? "▲" : "▼"}</span>
-					</div>
-					{open[index] && (
-						<ul className="pl-6 space-y-2 mt-2">
-							{item.subItems.map((subItem, subIndex) =>
-								renderMenuItem(subItem, `${index}-${subIndex}`)
-							)}
-						</ul>
-					)}
-				</>
-			)}
-		</li>
-	);
+	const activeBg = useColorModeValue("blue.500", "blue.200");
+	const activeColor = useColorModeValue("white", "gray.800");
+	const hoverBg = useColorModeValue("blackAlpha.100", "whiteAlpha.100");
 
 	return (
-		<div
-			className={`w-60 h-screen ${
-				colorMode === "light" ? "bg-gray-800" : "bg-gray-900"
-			} text-white flex flex-col p-6 shadow-md overflow-y-auto`}
+		<Box>
+			<Flex
+				as={hasChildren ? Box : NavLink}
+				to={hasChildren ? "#" : item.to}
+				align="center"
+				cursor="pointer"
+				onClick={hasChildren ? onToggle : undefined}
+				pl={`${1.5 + level}rem`}
+				pr={2}
+				py={2}
+				mx={2}
+				borderRadius="md"
+				bg={isActive ? activeBg : "transparent"}
+				color={isActive ? activeColor : "inherit"}
+				_hover={{ bg: !isActive && hoverBg }}
+				transition="all 0.2s"
+				minW="0" // Allow text truncation
+			>
+				{item.icon && (
+					<Icon
+						as={item.icon}
+						mr={3}
+						boxSize={5}
+						flexShrink={0} // Prevent icon from shrinking
+					/>
+				)}
+				<Text
+					fontSize="xl"
+					fontWeight={isActive ? "medium" : "normal"}
+					whiteSpace="nowrap"
+					overflow="hidden"
+					textOverflow="ellipsis"
+					flex="1"
+				>
+					{item.label}
+				</Text>
+				{hasChildren && (
+					<Icon
+						as={FiChevronDown}
+						ml={2}
+						transform={isOpen ? "rotate(180deg)" : "none"}
+						transition="transform 0.2s"
+						flexShrink={0}
+					/>
+				)}
+			</Flex>
+
+			{hasChildren && (
+				<Collapse in={isOpen}>
+					{item.subItems.map((child, idx) => (
+						<SidebarItem key={idx} item={child} level={level + 1} />
+					))}
+				</Collapse>
+			)}
+		</Box>
+	);
+};
+
+const Sidebar = ({ onClose }) => {
+	const bg = useColorModeValue("white", "gray.800");
+	const borderColor = useColorModeValue("gray.200", "gray.700");
+
+	return (
+		<Box
+			w={{ base: "full", md: "64" }}
+			minW={{ md: "64" }} // Set minimum width
+			h="full"
+			bg={bg}
+			borderRightWidth="1px"
+			borderColor={borderColor}
+			overflowY="auto"
+			overflowX="hidden" // Prevent horizontal scroll
+			pb={8}
+			boxShadow="lg"
 		>
-			<h2 className="text-2xl font-bold mb-8 text-center text-yellow-400">
-				Dyeing v1.0
-			</h2>
-			<ul className="space-y-6">
-				{sidebarItems.map((item, index) => renderMenuItem(item, index))}
-			</ul>
-		</div>
+			<Flex
+				px={6}
+				py={6}
+				align="center"
+				borderBottomWidth="1px"
+				borderColor={borderColor}
+				minW="0"
+			>
+				<Text
+					fontSize="xl"
+					fontWeight="bold"
+					letterSpacing="tighter"
+					whiteSpace="nowrap"
+					overflow="hidden"
+					textOverflow="ellipsis"
+				>
+					DyePro ERP v1.0
+				</Text>
+			</Flex>
+
+			<Box px={2} mt={4}>
+				{sidebarItems.map((item, idx) => (
+					<SidebarItem key={idx} item={item} />
+				))}
+			</Box>
+		</Box>
 	);
 };
 

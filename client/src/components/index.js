@@ -6,6 +6,7 @@ import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import SearchBar from "./SearchBar";
 import FormInput from "../components/FormInput.jsx";
 import SubmitButton from "../components/SubmitButton.jsx";
+import LoadingSpinner from "../components/LoadingSpinner.jsx";
 
 export { 
     Navbar, 
@@ -15,5 +16,6 @@ export {
     DeleteConfirmationModal, 
     SearchBar,
     FormInput,
-    SubmitButton
+    SubmitButton,
+    LoadingSpinner,
 };
