@@ -1,35 +1,38 @@
 {
-  "name": "ccl-dyeing-webapp",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon server/src/server.js",
-    "dev-mig": "node server/src/migrations"
-  },
-  "keywords": [],
-  "type": "module",
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "@neondatabase/serverless": "^0.10.4",
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.3",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.38.3",
-    "express": "^4.21.2",
-    "file-saver": "^2.0.5",
-    "helmet": "^8.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0",
-    "pdfkit": "^0.16.0",
-    "pg": "^8.13.1"
-  },
-  "devDependencies": {
-    "@types/pg": "^8.11.10",
-    "drizzle-kit": "^0.30.1",
-    "nodemon": "^3.1.9"
-  }
+	"name": "ccl-dyeing-webapp",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"dev": "cross-env NODE_ENV=development nodemon server/src/server.js",
+		"dev-mig": "node server/src/migrations",
+		"build": "npm install && npm install --prefix client && npm run build --prefix client",
+		"start": "cross-env NODE_ENV=production node server/src/server.js"
+	},
+	"keywords": [],
+	"type": "module",
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"@neondatabase/serverless": "^0.10.4",
+		"bcryptjs": "^2.4.3",
+		"body-parser": "^1.20.3",
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.5",
+		"cross-env": "^7.0.3",
+		"dotenv": "^16.4.7",
+		"drizzle-orm": "^0.38.3",
+		"express": "^4.21.2",
+		"file-saver": "^2.0.5",
+		"helmet": "^8.0.0",
+		"jsonwebtoken": "^9.0.2",
+		"morgan": "^1.10.0",
+		"pdfkit": "^0.16.0",
+		"pg": "^8.13.1"
+	},
+	"devDependencies": {
+		"@types/pg": "^8.11.10",
+		"drizzle-kit": "^0.30.1",
+		"nodemon": "^3.1.9"
+	}
 }
