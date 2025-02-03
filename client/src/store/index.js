@@ -1,5 +1,4 @@
-import { useAuthStore } from "./auth.js";
-import { useUserStore } from "./user.js";
+
 
 import { useClientStore } from "./client.js";
 import { useDyeingPriceStore } from "./dyeingPrice.js";
@@ -22,8 +21,6 @@ import { usePaymentStore } from "./payment.js";
 
 
 export { 
-    useAuthStore,
-    useUserStore,
     useClientStore, 
     useDyeingPriceStore, 
     useAdditionalPriceStore, 

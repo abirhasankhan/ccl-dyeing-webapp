@@ -20,8 +20,7 @@ import {
 	StorePage,
 	InvoicePage,
 	PaymentPage,
-	RegisterPage,
-	LoginPage,
+
 } from "./pages";
 import { Navbar, Sidebar } from "./components";
 
@@ -31,8 +30,7 @@ function App() {
 	return (
 		<Routes>
 			{/* Main routes */}
-			<Route path="/register" element={<RegisterPage />} />
-			<Route path="/login" element={<LoginPage />} />
+
 
 			<Route
 				path="/*"

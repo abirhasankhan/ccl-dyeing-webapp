@@ -18,8 +18,8 @@ import StorePage from "./StorePage";
 import InvoicePage from "./InvoicePage";
 import PaymentPage from "./PaymentPage";
 
-import RegisterPage from "./RegisterPage";
-import LoginPage from "./LoginPage";
+// import RegisterPage from "./RegisterPage";
+// import LoginPage from "./LoginPage";
 
 
 
@@ -48,6 +48,6 @@ export {
     StorePage,
     InvoicePage,
     PaymentPage,
-    RegisterPage,
-    LoginPage
+    // RegisterPage,
+    // LoginPage
 };

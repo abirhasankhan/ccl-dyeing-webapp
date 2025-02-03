@@ -1,5 +1,4 @@
-import adminRoutes from './admin.routes.js';
-import usersRoutes from './users.route.js';
+
 import clientRoutes from './client.route.js';
 import dyeingFinishingPricesRoutes from './dyeingFinishingPrices.route.js';
 import additionalProcessPricesRoutes from './additionalProcessPrices.route.js';
@@ -22,8 +21,6 @@ import paymentRoutes from './payments.route.js';
 
 
 export {
-    adminRoutes,
-    usersRoutes,
     clientRoutes, 
     dyeingFinishingPricesRoutes, 
     additionalProcessPricesRoutes,
