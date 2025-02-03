@@ -62,6 +62,6 @@ export const sidebarItems = [
     { label: "Production", to: "/dyeing-process", icon: FiSettings },
     { label: "Stores", to: "/store", icon: FiArchive },
     { label: "Invoices", to: "/invoice", icon: FiFileText },
-    { label: "Payments", to: "/paympaymentents", icon: FiCreditCard },
+    { label: "Payments", to: "/payment", icon: FiCreditCard },
     { label: "Machines", to: "/machinery", icon: FiSettings },
 ];
