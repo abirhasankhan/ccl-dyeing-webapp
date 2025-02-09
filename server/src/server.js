@@ -1,15 +1,16 @@
 import express from 'express';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';
-import { ApiError } from './utils/apiError.js';
+import helmet from 'helmet'; // Security middleware to set various HTTP headers
+import morgan from 'morgan'; // Logging middleware
+import cookieParser from 'cookie-parser'; // Middleware for parsing cookies
+import cors from 'cors'; // Middleware for enabling Cross-Origin Resource Sharing (CORS)
+import dotenv from 'dotenv'; // Loads environment variables from .env file
+import { connectDB } from './config/db.js'; // Function to connect to the database
+import { ApiError } from './utils/apiError.js'; // Custom error handler class
+import path from 'path'; // Built-in Node.js module for working with file paths
 
-
+// Importing route handlers
 import {
-    clientRoutes, 
+    clientRoutes,
     dyeingFinishingPricesRoutes,
     additionalProcessPricesRoutes,
     clientDealsRoutes,
@@ -26,59 +27,68 @@ import {
     paymentRoutes
 } from './routes/index.js';
 
-// Load environment variables
+// Load environment variables from .env file
 dotenv.config();
 
-
-// Create Express app
+// Create an instance of an Express application
 const app = express();
 
 
 // =====================
 // Security Middlewares
 // =====================
-app.use(helmet());
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                connectSrc: ["'self'", "https://res.cloudinary.com"],
+                imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+                scriptSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"]
+            }
+        }
+    })
+);
+
+
+// Logging setup - Different formats for production and development
 if (process.env.NODE_ENV === 'production') {
-    app.use(morgan('combined')); // Logs in Apache combined format, safer for production
+    app.use(morgan('combined')); // Detailed logging format for production
 } else {
-    app.use(morgan('dev')); // For development, use the dev format
+    app.use(morgan('dev')); // Simpler logging format for development
 }
+
 
 // =====================
 // CORS Configuration
 // =====================
 const corsOptions = {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',  // Your client URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true,
+    origin: process.env.CLIENT_URL || 'http://localhost:5173', // Define allowed frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // Allowed headers
+    credentials: true, // Allow cookies and authentication headers
     optionsSuccessStatus: 200
 };
 
 
+const __dirname = path.resolve(); // Get absolute directory path
 
-app.use(cors(corsOptions));
-app.use(cookieParser());
+app.use(cors(corsOptions)); // Enable CORS
+app.use(cookieParser()); // Enable cookie parsing
+
 
 // =====================
 // Body Parsing
 // =====================
-app.use(express.json({ limit: '50kb' }));
-app.use(express.urlencoded({ extended: true }));
-
-
+app.use(express.json({ limit: '50kb' })); // Parse incoming JSON requests, limit size
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
 
 
 // =====================
-// Routes
+// API Routes
 // =====================
-app.get('/', (req, res) => {
-    res.send('Server is running');
-});
-
-
-
-
 app.use('/api/client', clientRoutes);
 app.use('/api/dyeing-finishing-prices', dyeingFinishingPricesRoutes);
 app.use('/api/additional-process-prices', additionalProcessPricesRoutes);
@@ -96,19 +106,26 @@ app.use('/api/invoices', invoicesRoutes);
 app.use('/api/payments', paymentRoutes);
 
 
+// Serve client-side files in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '/client/dist')));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+    });
+}
 
 
 // =====================
 // Error Handling
 // =====================
-// Handle 404 routes
+// Handle 404 (Not Found) errors
 app.all('*', (req, res, next) => {
     next(new ApiError(404, `Can't find ${req.originalUrl} on this server`));
 });
 
+
 // Global error handler middleware
 app.use((err, req, res, next) => {
-    // Log the full error to the console for debugging
     console.error("Error occurred:", {
         message: err.message,
         stack: err.stack,
@@ -117,16 +134,14 @@ app.use((err, req, res, next) => {
     });
 
     if (err instanceof ApiError) {
-        // Handle ApiError and send appropriate response
         return res.status(err.statusCode).json({
             success: err.success,
             message: err.message,
             errors: err.errors || [],
-            ...(process.env.NODE_ENV === 'development' && { stack: err.stack }) // Only include stack in dev
+            ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
         });
     }
 
-    // For other errors, send a generic message
     return res.status(err.statusCode || 500).json({
         success: false,
         message: "An unexpected error occurred.",
@@ -140,11 +155,9 @@ app.use((err, req, res, next) => {
 // =====================
 const getDatabaseName = (url) => {
     if (!url) return null;
-    // Match the database name part
-    const match = url.match(/\/([^/?#:@]+)/);
+    const match = url.match(/\/(?!.*\/)([^/?#:@]+)/);
     return match ? match[1] : null;
 };
-
 
 const initializeDB = async () => {
     try {
@@ -158,29 +171,26 @@ const initializeDB = async () => {
 };
 
 
-
 // =====================
 // Server Initialization
 // =====================
 const PORT = process.env.PORT || 5001;
 const startServer = async () => {
-
-    initializeDB();
-    
-    const PORT = process.env.PORT || 5001;
+    initializeDB(); // Connect to the database
     app.listen(PORT, () => {
         console.log(`🟢 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
         console.log(`🔗 API: ${process.env.CLIENT_URL || `http://localhost:${PORT}`}`);
     });
 
-    // Graceful shutdown when receiving SIGTERM signal (e.g., for deployments)
+    // Handle graceful shutdown
     process.on('SIGTERM', async () => {
         console.log('🛑 SIGTERM received. Closing database connection...');
-        await pool.end(); // Closes the pool
+        await pool.end(); // Close the database connection
         console.log('🟢 Database connection closed');
-        process.exit(0); // Exit the process
+        process.exit(0);
     });
 };
+
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
@@ -189,7 +199,9 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
 });
 
-startServer();
+
+startServer(); // Start the server
+
 
 // // =====================
 // // Database Connection

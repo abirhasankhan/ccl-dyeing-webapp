@@ -41,6 +41,7 @@ function App() {
 	const bgColor = useColorModeValue("gray.50", "gray.900");
 	const sidebarBg = useColorModeValue("white", "gray.800");
 	const navbarBg = useColorModeValue("white", "gray.800");
+	
 
 	return (
 		<Box minH="100vh" bg={bgColor}>
