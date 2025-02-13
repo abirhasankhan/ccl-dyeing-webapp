@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, decimal, timestamp, text } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, decimal, timestamp, text, boolean } from "drizzle-orm/pg-core";
 
 // Define the AdditionalProcessPrices table schema using Drizzle ORM
 export const AdditionalProcessPrices = pgTable("additional_process_prices", {

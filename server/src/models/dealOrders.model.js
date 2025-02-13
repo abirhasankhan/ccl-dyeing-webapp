@@ -4,6 +4,7 @@ import {
     varchar,
     integer,
     timestamp,
+    boolean
 } from "drizzle-orm/pg-core";
 import { clientDeals } from "./clientDeals.model.js";
 

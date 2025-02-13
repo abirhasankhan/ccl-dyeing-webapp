@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer, text, timestamp, date } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, text, timestamp, date, boolean } from "drizzle-orm/pg-core";
 import { dealOrders } from "./dealOrders.model.js";
 
 export const returns = pgTable(

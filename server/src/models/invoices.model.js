@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, real, text } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, real, text, boolean } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { dyeingProcess } from "./dyeingProcess.model.js"; // Assuming dyeingProcess is linked
 

@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, decimal, timestamp, text } from "drizzle-orm/pg-core"; // Import Drizzle ORM core functions
+import { pgTable, serial, varchar, decimal, timestamp, text, boolean } from "drizzle-orm/pg-core"; // Import Drizzle ORM core functions
 
 // Define the DyeingFinishingPrices table schema using Drizzle ORM
 export const DyeingFinishingPrices = pgTable("dyeing_finishing_prices", {

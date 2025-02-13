@@ -1,4 +1,4 @@
-import { pgTable, varchar, decimal, timestamp, text} from "drizzle-orm/pg-core";
+import { pgTable, varchar, decimal, timestamp, text, boolean } from "drizzle-orm/pg-core";
 // Import the related table for foreign key reference
 import { clientDeals } from "./clientDeals.model.js";
 

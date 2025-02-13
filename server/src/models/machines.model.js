@@ -1,4 +1,4 @@
-import { pgTable, varchar, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 
 export const machines = pgTable("machines", {
     machineid: varchar("machineid", { length: 255 }).primaryKey(),

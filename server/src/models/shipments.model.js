@@ -1,4 +1,4 @@
-import { pgTable, varchar, date, integer, text, timestamp, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, date, integer, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 import { dealOrders } from "./dealOrders.model.js";
 
 export const shipments = pgTable('shipments', {

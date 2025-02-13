@@ -1,4 +1,4 @@
-import { pgTable, varchar, date, timestamp, jsonb, text } from 'drizzle-orm/pg-core';
+import { pgTable, varchar, date, timestamp, jsonb, text, boolean } from 'drizzle-orm/pg-core';
 import { Client } from './client.model.js'; // Import the clients table model
 
 // ClientDeals table definition
