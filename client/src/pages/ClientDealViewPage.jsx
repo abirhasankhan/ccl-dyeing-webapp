@@ -877,18 +877,7 @@ function ClientDealViewPage() {
 							</Text>
 						</VStack>
 					)}
-					{!loading && searchResults.length === 0 && (
-						<VStack spacing={8} mt={10}>
-							<Text
-								fontSize={"xl"}
-								fontWeight={"bold"}
-								color={"gray.500"}
-								textAlign={"center"}
-							>
-								No product details found 😢
-							</Text>
-						</VStack>
-					)}
+
 				</VStack>
 			</Container>
 

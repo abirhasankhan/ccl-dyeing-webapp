@@ -288,7 +288,7 @@ function AdditionalDealViewPage() {
 								color={"gray.500"}
 								textAlign={"center"}
 							>
-								No Additional Pprocess Deal found 😢
+								No Additional Process Deal found 😢
 							</Text>
 						</VStack>
 					)}
