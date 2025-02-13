@@ -12,6 +12,7 @@ export const payments = pgTable("payments", {
     payment_method: varchar("payment_method", { length: 50 }).notNull(), // Payment method: Cash, Card, Bank Transfer
     notes: text("notes"), // Additional notes
     remarks: text("remarks"), // Remarks
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(), // Timestamp for record creation
     updated_at: timestamp("updated_at").defaultNow(), // Timestamp for updates
 });

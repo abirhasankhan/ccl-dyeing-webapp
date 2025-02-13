@@ -21,9 +21,10 @@ export const storeSchema = async () => {
                     qty INT NOT NULL,  -- Quantity in store
                     status VARCHAR(50) DEFAULT 'In Store',  -- Status: 'In Store' or 'Delivered'
                     notes TEXT,
+                    remarks TEXT,                       -- Additional notes
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp for record creation
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp for updates
-                    remarks TEXT,                       -- Additional notes
                     FOREIGN KEY (processid) REFERENCES dyeing_process(processid) ON DELETE CASCADE
                 );
             `;

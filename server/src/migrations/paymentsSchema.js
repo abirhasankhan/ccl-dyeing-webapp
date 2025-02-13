@@ -22,6 +22,7 @@ export const paymentsSchema = async () => {
                     payment_method VARCHAR(50) NOT NULL,
                     notes TEXT,
                     remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (invoiceid) REFERENCES invoices(invoiceid) ON DELETE CASCADE

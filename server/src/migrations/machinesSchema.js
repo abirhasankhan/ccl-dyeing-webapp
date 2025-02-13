@@ -29,6 +29,7 @@ export const machinesSchema = async () => {
                     last_maintenance_date TIMESTAMP, -- Date of the last maintenance
                     next_maintenance_date TIMESTAMP, -- Date of the next scheduled maintenance
                     remarks TEXT, -- Remarks or comments
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the record was created
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp when the record was last updated
                 );

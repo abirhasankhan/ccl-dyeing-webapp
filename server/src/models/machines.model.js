@@ -12,6 +12,7 @@ export const machines = pgTable("machines", {
     last_maintenance_date: timestamp("last_maintenance_date"),
     next_maintenance_date: timestamp("next_maintenance_date"),
     remarks: text("remarks"),
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(),
     updated_at: timestamp("updated_at").defaultNow(),
 });

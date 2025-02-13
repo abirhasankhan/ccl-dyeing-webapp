@@ -11,6 +11,7 @@ export const Client = pgTable("clients", {
     created_at: timestamp("created_at").defaultNow(), // Automatically set creation timestamp
     updated_at: timestamp("updated_at").defaultNow(), // Automatically set update timestamp
     remarks: text("remarks"), // Remarks (optional)
+    is_active: boolean("is_active").default(true), // Default to active
 });
 
 

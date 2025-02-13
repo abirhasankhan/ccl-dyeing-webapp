@@ -9,6 +9,7 @@ export const DyeingFinishingPrices = pgTable("dyeing_finishing_prices", {
     open_tk: decimal("open_tk", { precision: 10, scale: 2 }).notNull(), // Open Tk
     elasteen_tk: decimal("elasteen_tk", { precision: 10, scale: 2 }).notNull(), // Elasteen Tk
     double_dyeing_tk: decimal("double_dyeing_tk", { precision: 10, scale: 2 }).notNull(), // Double Dyeing Tk
-    created_at: timestamp("created_at").defaultNow(), // Automatically set creation timestamp
     remarks: text("remarks"), // Remarks (optional)
+    is_active: boolean("is_active").default(true), // Default to active
+    created_at: timestamp("created_at").defaultNow(), // Automatically set creation timestamp
 });

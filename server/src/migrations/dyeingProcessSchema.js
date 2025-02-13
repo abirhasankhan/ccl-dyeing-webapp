@@ -36,6 +36,7 @@ export const dyeingProcessSchema = async () => {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for record creation
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp for updates
                     remarks TEXT,                       -- Additional notes
+                    is_active BOOLEAN DEFAULT TRUE,
                     FOREIGN KEY (productdetailid) REFERENCES product_details(productdetailid)  ON DELETE CASCADE, -- Links to the Products table
                     FOREIGN KEY (machineid) REFERENCES machines(machineid)  ON DELETE CASCADE -- Links to the Machines table
                 );

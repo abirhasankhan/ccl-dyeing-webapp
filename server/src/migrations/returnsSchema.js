@@ -17,9 +17,10 @@ export const returnsSchema = async () => {
                     return_date DATE NOT NULL,
                     qty_returned INT NOT NULL CHECK (qty_returned >= 0),
                     reason_for_return TEXT,
+                    remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT,
                     FOREIGN KEY (orderid) REFERENCES deal_orders(orderid) ON DELETE CASCADE
                 );
             `;

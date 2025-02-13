@@ -24,7 +24,8 @@ export const invoicesSchema = async () => {
                     due_date TIMESTAMP NOT NULL, 
                     status VARCHAR(50) DEFAULT 'Unpaid', 
                     notes TEXT,
-                    remarks TEXT,                       
+                    remarks TEXT,   
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
                     FOREIGN KEY (processid) REFERENCES dyeing_process(processid) ON DELETE CASCADE

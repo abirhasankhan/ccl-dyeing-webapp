@@ -9,7 +9,8 @@ export const shipments = pgTable('shipments', {
     shipment_date: date('shipment_date').notNull(), // Date of shipment
     quantity_shipped: integer('quantity_shipped').notNull(), // Quantity shipped
     notes: text('notes'), // Optional text notes
+    remarks: text('remarks'), // Optional text remarks
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(),
     updated_at: timestamp("updated_at").defaultNow(),
-    remarks: text('remarks'), // Optional text remarks
 });

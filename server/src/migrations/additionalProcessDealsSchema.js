@@ -24,6 +24,7 @@ export const additionalProcessDealsSchema = async () => {
                     price_tk DECIMAL(10, 2),
                     notes TEXT,
                     remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (deal_id) REFERENCES client_deals(deal_id)

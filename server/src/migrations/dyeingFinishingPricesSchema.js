@@ -22,8 +22,9 @@ export const dyeingFinishingPricesSchema = async () => {
                     open_tk DECIMAL(10, 2) NOT NULL,
                     elasteen_tk DECIMAL(10, 2) NOT NULL,
                     double_dyeing_tk DECIMAL(10, 2) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT
+                    remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `;
 

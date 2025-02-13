@@ -19,9 +19,10 @@ export const store = pgTable("store", {
     qty: integer("qty").notNull(), // Quantity in store
     status: varchar("status", { length: 50 }).default("In Store"), // Status: 'In Store' or 'Delivered'
     notes: text("notes"), // Additional notes
+    remarks: text("remarks"), // Remarks
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(), // Timestamp for record creation
     updated_at: timestamp("updated_at").defaultNow(), // Timestamp for updates
-    remarks: text("remarks"), // Remarks
 });
 
 // Define relationships (if needed)

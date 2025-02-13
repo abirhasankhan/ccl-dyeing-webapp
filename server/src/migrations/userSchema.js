@@ -22,9 +22,9 @@ export const userSchema = async () => {
                     password VARCHAR(255) NOT NULL,
                     role VARCHAR(255) NOT NULL DEFAULT 'user',
                     status VARCHAR(50) DEFAULT 'active',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp for record creation
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp for updates
-                    remarks TEXT
+                    remarks TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `;
 

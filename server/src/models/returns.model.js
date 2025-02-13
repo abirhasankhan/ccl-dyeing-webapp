@@ -11,9 +11,10 @@ export const returns = pgTable(
         return_date: date("return_date").notNull(), // DATE NOT NULL
         qty_returned: integer("qty_returned").notNull(), // Integer column
         reason_for_return: text("reason_for_return"), // Optional TEXT
+        remarks: text("remarks"), // Optional TEXT
+        is_active: boolean("is_active").default(true), // Default to active
         created_at: timestamp("created_at").defaultNow(), // DEFAULT CURRENT_TIMESTAMP
         updated_at: timestamp("updated_at").defaultNow(), // DEFAULT CURRENT_TIMESTAMP
-        remarks: text("remarks"), // Optional TEXT
     },
     {
         checks: [

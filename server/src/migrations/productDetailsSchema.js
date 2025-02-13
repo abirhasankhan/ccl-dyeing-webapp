@@ -31,6 +31,7 @@ export const productDetailsSchema = async () => {
                     grey_return_qty INT DEFAULT 0,      -- Grey fabric returned
                     notes TEXT,
                     remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (shipmentid) REFERENCES shipments(shipmentid) ON DELETE CASCADE,

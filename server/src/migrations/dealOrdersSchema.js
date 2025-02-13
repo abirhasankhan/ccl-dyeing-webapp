@@ -26,9 +26,10 @@ export const dealOrdersSchema = async () => {
                     total_returned_qty INT DEFAULT 0,
                     status VARCHAR(50) DEFAULT 'Pending',
                     notes TEXT,
+                    remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT,
                     FOREIGN KEY (deal_id) REFERENCES client_deals(deal_id) ON DELETE CASCADE
                 );
             `;

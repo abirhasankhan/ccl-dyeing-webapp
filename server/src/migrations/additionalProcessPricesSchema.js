@@ -16,8 +16,9 @@ export const additionalProcessPricesSchema = async () => {
                     ap_priceid SERIAL PRIMARY KEY,
                     process_type VARCHAR(255) NOT NULL,
                     price_tk DECIMAL(10, 2) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT
+                    remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `;
 

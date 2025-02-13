@@ -23,9 +23,10 @@ export const shipmentsSchema = async () => {
                     shipment_date DATE NOT NULL,
                     quantity_shipped INT NOT NULL,
                     notes TEXT,
+                    remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT,
                     FOREIGN KEY (orderid) REFERENCES deal_orders(orderid) ON DELETE CASCADE
                 );
             `;

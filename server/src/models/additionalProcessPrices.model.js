@@ -7,4 +7,5 @@ export const AdditionalProcessPrices = pgTable("additional_process_prices", {
     price_tk: decimal("price_tk", { precision: 10, scale: 2 }).notNull(),  // Price in Tk (required)
     created_at: timestamp("created_at").defaultNow(),  // Auto-generated timestamp
     remarks: text("remarks"),  // Optional remarks field
+    is_active: boolean("is_active").default(true),  // Default to active
 });

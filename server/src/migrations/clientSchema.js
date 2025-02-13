@@ -24,9 +24,10 @@ export const clientSchema = async () => {
                     contact VARCHAR(20) NOT NULL UNIQUE, -- Unique constraint for contact
                     email VARCHAR(50) NOT NULL UNIQUE, -- Unique constraint for email
                     status VARCHAR(50) DEFAULT 'active',
+                    remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    remarks TEXT
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `;
 

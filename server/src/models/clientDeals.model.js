@@ -16,6 +16,7 @@ export const clientDeals = pgTable('client_deals', {
     notes: text('notes'),
     status: varchar('status', { length: 30 }).default('Pending'),
     remarks: text('remarks'),
+    is_active: boolean('is_active').default(true),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
 });

@@ -20,7 +20,8 @@ export const dealOrders = pgTable("deal_orders", {
     total_returned_qty: integer("total_returned_qty").default(0),
     status: varchar("status", { length: 50 }).default("Pending"),
     notes: text("notes"),
+    remarks: text("remarks"),
+    is_active: boolean("is_active").default(true),
     created_at: timestamp("created_at").defaultNow(),
     updated_at: timestamp("updated_at").defaultNow(),
-    remarks: text("remarks"),
 });

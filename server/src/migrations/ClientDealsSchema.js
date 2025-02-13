@@ -30,6 +30,7 @@ export const clientDealsSchema = async () => {
                     notes TEXT,
                     status VARCHAR(30) DEFAULT 'Pending',
                     remarks TEXT,
+                    is_active BOOLEAN DEFAULT TRUE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (clientid) REFERENCES clients(clientid)

@@ -14,6 +14,7 @@ export const invoices = pgTable("invoices", {
     status: varchar("status", { length: 50 }).default("Unpaid"), // Status: Unpaid, Paid, Partially Paid
     notes: text("notes"), // Additional notes
     remarks: text("remarks"), // Remarks
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(), // Timestamp for record creation
     updated_at: timestamp("updated_at").defaultNow(), // Timestamp for updates
 });

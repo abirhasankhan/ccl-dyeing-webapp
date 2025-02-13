@@ -31,9 +31,11 @@ export const dyeingProcess = pgTable("dyeing_process", {
     rejected_qty: integer("rejected_qty"), // ✅ Fabric rejected after dyeing
     status: varchar("status", { length: 50 }).default("In Progress"), // Status of the dyeing process
     notes: text("notes"), // Additional notes
+    remarks: text("remarks"), // Remarks
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(), // Timestamp for record creation
     updated_at: timestamp("updated_at").defaultNow(), // Timestamp for updates
-    remarks: text("remarks"), // Remarks
+
 });
 
 

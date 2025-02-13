@@ -14,6 +14,7 @@ export const dyeingFinishingDeals = pgTable("dyeing_finishing_deals", {
     double_dyeing_tk: decimal("double_dyeing_tk", { precision: 10, scale: 2 }).notNull(), // Double Dyeing Tk
     notes: text('notes'),
     remarks: text("remarks"),
+    is_active: boolean("is_active").default(true),
     created_at: timestamp("created_at").defaultNow(),
     updated_at: timestamp("updated_at").defaultNow(),
 });

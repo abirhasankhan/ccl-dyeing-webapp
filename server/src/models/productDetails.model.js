@@ -16,7 +16,8 @@ export const productDetails = pgTable("product_details", {
     grey_received_qty: integer("grey_received_qty"),
     grey_return_qty: integer("grey_return_qty").default(0),
     notes: text("notes"),
+    remarks: text("remarks"),
+    is_active: boolean("is_active").default(true), // Default to active
     created_at: timestamp("created_at").defaultNow(),
     updated_at: timestamp("updated_at").defaultNow(),
-    remarks: text("remarks"),
 });

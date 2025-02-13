@@ -10,6 +10,7 @@ export const additionalProcessDeals = pgTable('additional_process_deals', {
     price_tk: decimal('price_tk', { precision: 10, scale: 2 }),
     notes: text('notes'),
     remarks: text('remarks'),
+    is_active: boolean('is_active').default(true),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
 
